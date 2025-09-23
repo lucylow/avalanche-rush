@@ -1,4 +1,4 @@
-Github readme 
+
 
 # 🏔️ Avalanche Rush - Gamified Learn-to-Earn Platform
 
