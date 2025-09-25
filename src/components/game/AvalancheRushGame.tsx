@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import EnhancedWalletConnector from './EnhancedWalletConnector';
 import RewardPsychologyEngine from './RewardPsychologyEngine';
+import ReactiveNetworkDashboard from '../reactive/ReactiveNetworkDashboard';
 import QuestSystem from './QuestSystem';
 import LeaderboardSystem from './LeaderboardSystem';
 import NFTMarketplace from './NFTMarketplace';
@@ -67,6 +68,7 @@ const AvalancheRushGame = () => {
   const [showQuestSystem, setShowQuestSystem] = useState(false);
   const [showLeaderboardSystem, setShowLeaderboardSystem] = useState(false);
   const [showNFTMarketplace, setShowNFTMarketplace] = useState(false);
+  const [showReactiveDashboard, setShowReactiveDashboard] = useState(false);
   const [notifications, setNotifications] = useState<string[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<number | null>(null);
 
@@ -199,7 +201,7 @@ const AvalancheRushGame = () => {
           )}
 
           {/* Action Buttons */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             <button
               onClick={() => setShowGameModeSelector(true)}
               disabled={!isConnected || isLoading}
@@ -231,6 +233,14 @@ const AvalancheRushGame = () => {
             >
               <div className="text-4xl mb-3">⚔️</div>
               <div className="text-lg font-bold">Quests</div>
+            </button>
+
+            <button
+              onClick={() => setShowReactiveDashboard(true)}
+              className="bg-gradient-to-br from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white font-bold py-8 px-6 rounded-2xl shadow-2xl transition-all duration-300"
+            >
+              <div className="text-4xl mb-3">⚡</div>
+              <div className="text-lg font-bold">Reactive</div>
             </button>
           </div>
         </div>
@@ -316,6 +326,23 @@ const AvalancheRushGame = () => {
           isOpen={showNFTMarketplace} 
           onClose={() => setShowNFTMarketplace(false)} 
         />
+      )}
+
+      {/* Reactive Network Dashboard */}
+      {showReactiveDashboard && (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowReactiveDashboard(false)}>
+          </div>
+          <div className="absolute inset-0 overflow-auto">
+            <ReactiveNetworkDashboard />
+          </div>
+          <button
+            onClick={() => setShowReactiveDashboard(false)}
+            className="fixed top-6 right-6 z-60 bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-full transition-colors duration-200"
+          >
+            ✕
+          </button>
+        </div>
       )}
     </div>
   );

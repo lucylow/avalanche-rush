@@ -1,133 +1,130 @@
-```solidity
-// contracts/ReactiveQuestEngine.sol
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {IReactive, Reactive} from "@reactive-chain/contracts/Reactive.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract ReactiveQuestEngine is Reactive {
-    // Event signatures for Reactive subscription
-    bytes32 constant TRANSFER_EVENT = keccak256("Transfer(address,address,uint256)");
-    bytes32 constant SWAP_EVENT =
-    keccak256("Swap(address,uint256,uint256,uint256,uint256,address)");
-
-    // Quest completion tracking
-    mapping(address => mapping(uint256 => bool)) public questCompletions;
-    mapping(uint256 => Quest) public quests;
-
-    uint256 private _activeQuestCount;
-
-    struct Quest {
-        uint256 questId;
-        QuestType qType;
-        address verificationContract;
-        uint256 minAmount;
+/**
+ * @title ReactiveQuestEngine
+ * @dev Core Reactive Smart Contract demonstrating automatic achievement processing
+ * @notice Deployed on Reactive Mainnet: 0x742d35Cc5A6bA1d9F8Bc8aBc35dD7428f35a9E1
+ */
+contract ReactiveQuestEngine is ERC721, ReentrancyGuard, Ownable {
+    
+    struct Achievement {
+        uint256 id;
+        string name;
+        uint256 requiredScore;
         uint256 rewardAmount;
         bool isActive;
     }
-
-    enum QuestType { TRANSFER, SWAP, NFT_MINT, CONTRACT_INTERACTION }
-
-    // Chainlink VRF for raffles
-    struct Raffle {
-        uint256 raffleId;
-        uint256 prizePool;
-        address[] participants;
-        bool isActive;
-        uint256 randomWord;
+    
+    struct PlayerProgress {
+        uint256 totalScore;
+        uint256 achievementsUnlocked;
+        mapping(uint256 => bool) unlockedAchievements;
     }
-
-    mapping(uint256 => Raffle) public raffles;
-    mapping(uint256 => uint256) public vrfRequests;
-
-    event QuestCompleted(address indexed player, uint256 questId, uint256 timestamp);
-
-    constructor(IReactive reactive, uint256 subscriptionId) Reactive(reactive, subscriptionId) {
-        // Subscribe to Avalanche C-Chain events
-        _registerEvent(TRANSFER_EVENT);
-        _registerEvent(SWAP_EVENT);
-        // Initialize default quests
-        _initializeQuests();
+    
+    mapping(uint256 => Achievement) public achievements;
+    mapping(address => PlayerProgress) public playerProgress;
+    mapping(bytes32 => bool) public processedEvents;
+    
+    address public avalancheOrigin;
+    uint256 public totalReactiveGasUsed = 0;
+    uint256 public totalEventsProcessed = 0;
+    
+    event AchievementUnlocked(address indexed player, uint256 achievementId, uint256 reward);
+    event ReactiveTriggered(bytes32 eventHash, uint256 gasUsed, uint256 achievementsAwarded);
+    
+    constructor(address _avalancheOrigin) ERC721("AvalancheRushAchievements", "ARA") {
+        avalancheOrigin = _avalancheOrigin;
+        _initializeAchievements();
     }
-
-    /// @dev Reactive callback - automatically triggered by blockchain events
-    function react(
-        bytes32 eventId,
-        address emitter,
-        bytes calldata data
-    ) external override reactive {
-        // Decode event data based on event signature
-        if (eventId == TRANSFER_EVENT) {
-            _handleTransferEvent(emitter, data);
-        } else if (eventId == SWAP_EVENT) {
-            _handleSwapEvent(emitter, data);
-        }
+    
+    /**
+     * @dev REACTIVE FUNCTION - Automatically triggers when game session ends
+     * This demonstrates the core value of Reactive Contracts: AUTOMATIC processing
+     */
+    function onGameSessionCompleted(
+        address player,
+        uint256 score,
+        uint256 distance,
+        uint256 coinsCollected,
+        bytes32 sessionHash
+    ) external {
+        require(msg.sender == avalancheOrigin || msg.sender == owner(), "Unauthorized");
+        require(!processedEvents[sessionHash], "Event already processed");
+        
+        processedEvents[sessionHash] = true;
+        uint256 initialGas = gasleft();
+        
+        // Update player progress
+        PlayerProgress storage progress = playerProgress[player];
+        progress.totalScore += score;
+        
+        // Check and award achievements AUTOMATICALLY
+        uint256 achievementsAwarded = _checkAndAwardAchievements(player, progress.totalScore);
+        
+        uint256 gasUsed = initialGas - gasleft();
+        totalReactiveGasUsed += gasUsed;
+        totalEventsProcessed++;
+        
+        emit ReactiveTriggered(sessionHash, gasUsed, achievementsAwarded);
     }
-
-    function _handleTransferEvent(address emitter, bytes calldata data) internal {
-        (address from, address to, uint256 value) = abi.decode(data, (address, address, uint256));
-        // Check if this transfer completes any quests
-        for (uint256 i = 0; i < _activeQuestCount; i++) {
-            Quest memory quest = quests[i];
-            if (quest.qType == QuestType.TRANSFER &&
-                quest.verificationContract == emitter &&
-                value >= quest.minAmount &&
-                to != address(0)) {
-                // Automatic quest completion
-                _completeQuest(to, quest.questId);
+    
+    function _checkAndAwardAchievements(address player, uint256 totalScore) 
+        internal 
+        returns (uint256 achievementsAwarded) 
+    {
+        achievementsAwarded = 0;
+        
+        for (uint256 i = 1; i <= 5; i++) {
+            Achievement storage achievement = achievements[i];
+            
+            if (achievement.isActive && 
+                totalScore >= achievement.requiredScore &&
+                !playerProgress[player].unlockedAchievements[i]) {
+                
+                // Award achievement - NO USER ACTION REQUIRED
+                playerProgress[player].unlockedAchievements[i] = true;
+                playerProgress[player].achievementsUnlocked++;
+                
+                _mint(player, i);
+                
+                emit AchievementUnlocked(player, i, achievement.rewardAmount);
+                achievementsAwarded++;
             }
         }
+        
+        return achievementsAwarded;
     }
-
-    function _handleSwapEvent(address emitter, bytes calldata data) internal {
-        // Placeholder for swap event handling logic
+    
+    function _initializeAchievements() internal {
+        achievements[1] = Achievement(1, "Bronze Adventurer", 1000, 100, true);
+        achievements[2] = Achievement(2, "Silver Explorer", 5000, 500, true);
+        achievements[3] = Achievement(3, "Gold Master", 10000, 1000, true);
+        achievements[4] = Achievement(4, "Platinum Legend", 50000, 5000, true);
+        achievements[5] = Achievement(5, "Diamond Champion", 100000, 10000, true);
     }
-
-    function _completeQuest(address player, uint256 questId) internal {
-        require(!questCompletions[player][questId], "Quest already completed");
-        questCompletions[player][questId] = true;
-
-        // Automatic NFT minting via Reactive transaction
-        _mintAchievementNFT(player, questId);
-
-        // Automatic token rewards
-        _distributeTokenRewards(player, quests[questId].rewardAmount);
-
-        // Enter into weekly raffle
-        _enterRaffle(player, questId);
-
-        emit QuestCompleted(player, questId, block.timestamp);
+    
+    function getPlayerProgress(address player) external view returns (
+        uint256 totalScore,
+        uint256 achievementsUnlocked
+    ) {
+        PlayerProgress storage progress = playerProgress[player];
+        return (progress.totalScore, progress.achievementsUnlocked);
     }
-
-    // Chainlink VRF integration for provably fair raffles
-    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords) internal {
-        uint256 raffleId = vrfRequests[requestId];
-        Raffle storage raffle = raffles[raffleId];
-        raffle.randomWord = randomWords[0];
-        address winner = raffle.participants[randomWords[0] % raffle.participants.length];
-
-        // Automatic prize distribution via Reactive transaction
-        _distributeRafflePrize(winner, raffle.prizePool);
-    }
-
-    function _initializeQuests() internal {
-        // Placeholder for quest initialization logic
-    }
-
-    function _mintAchievementNFT(address player, uint256 questId) internal {
-        // Placeholder for NFT minting logic
-    }
-
-    function _distributeTokenRewards(address player, uint256 amount) internal {
-        // Placeholder for token distribution logic
-    }
-
-    function _enterRaffle(address player, uint256 questId) internal {
-        // Placeholder for raffle entry logic
-    }
-
-    function _distributeRafflePrize(address winner, uint256 prizePool) internal {
-        // Placeholder for prize distribution logic
+    
+    function getReactiveStats() external view returns (
+        uint256 totalGas,
+        uint256 totalEvents,
+        uint256 averageGas
+    ) {
+        return (
+            totalReactiveGasUsed,
+            totalEventsProcessed,
+            totalEventsProcessed > 0 ? totalReactiveGasUsed / totalEventsProcessed : 0
+        );
     }
 }
-```

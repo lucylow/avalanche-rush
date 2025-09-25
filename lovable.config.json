@@ -1,10 +1,8 @@
 {
-  "name": "avalanche-rush-crossmint",
+  "name": "avalanche-rush-social",
   "version": "1.0.0",
-  "description": "Avalanche Rush game with Crossmint character integration",
+  "description": "Avalanche Rush game with Lens Protocol and Farcaster social integration, tournaments, and leaderboards",
   "dependencies": {
-    "@crossmint/client-sdk-react": "^1.0.0",
-    "@crossmint/client-sdk-base": "^1.0.0",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
@@ -153,11 +151,48 @@
       }
     ]
   },
+  "social": {
+    "lens": {
+      "apiUrl": "https://api.lens.dev",
+      "network": "polygon",
+      "handles": {
+        "avalanche_rush": "Official Avalanche Rush channel",
+        "defi_masters": "DeFi Masters tournament channel",
+        "social_champions": "Social Influencer Championship"
+      }
+    },
+    "farcaster": {
+      "apiUrl": "https://api.warpcast.com/v2",
+      "channels": {
+        "avalanche-rush": "Official Avalanche Rush channel",
+        "defi-masters": "DeFi Masters tournament channel", 
+        "social-champions": "Social Influencer Championship",
+        "web3-gaming": "General Web3 gaming discussions",
+        "avalanche-ecosystem": "Avalanche ecosystem discussions"
+      }
+    },
+    "tournaments": {
+      "types": ["daily", "weekly", "seasonal", "community", "sponsored"],
+      "socialMultipliers": {
+        "lensFollower": 0.1,
+        "farcasterFollower": 0.05,
+        "engagement": 0.01,
+        "verifiedProfile": 5
+      },
+      "prizeDistribution": {
+        "first": 40,
+        "second": 25,
+        "third": 15,
+        "remaining": 20
+      }
+    }
+  },
   "environment": {
-    "REACT_APP_CROSSMINT_CLIENT_ID": "avalanche-rush-client",
-    "REACT_APP_CROSSMINT_ENVIRONMENT": "staging",
+    "REACT_APP_LENS_API_URL": "https://api.lens.dev",
+    "REACT_APP_FARCASTER_API_URL": "https://api.warpcast.com/v2",
     "REACT_APP_AVALANCHE_NETWORK": "fuji",
-    "REACT_APP_REACTIVE_NETWORK": "testnet"
+    "REACT_APP_REACTIVE_NETWORK": "testnet",
+    "REACT_APP_TOURNAMENT_CONTRACT": "0x742d35Cc5A5E2a9E1aB8d8C6E6E9F4A5B8D35a9"
   },
   "scripts": {
     "dev": "vite",

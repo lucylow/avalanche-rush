@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import GamePage from "./pages/game/GamePage";
 import LeaderboardPage from "./pages/LeaderboardPage";
+import SocialLeaderboardPage from "./pages/SocialLeaderboardPage";
 import AchievementsPage from "./pages/AchievementsPage";
 import LearnWeb3Page from "./pages/LearnWeb3Page";
 import NotFound from "./pages/NotFound";
@@ -23,6 +24,8 @@ const App = () => (
           <Route path="/play" element={<GamePage />} />
           <Route path="/game" element={<GamePage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />
+          <Route path="/social-leaderboard" element={<SocialLeaderboardPage />} />
+          <Route path="/tournaments" element={<SocialLeaderboardPage />} />
           <Route path="/achievements" element={<AchievementsPage />} />
           <Route path="/learn" element={<LearnWeb3Page />} />
           <Route path="/learn-web3" element={<LearnWeb3Page />} />
