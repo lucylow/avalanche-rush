@@ -1,4 +1,6 @@
 import React, { useEffect } from "react";
+import EnhancedWalletConnector from "../components/ui/enhanced-wallet-connector";
+import WalletTest from "../components/WalletTest";
 
 const Index = () => {
   useEffect(() => {
@@ -76,13 +78,20 @@ const Index = () => {
         <div className="hidden md:flex gap-8">
           <a href="#features" className="text-foreground hover:text-primary transition-all duration-300 font-medium relative after:content-[''] after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full">Features</a>
           <a href="#modes" className="text-foreground hover:text-primary transition-all duration-300 font-medium relative after:content-[''] after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full">Game Modes</a>
-          <a href="#play" className="text-foreground hover:text-primary transition-all duration-300 font-medium relative after:content-[''] after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full">Play Now</a>
+          <a href="/play" className="text-foreground hover:text-primary transition-all duration-300 font-medium relative after:content-[''] after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full">Play Now</a>
           <a href="#about" className="text-foreground hover:text-primary transition-all duration-300 font-medium relative after:content-[''] after:absolute after:bottom-[-5px] after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 hover:after:w-full">About</a>
         </div>
-        <button className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-8 py-3 rounded-full font-semibold hover:shadow-glow hover:-translate-y-1 transition-all duration-300">
+        <a href="/play" className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-8 py-3 rounded-full font-semibold hover:shadow-glow hover:-translate-y-1 transition-all duration-300">
           Play Free
-        </button>
+        </a>
       </nav>
+
+      {/* Wallet Test Section */}
+      <section className="py-16 px-8 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <WalletTest />
+        </div>
+      </section>
 
       {/* Hero Section */}
       <section className="min-h-screen flex items-center px-8 pt-20">
@@ -95,11 +104,11 @@ const Index = () => {
               The first learn-to-earn arcade game that bridges Web2 fun with Web3 ownership. Play, learn, and earn real rewards seamlessly.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <a href="#" className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-8 py-4 rounded-full font-semibold hover:shadow-glow hover:-translate-y-1 transition-all duration-300 flex items-center gap-3 justify-center">
+              <a href="/play" className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-8 py-4 rounded-full font-semibold hover:shadow-glow hover:-translate-y-1 transition-all duration-300 flex items-center gap-3 justify-center">
                 <span>▶</span> Play Now
               </a>
-              <a href="#" className="border-2 border-primary text-primary px-8 py-4 rounded-full font-semibold hover:bg-primary/10 hover:-translate-y-1 transition-all duration-300 flex items-center gap-3 justify-center">
-                <span>🎬</span> Watch Trailer
+              <a href="/play" className="border-2 border-primary text-primary px-8 py-4 rounded-full font-semibold hover:bg-primary/10 hover:-translate-y-1 transition-all duration-300 flex items-center gap-3 justify-center">
+                <span>🎮</span> Start Gaming
               </a>
             </div>
             <div className="flex gap-8 pt-4">
@@ -214,7 +223,7 @@ const Index = () => {
                     <span className="text-primary">✓</span> Perfect for beginners
                   </li>
                 </ul>
-                <a href="#" className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-6 py-3 rounded-full font-semibold hover:shadow-glow hover:-translate-y-1 transition-all duration-300 block text-center">
+                <a href="/play" className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-6 py-3 rounded-full font-semibold hover:shadow-glow hover:-translate-y-1 transition-all duration-300 block text-center">
                   Start Learning
                 </a>
               </div>
@@ -239,7 +248,7 @@ const Index = () => {
                     <span className="text-primary">✓</span> Skill-based matchmaking
                   </li>
                 </ul>
-                <a href="#" className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-6 py-3 rounded-full font-semibold hover:shadow-glow hover:-translate-y-1 transition-all duration-300 block text-center">
+                <a href="/play" className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-6 py-3 rounded-full font-semibold hover:shadow-glow hover:-translate-y-1 transition-all duration-300 block text-center">
                   Join Tournament
                 </a>
               </div>
@@ -264,7 +273,7 @@ const Index = () => {
                     <span className="text-primary">✓</span> Social features
                   </li>
                 </ul>
-                <a href="#" className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-6 py-3 rounded-full font-semibold hover:shadow-glow hover:-translate-y-1 transition-all duration-300 block text-center">
+                <a href="/play" className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-6 py-3 rounded-full font-semibold hover:shadow-glow hover:-translate-y-1 transition-all duration-300 block text-center">
                   View Collection
                 </a>
               </div>
@@ -282,7 +291,7 @@ const Index = () => {
           <p className="text-xl text-muted-foreground mb-10 leading-relaxed">
             Join thousands of players already earning while playing. No experience required.
           </p>
-          <a href="#" className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-12 py-5 rounded-full font-bold text-xl hover:shadow-glow hover:-translate-y-2 transition-all duration-300 inline-flex items-center gap-4">
+          <a href="/play" className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-12 py-5 rounded-full font-bold text-xl hover:shadow-glow hover:-translate-y-2 transition-all duration-300 inline-flex items-center gap-4">
             🚀 Launch Game Now
           </a>
           <p className="mt-6 text-muted-foreground">
