@@ -2,53 +2,53 @@
 
 export const ENV_CONFIG = {
   // Network Configuration
-  NETWORK: process.env.REACT_APP_NETWORK || 'fuji',
-  CHAIN_ID: parseInt(process.env.REACT_APP_CHAIN_ID || '43113'),
+  NETWORK: import.meta.env.VITE_NETWORK || 'fuji',
+  CHAIN_ID: parseInt(import.meta.env.VITE_CHAIN_ID || '43113'),
   
   // Contract Addresses
   CONTRACTS: {
-    AVALANCHE_RUSH_CORE: process.env.REACT_APP_AVALANCHE_RUSH_CORE || '0x1234567890123456789012345678901234567890',
-    REACTIVE_QUEST_ENGINE: process.env.REACT_APP_REACTIVE_QUEST_ENGINE || '0x2345678901234567890123456789012345678901',
-    EDUCATIONAL_NFT: process.env.REACT_APP_EDUCATIONAL_NFT || '0x3456789012345678901234567890123456789012',
-    RUSH_TOKEN: process.env.REACT_APP_RUSH_TOKEN || '0x4567890123456789012345678901234567890123',
-    MOCK_DEX: process.env.REACT_APP_MOCK_DEX || '0x5678901234567890123456789012345678901234'
+    AVALANCHE_RUSH_CORE: import.meta.env.VITE_AVALANCHE_RUSH_CORE || '0x1234567890123456789012345678901234567890',
+    REACTIVE_QUEST_ENGINE: import.meta.env.VITE_REACTIVE_QUEST_ENGINE || '0x2345678901234567890123456789012345678901',
+    EDUCATIONAL_NFT: import.meta.env.VITE_EDUCATIONAL_NFT || '0x3456789012345678901234567890123456789012',
+    RUSH_TOKEN: import.meta.env.VITE_RUSH_TOKEN || '0x4567890123456789012345678901234567890123',
+    MOCK_DEX: import.meta.env.VITE_MOCK_DEX || '0x5678901234567890123456789012345678901234'
   },
   
   // RPC URLs
   RPC_URLS: {
-    FUJI: process.env.REACT_APP_FUJI_RPC_URL || 'https://api.avax-test.network/ext/bc/C/rpc',
-    MAINNET: process.env.REACT_APP_MAINNET_RPC_URL || 'https://api.avax.network/ext/bc/C/rpc'
+    FUJI: import.meta.env.VITE_FUJI_RPC_URL || 'https://api.avax-test.network/ext/bc/C/rpc',
+    MAINNET: import.meta.env.VITE_MAINNET_RPC_URL || 'https://api.avax.network/ext/bc/C/rpc'
   },
   
   // Explorer URLs
   EXPLORER_URLS: {
-    FUJI: process.env.REACT_APP_FUJI_EXPLORER_URL || 'https://testnet.snowtrace.io',
-    MAINNET: process.env.REACT_APP_MAINNET_EXPLORER_URL || 'https://snowtrace.io'
+    FUJI: import.meta.env.VITE_FUJI_EXPLORER_URL || 'https://testnet.snowtrace.io',
+    MAINNET: import.meta.env.VITE_MAINNET_EXPLORER_URL || 'https://snowtrace.io'
   },
   
   // App Configuration
   APP: {
-    VERSION: process.env.REACT_APP_VERSION || '2.0.0',
-    NAME: process.env.REACT_APP_NAME || 'Avalanche Rush'
+    VERSION: import.meta.env.VITE_VERSION || '2.0.0',
+    NAME: import.meta.env.VITE_NAME || 'Avalanche Rush'
   },
   
   // Feature Flags
   FEATURES: {
-    ENABLE_ANALYTICS: process.env.REACT_APP_ENABLE_ANALYTICS === 'true',
-    ENABLE_ERROR_REPORTING: process.env.REACT_APP_ENABLE_ERROR_REPORTING === 'true',
-    ENABLE_PERFORMANCE_MONITORING: process.env.REACT_APP_ENABLE_PERFORMANCE_MONITORING !== 'false'
+    ENABLE_ANALYTICS: import.meta.env.VITE_ENABLE_ANALYTICS === 'true',
+    ENABLE_ERROR_REPORTING: import.meta.env.VITE_ENABLE_ERROR_REPORTING === 'true',
+    ENABLE_PERFORMANCE_MONITORING: import.meta.env.VITE_ENABLE_PERFORMANCE_MONITORING !== 'false'
   },
   
   // API Keys
   API_KEYS: {
-    ALCHEMY: process.env.REACT_APP_ALCHEMY_API_KEY,
-    INFURA: process.env.REACT_APP_INFURA_API_KEY
+    ALCHEMY: import.meta.env.VITE_ALCHEMY_API_KEY,
+    INFURA: import.meta.env.VITE_INFURA_API_KEY
   },
   
   // Crossmint Configuration
   CROSSMINT: {
-    ENVIRONMENT: process.env.REACT_APP_CROSSMINT_ENVIRONMENT || 'staging',
-    COLLECTION_ID: process.env.REACT_APP_CROSSMINT_COLLECTION_ID
+    ENVIRONMENT: import.meta.env.VITE_CROSSMINT_ENVIRONMENT || 'staging',
+    COLLECTION_ID: import.meta.env.VITE_CROSSMINT_COLLECTION_ID
   }
 };
 
