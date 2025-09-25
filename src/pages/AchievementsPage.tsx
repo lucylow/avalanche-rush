@@ -20,7 +20,7 @@ import {
   Flame,
   Mountain,
   Coins,
-  GameController2,
+  Gamepad2,
   Calendar,
   TrendingUp,
   Award,
@@ -339,7 +339,7 @@ const AchievementsPage: React.FC = () => {
     return [
       {
         name: 'Gaming',
-        icon: <GameController2 className="h-5 w-5" />,
+        icon: <Gamepad2 className="h-5 w-5" />,
         color: 'from-blue-500 to-purple-500',
         achievements: achievements.filter(a => a.category === 'gaming')
       },
