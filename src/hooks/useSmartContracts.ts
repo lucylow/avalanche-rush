@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { ethers } from 'ethers';
+import { ethers, BrowserProvider } from 'ethers';
 import SmartContractService, { 
   CONTRACT_ADDRESSES, 
   NETWORKS, 
@@ -55,7 +55,7 @@ export const useSmartContracts = () => {
     try {
       setWeb3State(prev => ({ ...prev, isLoading: true, error: null }));
 
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new BrowserProvider(window.ethereum);
       const accounts = await provider.listAccounts();
       const signer = provider.getSigner();
       const network = await provider.getNetwork();
@@ -109,7 +109,7 @@ export const useSmartContracts = () => {
     try {
       setWeb3State(prev => ({ ...prev, isLoading: true, error: null }));
 
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new BrowserProvider(window.ethereum);
       const accounts = await provider.send('eth_requestAccounts', []);
       const signer = provider.getSigner();
       const network = await provider.getNetwork();

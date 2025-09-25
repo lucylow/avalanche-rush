@@ -5,7 +5,7 @@ import { Button } from './button';
 import { Badge } from './badge';
 import { 
   Home,
-  GameController2,
+  Gamepad2,
   Trophy,
   Medal,
   BookOpen,
@@ -31,7 +31,7 @@ const Navigation: React.FC = () => {
     {
       path: '/play',
       label: 'Play Game',
-      icon: <GameController2 className="h-4 w-4" />,
+      icon: <Gamepad2 className="h-4 w-4" />,
       color: 'from-green-500 to-emerald-500'
     },
     {

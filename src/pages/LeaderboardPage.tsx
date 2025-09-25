@@ -16,7 +16,7 @@ import {
   Star, 
   TrendingUp, 
   Users,
-  GameController2,
+  Gamepad2,
   Mountain,
   Zap,
   ArrowUp,
@@ -529,7 +529,7 @@ const LeaderboardPage: React.FC = () => {
           
           <Card className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 border-purple-500/30">
             <CardContent className="p-6 text-center">
-              <GameController2 className="h-8 w-8 text-purple-400 mx-auto mb-2" />
+              <Gamepad2 className="h-8 w-8 text-purple-400 mx-auto mb-2" />
               <div className="text-2xl font-bold text-white">
                 {leaderboardData.reduce((sum, p) => sum + p.gamesPlayed, 0).toLocaleString()}
               </div>

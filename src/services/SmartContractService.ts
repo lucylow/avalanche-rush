@@ -1,4 +1,4 @@
-import { ethers, Contract, BigNumber } from 'ethers';
+import { ethers, Contract, BigNumber, formatEther, parseEther } from 'ethers';
 
 // Contract ABIs with full functionality
 export const AVALANCHE_RUSH_CORE_ABI = [
@@ -352,7 +352,7 @@ export class SmartContractService {
 
     try {
       const balance = await this.contracts.rushToken.balanceOf(address);
-      return ethers.utils.formatEther(balance);
+      return formatEther(balance);
     } catch (error) {
       console.error('Error fetching RUSH balance:', error);
       return '0';
@@ -441,7 +441,7 @@ export class SmartContractService {
 
     try {
       const price = await this.contracts.mockDEX.getPrice(tokenA, tokenB);
-      return parseFloat(ethers.utils.formatEther(price));
+      return parseFloat(formatEther(price));
     } catch (error) {
       console.error('Error fetching token price:', error);
       return 0;
@@ -462,13 +462,13 @@ export class SmartContractService {
       const tx = await this.contracts.mockDEX.swapTokens(
         tokenIn,
         tokenOut,
-        ethers.utils.parseEther(amountIn),
-        ethers.utils.parseEther(minAmountOut)
+        parseEther(amountIn),
+        parseEther(minAmountOut)
       );
       
       const receipt = await tx.wait();
-      const event = receipt.events?.find(e => e.event === 'Swap');
-      return ethers.utils.formatEther(event?.args?.amountOut || 0);
+      const event = receipt.logs?.find((log: any) => log.fragment?.name === 'Swap');
+      return formatEther(event?.args?.amountOut || 0);
     } catch (error) {
       console.error('Error swapping tokens:', error);
       throw error;
@@ -553,11 +553,11 @@ export class SmartContractService {
 
   // Utility functions
   public formatEther(value: BigNumber): string {
-    return ethers.utils.formatEther(value);
+    return formatEther(value);
   }
 
   public parseEther(value: string): BigNumber {
-    return ethers.utils.parseEther(value);
+    return parseEther(value);
   }
 
   public async getCurrentBlock(): Promise<number> {

@@ -5,7 +5,9 @@ import ReactiveNetworkDashboard from '../reactive/ReactiveNetworkDashboard';
 import QuestSystem from './QuestSystem';
 import LeaderboardSystem from './LeaderboardSystem';
 import NFTMarketplace from './NFTMarketplace';
+import TutorialManager from '../tutorial/TutorialManager';
 import { useSmartContracts } from '../../hooks/useSmartContracts';
+import { BookOpen, Play } from 'lucide-react';
 
 interface GameState {
   isPlaying: boolean;
@@ -71,6 +73,8 @@ const AvalancheRushGame = () => {
   const [showReactiveDashboard, setShowReactiveDashboard] = useState(false);
   const [notifications, setNotifications] = useState<string[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<number | null>(null);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [hasCompletedTutorial, setHasCompletedTutorial] = useState(false);
 
   // Load player profile when wallet connects
   useEffect(() => {
@@ -78,10 +82,38 @@ const AvalancheRushGame = () => {
       if (isConnected && account) {
         const profile = await getPlayerProfile(account);
         setPlayerProfile(profile);
+        
+        // Check if player has completed tutorial
+        const tutorialCompleted = localStorage.getItem('avalanche-rush-tutorial-completed');
+        setHasCompletedTutorial(!!tutorialCompleted);
       }
     };
     loadProfile();
   }, [isConnected, account, getPlayerProfile]);
+
+  // Handle tutorial completion
+  const handleTutorialComplete = (achievements: string[], totalPoints: number) => {
+    setHasCompletedTutorial(true);
+    localStorage.setItem('avalanche-rush-tutorial-completed', 'true');
+    
+    // Add tutorial points to player profile
+    if (playerProfile) {
+      setPlayerProfile(prev => prev ? {
+        ...prev,
+        experience: prev.experience + totalPoints,
+        totalScore: prev.totalScore + totalPoints,
+        achievements: prev.achievements + achievements.length
+      } : null);
+    }
+    
+    // Update game state achievements
+    setGameState(prev => ({
+      ...prev,
+      achievements: [...prev.achievements, ...achievements]
+    }));
+    
+    setNotifications(prev => [...prev, `Tutorial completed! +${totalPoints} points earned!`]);
+  };
 
   // Start game function
   const startGame = useCallback(async (mode: GameState['gameMode'], difficulty: GameState['difficulty']) => {
@@ -200,8 +232,30 @@ const AvalancheRushGame = () => {
             </div>
           )}
 
+          {/* Tutorial Banner for New Players */}
+          {!hasCompletedTutorial && isConnected && (
+            <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 mb-8 border border-purple-400 shadow-2xl">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="text-4xl">📚</div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white mb-1">New to Avalanche Rush?</h3>
+                    <p className="text-purple-100">Learn the basics with our interactive tutorial and earn bonus rewards!</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowTutorial(true)}
+                  className="bg-white text-purple-600 hover:bg-purple-50 font-bold py-3 px-6 rounded-xl transition-all duration-300 flex items-center gap-2"
+                >
+                  <BookOpen className="w-5 h-5" />
+                  Start Tutorial
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Action Buttons */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
             <button
               onClick={() => setShowGameModeSelector(true)}
               disabled={!isConnected || isLoading}
@@ -209,6 +263,17 @@ const AvalancheRushGame = () => {
             >
               <div className="text-4xl mb-3">🎮</div>
               <div className="text-lg font-bold">Play Game</div>
+            </button>
+
+            <button
+              onClick={() => setShowTutorial(true)}
+              className="bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white font-bold py-8 px-6 rounded-2xl shadow-2xl transition-all duration-300"
+            >
+              <div className="text-4xl mb-3">📚</div>
+              <div className="text-lg font-bold">Tutorial</div>
+              {!hasCompletedTutorial && (
+                <div className="text-xs text-yellow-300 mt-1">New!</div>
+              )}
             </button>
 
             <button
@@ -343,6 +408,17 @@ const AvalancheRushGame = () => {
             ✕
           </button>
         </div>
+      )}
+
+      {/* Tutorial System */}
+      {showTutorial && (
+        <TutorialManager
+          isActive={showTutorial}
+          onClose={() => setShowTutorial(false)}
+          onTutorialComplete={handleTutorialComplete}
+          playerLevel={playerProfile?.level || 1}
+          hasPlayedBefore={hasCompletedTutorial}
+        />
       )}
     </div>
   );
