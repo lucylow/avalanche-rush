@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 import GameEngine from './GameEngine';
 import EnhancedWalletConnector from './EnhancedWalletConnector';
 import RewardPsychologyEngine from './RewardPsychologyEngine';
@@ -42,7 +41,6 @@ interface PlayerProfile {
 }
 
 const AvalancheRushGame: React.FC = () => {
-  const navigate = useNavigate();
   const {
     isConnected,
     account,
@@ -76,6 +74,8 @@ const AvalancheRushGame: React.FC = () => {
   const [showGameModeSelector, setShowGameModeSelector] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
+  const [showCharacterSelection, setShowCharacterSelection] = useState(false);
+  const [selectedCharacter, setSelectedCharacter] = useState<any>(null);
   const [gameStartTime, setGameStartTime] = useState<number>(0);
   const [notifications, setNotifications] = useState<string[]>([]);
 
@@ -123,8 +123,8 @@ const AvalancheRushGame: React.FC = () => {
       }));
 
       // Trigger daily login reward
-      if (window.triggerReward) {
-        window.triggerReward('dailyLogin', { streak: profile?.streakDays || 1 });
+      if ((window as any).triggerReward) {
+        (window as any).triggerReward('dailyLogin', { streak: profile?.streakDays || 1 });
       }
 
     } catch (error) {
@@ -140,6 +140,15 @@ const AvalancheRushGame: React.FC = () => {
     setTimeout(() => {
       setNotifications(prev => prev.slice(1));
     }, 5000);
+  };
+
+  const handleCharacterSelect = (character: any) => {
+    setSelectedCharacter(character);
+    addNotification(`Selected ${character.name} as your game character!`);
+  };
+
+  const openCharacterSelection = () => {
+    setShowCharacterSelection(true);
   };
 
   const startGame = async (mode: GameState['gameMode'], difficulty: GameState['difficulty']) => {
@@ -174,8 +183,8 @@ const AvalancheRushGame: React.FC = () => {
       setShowGameModeSelector(false);
 
       // Trigger game start reward
-      if (window.triggerReward) {
-        window.triggerReward('gameStart');
+      if ((window as any).triggerReward) {
+        (window as any).triggerReward('gameStart');
       }
 
       addNotification(`${mode.toUpperCase()} mode started!`);
@@ -224,17 +233,17 @@ const AvalancheRushGame: React.FC = () => {
       }));
 
       // Trigger completion rewards
-      if (window.triggerReward) {
+      if ((window as any).triggerReward) {
         if (finalScore > gameState.highScore) {
-          window.triggerReward('highScoreBeat', { score: finalScore });
+          (window as any).triggerReward('highScoreBeat', { score: finalScore });
         }
         
         achievements.forEach(achievement => {
-          window.triggerReward('questComplete', { achievement });
+          (window as any).triggerReward('questComplete', { achievement });
         });
 
         if (finalScore >= 1000) {
-          window.triggerReward('100Points');
+          (window as any).triggerReward('100Points');
         }
       }
 
@@ -338,57 +347,138 @@ const AvalancheRushGame: React.FC = () => {
   const GameHUD = () => (
     <div className="fixed top-4 left-4 right-4 z-40 pointer-events-none">
       <div className="flex justify-between items-start">
-        <div className="bg-black/70 backdrop-blur-sm text-white p-4 rounded-lg pointer-events-auto">
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>Score: <span className="font-bold text-yellow-400">{gameState.score.toLocaleString()}</span></div>
-            <div>High: <span className="font-bold text-green-400">{gameState.highScore.toLocaleString()}</span></div>
-            <div>Level: <span className="font-bold text-blue-400">{gameState.currentLevel}</span></div>
-            <div>Lives: <span className="font-bold text-red-400">{'❤️'.repeat(gameState.lives)}</span></div>
-          </div>
-          <div className="mt-2">
+        {/* Enhanced Score Panel */}
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="bg-gradient-to-br from-black/80 to-purple-900/80 backdrop-blur-md text-white p-6 rounded-2xl pointer-events-auto border border-purple-500/30 shadow-2xl"
+        >
+          <div className="grid grid-cols-2 gap-6 text-sm">
             <div className="flex items-center space-x-2">
-              <span className="text-xs">Energy:</span>
-              <div className="flex-1 bg-gray-700 rounded-full h-2">
-                <div 
-                  className="bg-green-500 h-2 rounded-full transition-all duration-300"
+              <span className="text-yellow-400 text-lg">🎯</span>
+              <div>
+                <div className="text-xs text-gray-300">Score</div>
+                <div className="font-black text-xl text-yellow-400">{gameState.score.toLocaleString()}</div>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-green-400 text-lg">🏆</span>
+              <div>
+                <div className="text-xs text-gray-300">Best</div>
+                <div className="font-black text-xl text-green-400">{gameState.highScore.toLocaleString()}</div>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-blue-400 text-lg">📊</span>
+              <div>
+                <div className="text-xs text-gray-300">Level</div>
+                <div className="font-black text-xl text-blue-400">{gameState.currentLevel}</div>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-red-400 text-lg">❤️</span>
+              <div>
+                <div className="text-xs text-gray-300">Lives</div>
+                <div className="text-lg">{'❤️'.repeat(gameState.lives)}</div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Enhanced Energy Bar */}
+          <div className="mt-4">
+            <div className="flex items-center justify-between text-xs text-gray-300 mb-1">
+              <span className="flex items-center">
+                <span className="mr-1">⚡</span>Energy
+              </span>
+              <span className="font-bold">{gameState.energy}%</span>
+            </div>
+            <div className="relative">
+              <div className="w-full bg-gray-700/50 rounded-full h-3 overflow-hidden">
+                <motion.div 
+                  className="bg-gradient-to-r from-green-400 via-yellow-400 to-red-400 h-3 rounded-full shadow-lg"
                   style={{ width: `${gameState.energy}%` }}
+                  animate={{ 
+                    boxShadow: gameState.energy > 80 ? "0 0 15px #4ade80" : 
+                               gameState.energy > 50 ? "0 0 15px #fbbf24" : "0 0 15px #ef4444"
+                  }}
                 />
               </div>
-              <span className="text-xs">{gameState.energy}%</span>
+              {gameState.energy < 30 && (
+                <motion.div
+                  animate={{ opacity: [0.5, 1, 0.5] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                  className="absolute inset-0 bg-red-500/20 rounded-full"
+                />
+              )}
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="bg-black/70 backdrop-blur-sm text-white p-4 rounded-lg pointer-events-auto">
-          <div className="text-xs space-y-1">
-            <div>Mode: <span className="capitalize text-purple-400">{gameState.gameMode}</span></div>
-            <div>Difficulty: <span className="capitalize text-orange-400">{gameState.difficulty}</span></div>
+        {/* Enhanced Game Info Panel */}
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="bg-gradient-to-bl from-black/80 to-blue-900/80 backdrop-blur-md text-white p-6 rounded-2xl pointer-events-auto border border-blue-500/30 shadow-2xl"
+        >
+          <div className="space-y-3 text-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-purple-300">Mode:</span>
+              <span className="capitalize text-purple-400 font-bold px-2 py-1 bg-purple-500/20 rounded-full">
+                {gameState.gameMode}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-orange-300">Difficulty:</span>
+              <span className="capitalize text-orange-400 font-bold px-2 py-1 bg-orange-500/20 rounded-full">
+                {gameState.difficulty}
+              </span>
+            </div>
             {playerProfile && (
-              <div>RUSH: <span className="text-yellow-400">{parseFloat(playerProfile.rushBalance).toFixed(2)}</span></div>
+              <div className="flex items-center justify-between">
+                <span className="text-yellow-300">RUSH:</span>
+                <span className="text-yellow-400 font-bold px-2 py-1 bg-yellow-500/20 rounded-full">
+                  {parseFloat(playerProfile.rushBalance).toFixed(2)}
+                </span>
+              </div>
             )}
           </div>
-        </div>
+        </motion.div>
       </div>
 
+      {/* Enhanced Game Controls */}
       {gameState.isPlaying && (
-        <div className="flex justify-center mt-4">
-          <div className="bg-black/70 backdrop-blur-sm text-white p-2 rounded-lg pointer-events-auto">
-            <div className="flex space-x-2">
-              <button
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex justify-center mt-6"
+        >
+          <div className="bg-gradient-to-r from-black/80 to-gray-900/80 backdrop-blur-md text-white p-4 rounded-2xl pointer-events-auto border border-gray-500/30 shadow-2xl">
+            <div className="flex space-x-4">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={pauseGame}
-                className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 rounded transition-colors"
+                className={`px-6 py-3 rounded-xl font-bold transition-all duration-200 flex items-center space-x-2 ${
+                  gameState.isPaused 
+                    ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-green-500/25' 
+                    : 'bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 shadow-yellow-500/25'
+                } shadow-lg`}
               >
-                {gameState.isPaused ? '▶️ Resume' : '⏸️ Pause'}
-              </button>
-              <button
+                <span className="text-xl">{gameState.isPaused ? '▶️' : '⏸️'}</span>
+                <span>{gameState.isPaused ? 'Resume' : 'Pause'}</span>
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={quitGame}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded transition-colors"
+                className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-xl font-bold transition-all duration-200 flex items-center space-x-2 shadow-lg shadow-red-500/25"
               >
-                🚪 Quit
-              </button>
+                <span className="text-xl">🚪</span>
+                <span>Quit</span>
+              </motion.button>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
     </div>
   );
@@ -449,7 +539,7 @@ const AvalancheRushGame: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/leaderboard')}
+              onClick={() => setShowLeaderboard(true)}
               className="bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 text-white font-bold py-6 px-6 rounded-xl shadow-lg transition-all duration-200"
             >
               <div className="text-3xl mb-2">🏆</div>
@@ -459,7 +549,7 @@ const AvalancheRushGame: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/achievements')}
+              onClick={() => setShowAchievements(true)}
               className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-6 px-6 rounded-xl shadow-lg transition-all duration-200"
             >
               <div className="text-3xl mb-2">🏅</div>
@@ -469,7 +559,22 @@ const AvalancheRushGame: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/learn-web3')}
+              onClick={openCharacterSelection}
+              className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold py-6 px-6 rounded-xl shadow-lg transition-all duration-200"
+            >
+              <div className="text-3xl mb-2">👤</div>
+              <div>Characters</div>
+              {selectedCharacter && (
+                <div className="text-xs mt-1 opacity-75">
+                  {selectedCharacter.name}
+                </div>
+              )}
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => window.open('https://docs.avalanche-rush.com', '_blank')}
               className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-6 px-6 rounded-xl shadow-lg transition-all duration-200"
             >
               <div className="text-3xl mb-2">📚</div>
@@ -547,14 +652,41 @@ const AvalancheRushGame: React.FC = () => {
         ))}
       </AnimatePresence>
 
-      {/* Loading Overlay */}
+      {/* Enhanced Loading Overlay */}
       {isLoading && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 flex items-center space-x-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent"></div>
-            <span className="text-gray-900 font-medium">Loading...</span>
-          </div>
-        </div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50"
+        >
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-gradient-to-br from-purple-900 to-blue-900 rounded-2xl p-8 flex flex-col items-center space-y-6 border border-purple-500/30 shadow-2xl"
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="text-6xl"
+            >
+              🎮
+            </motion.div>
+            <div className="flex items-center space-x-4">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                className="w-8 h-8 border-4 border-blue-400 border-t-transparent rounded-full"
+              />
+              <span className="text-white font-bold text-xl">Loading Game...</span>
+            </div>
+            <div className="text-center max-w-sm">
+              <p className="text-purple-200 text-sm">
+                Initializing blockchain connection and loading your player profile
+              </p>
+            </div>
+          </motion.div>
+        </motion.div>
       )}
 
       {/* Game States */}

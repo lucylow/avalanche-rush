@@ -151,3 +151,4 @@ Contract addresses are managed through environment variables:
 
 ## Support
 For technical support or questions about the wallet integration, please refer to the project documentation or contact the development team.
+

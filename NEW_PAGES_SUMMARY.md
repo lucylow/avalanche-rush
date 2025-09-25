@@ -207,3 +207,4 @@ Home Page → Play Game ↔ Leaderboard ↔ Achievements ↔ Learn Web3
 **The three new pages (Leaderboard, Achievements, and Learn Web3) are now fully functional, beautifully designed, and seamlessly integrated with all existing Avalanche Rush features. Players can now enjoy a complete gaming experience with learning, competition, and achievement tracking all in one cohesive platform.**
 
 🎮 **Ready to play, learn, and compete on Avalanche!** 🏔️
+

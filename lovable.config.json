@@ -1,15 +1,7 @@
 {
-  "name": "vite_react_shadcn_ts",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "build:dev": "vite build --mode development",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
+  "name": "avalanche-rush-crossmint",
+  "version": "1.0.0",
+  "description": "Avalanche Rush game with Crossmint character integration",
   "dependencies": {
     "@crossmint/client-sdk-react": "^1.0.0",
     "@crossmint/client-sdk-base": "^1.0.0",
@@ -84,5 +76,94 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0",
     "vite": "^5.4.19"
+  },
+  "crossmint": {
+    "clientId": "avalanche-rush-client",
+    "environment": "staging",
+    "collections": {
+      "characters": {
+        "name": "Avalanche Rush Characters",
+        "description": "Unique game characters for Avalanche Rush",
+        "image": "/characters/collection-preview.png",
+        "externalLink": "https://avalanche-rush.lovable.app",
+        "sellerFeeBasisPoints": 500,
+        "symbol": "ARC"
+      }
+    },
+    "characters": [
+      {
+        "id": "avalanche-warrior",
+        "name": "Avalanche Warrior",
+        "rarity": "Epic",
+        "type": "Warrior",
+        "mintPrice": "0.1",
+        "currency": "AVAX",
+        "attributes": {
+          "strength": 85,
+          "intelligence": 60,
+          "agility": 70,
+          "defense": 90,
+          "speed": 65,
+          "luck": 50
+        },
+        "bonuses": {
+          "quest": 15,
+          "tournament": 10
+        }
+      },
+      {
+        "id": "rush-mage",
+        "name": "Rush Mage",
+        "rarity": "Legendary",
+        "type": "Mage",
+        "mintPrice": "0.25",
+        "currency": "AVAX",
+        "attributes": {
+          "strength": 40,
+          "intelligence": 95,
+          "agility": 80,
+          "defense": 60,
+          "speed": 85,
+          "luck": 70
+        },
+        "bonuses": {
+          "quest": 25,
+          "tournament": 20
+        }
+      },
+      {
+        "id": "reactive-ranger",
+        "name": "Reactive Ranger",
+        "rarity": "Rare",
+        "type": "Ranger",
+        "mintPrice": "0.15",
+        "currency": "AVAX",
+        "attributes": {
+          "strength": 70,
+          "intelligence": 75,
+          "agility": 95,
+          "defense": 65,
+          "speed": 90,
+          "luck": 80
+        },
+        "bonuses": {
+          "quest": 20,
+          "tournament": 15
+        }
+      }
+    ]
+  },
+  "environment": {
+    "REACT_APP_CROSSMINT_CLIENT_ID": "avalanche-rush-client",
+    "REACT_APP_CROSSMINT_ENVIRONMENT": "staging",
+    "REACT_APP_AVALANCHE_NETWORK": "fuji",
+    "REACT_APP_REACTIVE_NETWORK": "testnet"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:dev": "vite build --mode development",
+    "lint": "eslint .",
+    "preview": "vite preview"
   }
 }

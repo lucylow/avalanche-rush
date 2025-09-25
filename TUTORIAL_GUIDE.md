@@ -335,3 +335,4 @@
 **Ready to start your Avalanche Rush journey? Connect your wallet and begin earning rewards today!**
 
 For additional support, join our Discord community or check out the video tutorials for visual guidance.
+

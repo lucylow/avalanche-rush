@@ -332,3 +332,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ---
 
 **Avalanche Rush Enhanced** represents the cutting edge of blockchain gaming, showcasing the full potential of the Avalanche network while providing an engaging and educational experience for users.
+

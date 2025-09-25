@@ -12,6 +12,16 @@ interface GameEngineProps {
     lives: number;
     energy: number;
   };
+  selectedCharacter?: {
+    id: string;
+    name: string;
+    rarity: string;
+    type: string;
+    questBonus: number;
+    tournamentBonus: number;
+    attributes: Record<string, number>;
+    specialAbilities: string[];
+  };
   onScoreUpdate: (score: number) => void;
   onGameEnd: (score: number, achievements?: string[]) => void;
   onLevelComplete: (level: number) => void;
@@ -50,6 +60,7 @@ interface GameObject {
 
 const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
   gameState,
+  selectedCharacter,
   onScoreUpdate,
   onGameEnd,
   onLevelComplete,
@@ -481,7 +492,19 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
         createParticles(collectible.x + collectible.width/2, collectible.y + collectible.height/2, 'collect', 6);
         
         if (collectible.type === 'coin') {
-          const points = (10 + gameStateRef.current.combo * 2);
+          let points = (10 + gameStateRef.current.combo * 2);
+          
+          // Apply character bonuses
+          if (selectedCharacter) {
+            // Apply quest bonus for coin collection
+            points = Math.floor(points * (1 + selectedCharacter.questBonus / 100));
+            
+            // Apply special abilities
+            if (selectedCharacter.specialAbilities.includes('Lucky Strike')) {
+              points = Math.floor(points * 1.2); // 20% bonus for lucky strikes
+            }
+          }
+          
           gameStateRef.current.score += points;
           gameStateRef.current.combo++;
           gameStateRef.current.comboTimer = 300; // 5 seconds
