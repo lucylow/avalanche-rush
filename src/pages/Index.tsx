@@ -1,8 +1,12 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import EnhancedWalletConnector from "../components/ui/enhanced-wallet-connector";
 import WalletTest from "../components/WalletTest";
+import TutorialModal from "../components/TutorialModal";
+import QuickStartGuide from "../components/QuickStartGuide";
 
 const Index = () => {
+  const [showTutorial, setShowTutorial] = useState(false);
+
   useEffect(() => {
     // Navbar scroll effect
     const handleScroll = () => {
@@ -86,8 +90,15 @@ const Index = () => {
         </a>
       </nav>
 
-      {/* Wallet Test Section */}
+      {/* Quick Start Guide Section */}
       <section className="py-16 px-8 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <QuickStartGuide />
+        </div>
+      </section>
+
+      {/* Wallet Test Section */}
+      <section className="py-16 px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <WalletTest />
         </div>
@@ -104,9 +115,12 @@ const Index = () => {
               The first learn-to-earn arcade game that bridges Web2 fun with Web3 ownership. Play, learn, and earn real rewards seamlessly.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <a href="/play" className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-8 py-4 rounded-full font-semibold hover:shadow-glow hover:-translate-y-1 transition-all duration-300 flex items-center gap-3 justify-center">
-                <span>▶</span> Play Now
-              </a>
+              <button 
+                onClick={() => setShowTutorial(true)}
+                className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-8 py-4 rounded-full font-semibold hover:shadow-glow hover:-translate-y-1 transition-all duration-300 flex items-center gap-3 justify-center"
+              >
+                <span>▶</span> Learn How to Play
+              </button>
               <a href="/play" className="border-2 border-primary text-primary px-8 py-4 rounded-full font-semibold hover:bg-primary/10 hover:-translate-y-1 transition-all duration-300 flex items-center gap-3 justify-center">
                 <span>🎮</span> Start Gaming
               </a>
@@ -223,7 +237,7 @@ const Index = () => {
                     <span className="text-primary">✓</span> Perfect for beginners
                   </li>
                 </ul>
-                <a href="/play" className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-6 py-3 rounded-full font-semibold hover:shadow-glow hover:-translate-y-1 transition-all duration-300 block text-center">
+                <a href="/learn-web3" className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-6 py-3 rounded-full font-semibold hover:shadow-glow hover:-translate-y-1 transition-all duration-300 block text-center">
                   Start Learning
                 </a>
               </div>
@@ -362,6 +376,9 @@ const Index = () => {
           <p>&copy; 2024 Avalanche Rush. All rights reserved. | Built on Avalanche • Powered by Funtico</p>
         </div>
       </footer>
+
+      {/* Tutorial Modal */}
+      <TutorialModal isOpen={showTutorial} onClose={() => setShowTutorial(false)} />
     </div>
   );
 };

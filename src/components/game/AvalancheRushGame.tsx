@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import GameEngine from './GameEngine';
 import EnhancedWalletConnector from './EnhancedWalletConnector';
 import RewardPsychologyEngine from './RewardPsychologyEngine';
@@ -41,6 +42,7 @@ interface PlayerProfile {
 }
 
 const AvalancheRushGame: React.FC = () => {
+  const navigate = useNavigate();
   const {
     isConnected,
     account,
@@ -447,7 +449,7 @@ const AvalancheRushGame: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setShowLeaderboard(true)}
+              onClick={() => navigate('/leaderboard')}
               className="bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 text-white font-bold py-6 px-6 rounded-xl shadow-lg transition-all duration-200"
             >
               <div className="text-3xl mb-2">🏆</div>
@@ -457,7 +459,7 @@ const AvalancheRushGame: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setShowAchievements(true)}
+              onClick={() => navigate('/achievements')}
               className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold py-6 px-6 rounded-xl shadow-lg transition-all duration-200"
             >
               <div className="text-3xl mb-2">🏅</div>
@@ -467,7 +469,7 @@ const AvalancheRushGame: React.FC = () => {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => window.open('https://docs.avalanche-rush.com', '_blank')}
+              onClick={() => navigate('/learn-web3')}
               className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-6 px-6 rounded-xl shadow-lg transition-all duration-200"
             >
               <div className="text-3xl mb-2">📚</div>
