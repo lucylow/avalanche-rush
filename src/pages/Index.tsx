@@ -3,6 +3,7 @@ import EnhancedWalletConnector from "../components/ui/enhanced-wallet-connector"
 import WalletTest from "../components/WalletTest";
 import TutorialModal from "../components/TutorialModal";
 import QuickStartGuide from "../components/QuickStartGuide";
+import GameChatbot from "../components/GameChatbot";
 
 const Index = () => {
   const [showTutorial, setShowTutorial] = useState(false);
@@ -379,6 +380,9 @@ const Index = () => {
 
       {/* Tutorial Modal */}
       <TutorialModal isOpen={showTutorial} onClose={() => setShowTutorial(false)} />
+      
+      {/* Chatbot */}
+      <GameChatbot />
     </div>
   );
 };
