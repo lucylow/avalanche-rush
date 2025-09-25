@@ -1,9 +1,17 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import GameEngine from './GameEngine';
+import AudioEnhancedGameEngine from '../audio/AudioEnhancedGameEngine';
+import DynamicMusicSystem from '../audio/DynamicMusicSystem';
+import AudioSettings from '../components/ui/AudioSettings';
 import EnhancedWalletConnector from './EnhancedWalletConnector';
 import RewardPsychologyEngine from './RewardPsychologyEngine';
+import CharacterSelectionModal from './CharacterSelectionModal';
 import { useAdvancedWeb3 } from '../../hooks/useAdvancedWeb3';
+import { useCrossmint } from '../../hooks/useCrossmint';
+import { useAudioManager } from '../../hooks/useAudioManager';
+import { Volume2, VolumeX } from 'lucide-react';
 
 interface GameState {
   isPlaying: boolean;
@@ -78,6 +86,8 @@ const AvalancheRushGame: React.FC = () => {
   const [selectedCharacter, setSelectedCharacter] = useState<any>(null);
   const [gameStartTime, setGameStartTime] = useState<number>(0);
   const [notifications, setNotifications] = useState<string[]>([]);
+  const [vrfEvents, setVrfEvents] = useState<any[]>([]);
+  const [currentSessionId, setCurrentSessionId] = useState<number>(0);
 
   const gameEngineRef = useRef<any>(null);
   const animationFrameRef = useRef<number>();
@@ -142,14 +152,51 @@ const AvalancheRushGame: React.FC = () => {
     }, 5000);
   };
 
-  const handleCharacterSelect = (character: any) => {
-    setSelectedCharacter(character);
-    addNotification(`Selected ${character.name} as your game character!`);
-  };
+  // Handle VRF random events
+  const handleVRFEvent = useCallback((eventType: string, eventData: any) => {
+    console.log('VRF Event received:', { eventType, eventData });
+    
+    // Add to VRF events log
+    setVrfEvents(prev => [...prev, {
+      type: eventType,
+      data: eventData,
+      timestamp: Date.now(),
+      sessionId: currentSessionId
+    }]);
 
-  const openCharacterSelection = () => {
-    setShowCharacterSelection(true);
-  };
+    // Handle different event types
+    switch (eventType) {
+      case '0': // DAILY_CHALLENGE
+        addNotification(`🎯 Daily Challenge: ${eventData.title}`);
+        break;
+      case '1': // NFT_REWARD_RARITY
+        addNotification(`🏆 ${eventData.rarity} NFT Reward: ${eventData.nftType}`);
+        break;
+      case '2': // POWER_UP_SPAWN
+        addNotification(`⚡ Power-up Spawned: ${eventData.name}`);
+        break;
+      case '3': // OBSTACLE_PATTERN
+        addNotification(`🎲 New Obstacle Pattern: ${eventData.name}`);
+        break;
+      case '4': // TOURNAMENT_MATCH
+        addNotification(`🏆 Tournament Match: Difficulty ${eventData.difficulty}`);
+        break;
+      case '5': // QUEST_REWARD
+        addNotification(`💰 Quest Reward: ${eventData.type} +${eventData.amount}`);
+        break;
+      case '6': // SPECIAL_EVENT
+        addNotification(`✨ Special Event: ${eventData.name}`);
+        break;
+      case '7': // BONUS_MULTIPLIER
+        addNotification(`🎯 Bonus Multiplier: ${eventData.multiplier}x`);
+        break;
+    }
+
+    // Trigger reward system if available
+    if ((window as any).triggerReward) {
+      (window as any).triggerReward('vrfEvent', { eventType, eventData });
+    }
+  }, [currentSessionId, addNotification]);
 
   const startGame = async (mode: GameState['gameMode'], difficulty: GameState['difficulty']) => {
     if (!isConnected) {
@@ -179,6 +226,7 @@ const AvalancheRushGame: React.FC = () => {
         energy: 100
       }));
 
+      setCurrentSessionId(sessionId);
       setGameStartTime(Date.now());
       setShowGameModeSelector(false);
 
@@ -292,38 +340,74 @@ const AvalancheRushGame: React.FC = () => {
 
   const GameModeSelector = () => (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50"
       onClick={() => setShowGameModeSelector(false)}
     >
       <motion.div
-        className="bg-white rounded-xl p-8 max-w-2xl w-full mx-4 shadow-2xl"
+        initial={{ scale: 0.8, opacity: 0, y: 50 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.8, opacity: 0, y: 50 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-8 max-w-4xl w-full mx-4 shadow-2xl border border-white/10 relative overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-3xl font-bold text-center mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          Choose Game Mode
-        </h2>
+        {/* Modal Background Effects */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-3xl"></div>
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-t-3xl"></div>
         
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="relative z-10">
+          <div className="text-center mb-8">
+            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
+              <span className="text-3xl">🎮</span>
+            </div>
+            <h2 className="text-4xl font-black text-white mb-2">
+              Choose Your Adventure
+            </h2>
+            <p className="text-white/70 text-lg">
+              Select a game mode and start earning rewards
+            </p>
+            <div className="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-400 mx-auto mt-4 rounded-full"></div>
+          </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {[
-            { mode: 'classic', title: 'Classic', desc: 'Traditional endless runner', icon: '🏃' },
-            { mode: 'tutorial', title: 'Tutorial', desc: 'Learn the basics', icon: '📚' },
-            { mode: 'challenge', title: 'Challenge', desc: 'Special objectives', icon: '🎯' },
-            { mode: 'quest', title: 'Quest', desc: 'Blockchain quests', icon: '⚔️' },
-            { mode: 'speedrun', title: 'Speed Run', desc: 'Race against time', icon: '⚡' },
-            { mode: 'survival', title: 'Survival', desc: 'Last as long as possible', icon: '🛡️' }
-          ].map(({ mode, title, desc, icon }) => (
-            <button
+            { mode: 'classic', title: 'Classic', desc: 'Traditional endless runner', icon: '🏃', color: 'from-blue-500 to-cyan-500' },
+            { mode: 'tutorial', title: 'Tutorial', desc: 'Learn the basics', icon: '📚', color: 'from-green-500 to-emerald-500' },
+            { mode: 'challenge', title: 'Challenge', desc: 'Special objectives', icon: '🎯', color: 'from-orange-500 to-red-500' },
+            { mode: 'quest', title: 'Quest', desc: 'Blockchain quests', icon: '⚔️', color: 'from-purple-500 to-violet-500' },
+            { mode: 'speedrun', title: 'Speed Run', desc: 'Race against time', icon: '⚡', color: 'from-yellow-500 to-orange-500' },
+            { mode: 'survival', title: 'Survival', desc: 'Last as long as possible', icon: '🛡️', color: 'from-indigo-500 to-blue-500' }
+          ].map(({ mode, title, desc, icon, color }) => (
+            <motion.button
               key={mode}
+              whileHover={{ scale: 1.05, y: -5 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => startGame(mode as GameState['gameMode'], 'beginner')}
-              className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 text-left"
+              className="relative group bg-gradient-to-br from-slate-700 to-slate-800 hover:from-slate-600 hover:to-slate-700 p-6 rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 text-left overflow-hidden"
             >
-              <div className="text-2xl mb-2">{icon}</div>
-              <h3 className="font-semibold text-gray-900">{title}</h3>
-              <p className="text-sm text-gray-600">{desc}</p>
-            </button>
+              <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-20 transition-opacity duration-300" style={{ background: `linear-gradient(135deg, ${color.split(' ')[1]} 0%, ${color.split(' ')[3]} 100%)` }}></div>
+              
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`w-12 h-12 bg-gradient-to-br ${color} rounded-xl flex items-center justify-center shadow-lg`}>
+                    <span className="text-2xl">{icon}</span>
+                  </div>
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                </div>
+                
+                <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
+                <p className="text-sm text-white/70 leading-relaxed">{desc}</p>
+                
+                <div className="mt-4 flex items-center text-xs text-white/60">
+                  <span className="bg-white/10 px-2 py-1 rounded-full">Beginner Friendly</span>
+                </div>
+              </div>
+              
+              <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-500"></div>
+            </motion.button>
           ))}
         </div>
 
@@ -484,13 +568,46 @@ const AvalancheRushGame: React.FC = () => {
   );
 
   const MainMenu = () => (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-40 left-40 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+      </div>
+
+      {/* Floating Particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(50)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-white rounded-full opacity-20 animate-float"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 10}s`,
+              animationDuration: `${10 + Math.random() * 20}s`
+            }}
+          />
+        ))}
+      </div>
+
       {/* Header */}
-      <div className="flex justify-between items-center p-6">
+      <div className="flex justify-between items-center p-6 relative z-10">
         <div className="flex items-center space-x-4">
-          <h1 className="text-4xl font-bold text-white">🏔️ Avalanche Rush</h1>
-          <div className="text-sm text-white/70">
-            Learn • Play • Earn
+          <div className="relative">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-2xl font-bold text-white shadow-2xl animate-pulse">
+              🏔️
+            </div>
+            <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl blur opacity-30 animate-pulse"></div>
+          </div>
+          <div>
+            <h1 className="text-5xl font-black text-white bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              Avalanche Rush
+            </h1>
+            <div className="text-sm text-white/70 font-medium tracking-wide">
+              Learn • Play • Earn
+            </div>
           </div>
         </div>
         <EnhancedWalletConnector />
@@ -504,20 +621,50 @@ const AvalancheRushGame: React.FC = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white/10 backdrop-blur-sm rounded-xl p-6 mb-8 border border-white/20"
+              className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8 border border-white/20 shadow-2xl relative overflow-hidden"
             >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-white">{playerProfile.level}</div>
-                  <div className="text-white/70">Level</div>
+              {/* Card Glow Effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl"></div>
+              
+              <div className="relative z-10">
+                <div className="text-center mb-6">
+                  <h2 className="text-2xl font-bold text-white mb-2">Player Dashboard</h2>
+                  <div className="w-20 h-1 bg-gradient-to-r from-blue-400 to-purple-400 mx-auto rounded-full"></div>
                 </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-yellow-400">{playerProfile.rushBalance}</div>
-                  <div className="text-white/70">RUSH Tokens</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-purple-400">{playerProfile.nftCount}</div>
-                  <div className="text-white/70">NFT Achievements</div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <motion.div 
+                    className="text-center p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all duration-300"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
+                      <span className="text-2xl font-bold text-white">{playerProfile.level}</span>
+                    </div>
+                    <div className="text-white font-semibold">Level</div>
+                    <div className="text-white/60 text-sm">Player Level</div>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="text-center p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all duration-300"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <div className="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
+                      <span className="text-lg font-bold text-white">💎</span>
+                    </div>
+                    <div className="text-white font-semibold">{playerProfile.rushBalance}</div>
+                    <div className="text-white/60 text-sm">RUSH Tokens</div>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="text-center p-4 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-all duration-300"
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
+                      <span className="text-lg font-bold text-white">🎨</span>
+                    </div>
+                    <div className="text-white font-semibold">{playerProfile.nftCount}</div>
+                    <div className="text-white/60 text-sm">NFT Achievements</div>
+                  </motion.div>
                 </div>
               </div>
             </motion.div>
@@ -636,6 +783,14 @@ const AvalancheRushGame: React.FC = () => {
       {/* Reward Psychology Engine */}
       <RewardPsychologyEngine />
 
+      {/* VRF Game Events */}
+      {gameState.isPlaying && (
+        <VRFGameEvents 
+          gameSessionId={currentSessionId} 
+          onRandomEvent={handleVRFEvent}
+        />
+      )}
+
       {/* Notifications */}
       <AnimatePresence>
         {notifications.map((notification, index) => (
@@ -695,16 +850,16 @@ const AvalancheRushGame: React.FC = () => {
       ) : (
         <>
           <GameHUD />
-          <GameEngine
+          <EnhancedGameEngine
             ref={gameEngineRef}
             gameState={gameState}
             onScoreUpdate={(score) => setGameState(prev => ({ ...prev, score }))}
             onGameEnd={endGame}
             onLevelComplete={(level) => {
               setGameState(prev => ({ ...prev, currentLevel: level + 1 }));
-              if (window.triggerReward) {
-                window.triggerReward('levelUp', { level });
-              }
+                    if ((window as any).triggerReward) {
+                      (window as any).triggerReward('levelUp', { level });
+                    }
             }}
             isPaused={gameState.isPaused}
           />

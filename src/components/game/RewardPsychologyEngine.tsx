@@ -252,17 +252,18 @@ const RewardPsychologyEngine: React.FC = () => {
             >
               <motion.div
                 className={`
-                  bg-gradient-to-r ${reward.color} 
-                  text-white font-bold px-6 py-4 rounded-xl shadow-2xl
-                  backdrop-blur-sm border border-white/20
-                  flex items-center space-x-3
-                  min-w-[200px] justify-center
+                  bg-gradient-to-br ${reward.color} 
+                  text-white font-bold px-8 py-6 rounded-2xl shadow-2xl
+                  backdrop-blur-md border border-white/30
+                  flex items-center space-x-4
+                  min-w-[250px] justify-center
+                  relative overflow-hidden
                 `}
                 whileHover={{ scale: 1.05 }}
                 animate={{
                   boxShadow: [
                     '0 0 0px rgba(255,255,255,0.4)',
-                    '0 0 20px rgba(255,255,255,0.6)',
+                    '0 0 30px rgba(255,255,255,0.8)',
                     '0 0 0px rgba(255,255,255,0.4)'
                   ]
                 }}
@@ -274,6 +275,33 @@ const RewardPsychologyEngine: React.FC = () => {
                   }
                 }}
               >
+                {/* Animated background gradient */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full animate-pulse"></div>
+                
+                {/* Sparkle effects */}
+                <div className="absolute inset-0 overflow-hidden rounded-2xl">
+                  {[...Array(8)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="absolute w-1 h-1 bg-white rounded-full"
+                      initial={{
+                        x: Math.random() * 250,
+                        y: Math.random() * 60,
+                        opacity: 0
+                      }}
+                      animate={{
+                        x: Math.random() * 250,
+                        y: Math.random() * 60,
+                        opacity: [0, 1, 0]
+                      }}
+                      transition={{
+                        duration: 2,
+                        delay: i * 0.2,
+                        repeat: Infinity
+                      }}
+                    />
+                  ))}
+                </div>
                 <motion.span
                   className="text-2xl"
                   animate={{

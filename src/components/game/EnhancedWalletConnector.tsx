@@ -181,44 +181,61 @@ const EnhancedWalletConnector: React.FC = () => {
     if (!isConnected) {
       return (
         <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+          whileHover={{ scale: 1.05, y: -2 }}
+          whileTap={{ scale: 0.95 }}
           onClick={() => setShowWalletModal(true)}
           disabled={walletState.isConnecting}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+          className="relative group bg-gradient-to-br from-blue-500 to-purple-600 hover:from-blue-400 hover:to-purple-500 text-white font-bold py-4 px-8 rounded-2xl shadow-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-3 overflow-hidden"
         >
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+          
           {walletState.isConnecting ? (
             <>
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-              <span>Connecting...</span>
+              <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></div>
+              <span className="relative z-10">Connecting...</span>
             </>
           ) : (
             <>
-              <span>🦊</span>
-              <span>Connect Wallet</span>
+              <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center relative z-10">
+                <span className="text-lg">🦊</span>
+              </div>
+              <span className="relative z-10">Connect Wallet</span>
             </>
           )}
+          
+          <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
         </motion.button>
       );
     }
 
     return (
-      <div className="flex items-center space-x-3">
-        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
-          <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-4">
+        <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/20 shadow-2xl relative overflow-hidden">
+          {/* Background glow effect */}
+          <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-blue-500/10 rounded-2xl"></div>
+          
+          <div className="relative z-10 flex items-center space-x-4">
             <div className="flex flex-col items-end">
-              <span className="text-white font-semibold text-sm">
-                {formatAddress(walletState.address)}
-              </span>
-              <span className="text-white/70 text-xs">
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <span className="text-white font-bold text-sm">
+                  {formatAddress(walletState.address)}
+                </span>
+              </div>
+              <span className="text-white/70 text-xs font-medium">
                 {formatBalance(walletState.balance)} RUSH
               </span>
             </div>
             <div 
-              className={`px-2 py-1 rounded-full text-xs font-medium border ${getNetworkBadgeColor(walletState.networkStatus)}`}
+              className={`px-3 py-2 rounded-xl text-xs font-bold border-2 ${getNetworkBadgeColor(walletState.networkStatus)} shadow-lg`}
             >
               {networkName}
             </div>
+          </div>
+          
+          {/* Animated border */}
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-green-400 via-blue-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ padding: '1px' }}>
+            <div className="w-full h-full bg-slate-900 rounded-2xl"></div>
           </div>
         </div>
         
