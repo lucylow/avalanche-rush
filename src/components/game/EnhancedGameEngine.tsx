@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
-import { useAdvancedWeb3 } from '../../hooks/useAdvancedWeb3';
+import { useSmartContracts } from '../../hooks/useSmartContracts';
 
 interface GameState {
   isPlaying: boolean;
@@ -53,7 +53,7 @@ const EnhancedGameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
 }, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();
-  const { isConnected, startGameSession, completeGameSession } = useAdvancedWeb3();
+  const { isConnected, startGameSession, completeGameSession } = useSmartContracts();
   
   const [gameObjects, setGameObjects] = useState<GameObject[]>([]);
   const [currentScore, setCurrentScore] = useState(0);

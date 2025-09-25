@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAdvancedWeb3 } from '../../hooks/useAdvancedWeb3';
+import { useSmartContracts } from '../../hooks/useSmartContracts';
 
 interface WalletState {
   isConnecting: boolean;
@@ -30,7 +30,7 @@ const EnhancedWalletConnector: React.FC = () => {
     connectWallet, 
     switchNetwork,
     getRushBalance 
-  } = useAdvancedWeb3();
+  } = useSmartContracts();
 
   const [walletState, setWalletState] = useState<WalletState>({
     isConnecting: false,

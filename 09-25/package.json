@@ -18,6 +18,10 @@
     "verify:compliance": "hardhat run scripts/verify-deployment.js --network fuji",
     "monitor:production": "node scripts/monitor-production.js",
     "initialize:quests": "hardhat run scripts/initialize-quests.js",
+    "deploy:contracts": "hardhat run scripts/deploy-contracts.js",
+    "deploy:testnet": "hardhat run scripts/deploy-contracts.js --network fuji",
+    "verify:contracts": "hardhat run scripts/verify-deployment.js",
+    "setup:full": "npm run deploy:contracts && npm run verify:contracts",
     "setup": "npm install && cd frontend && npm install"
   },
   "keywords": [
