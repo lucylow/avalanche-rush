@@ -1,0 +1,59 @@
+this.showSuccess('Wallet connected successfully!');
+} catch (error) {
+this.updateUI('error');
+this.showError(this.getUserFriendlyError(error));
+}
+}
+getUserFriendlyError(error) {
+
+--- PAGE 204 ---
+
+const errorMap = {
+'User rejected': 'Connection cancelled',
+'Already processing': 'Please check your wallet',
+'No provider': 'Please install MetaMask or similar wallet'
+};
+return errorMap[error.message] || 'Something went wrong. Please try again.';
+}
+}
+```
+## 🎮 **Game Interface Psychology**
+### **Reward Schedule Design**
+```javascript
+class RewardPsychology {
+constructor() {
+this.rewardSchedule = {
+immediate: [
+{ trigger: 'gameStart', reward: 'energyFull' },
+{ trigger: 'firstJump', reward: 'positiveFeedback' },
+{ trigger: 'coinCollect', reward: 'points+sound' }
+],
+shortTerm: [
+{ trigger: '100Points', reward: 'miniAchievement' },
+{ trigger: '5Coins', reward: 'smallBonus' },
+{ trigger: 'firstObstacle', reward: 'learningTip' }
+],
+mediumTerm: [
+{ trigger: 'questComplete', reward: 'NFT+points' },
+{ trigger: 'levelUp', reward: 'newAbility' },
+{ trigger: 'dailyLogin', reward: 'bonusEnergy' }
+],
+longTerm: [
+{ trigger: 'allQuests', reward: 'rareNFT' },
+{ trigger: 'topLeaderboard', reward: 'specialTitle' },
+{ trigger: 'seasonComplete', reward: 'exclusiveRewards' }
+]
+};
+}
+calculateOptimalRewardTiming() {
+// Variable ratio reinforcement (like slot machines)
+return {
+
+--- PAGE 205 ---
+
+smallRewards: this.randomBetween(30, 120), // seconds
+mediumRewards: this.randomBetween(300, 600),
+largeRewards: this.randomBetween(1800, 3600)
+};
+}
+randomBetween(min, max) {

@@ -1,0 +1,115 @@
+
+
+3
+
+
+Prize pool
+
+30,000 USD
+
+event timeline
+11 days left for submission
+Upcoming
+Pre-registration
+2025/08/31 18:00
+Submission
+2025/09/07 18:00
+Deadline
+2025/10/06 17:59
+Virtual
+Hackathon Tags
+No Web3 Needed
+Gaming
+AI
+Web3
+Blockchain
+Web3 Gaming
+web3 ecosystem
+Avalanche
+Funtico
+LaunchLoop
+
+LaunchLoop
+Avalanche GameLoop: High Score!
+Details
+BUIDLs
+Hackers
+69
+Join a Team
+New
+Tracks
+Announcements
+Ask Question
+Ideas
+Outline
+
+no chapters
+Our first game jam earlier this year showed us what happens when you bring talented people together and give them a little extra nudge to build great games. Over 40 games were submitted. Some were clever and innovative, others simply beautiful to play, but one thing quickly became clear: a single event just wasn't enough. Great games and the talented developers behind them deserve more support, spotlight, and opportunity.
+
+Avalanche GameLoop isn't just another jam; it's a community built to empower creators with:
+
+Continuous feedback and support from industry experts
+A live audience for playtesting your games in real-time
+Significant prizes - $30,000 for Season 1!
+Direct access to investors and publishers looking for new talent
+Our goal is to give community members a real chance at success and growth, cycle after cycle, year after year.
+
+Season 1: High Score!
+Here's the plan for Season 1. We're starting with a classic theme and a straightforward goal.
+
+🎯 The Goal: Make a browser game where players compete for a HIGH SCORE! It can be a new idea or something you've already been tinkering with. We'll have some special bonuses for classic game types like tower defense, arcade, and more.
+
+🏆 High Score Tournament (Funtico.com): Instead of building in a vacuum, your game will be featured in a global tournament on Funtico. This means a real audience and real-world feedback from day one! Just submit your game, and if it is selected we will set you up with the SDK needed to plug in to the tournament.
+
+💰 $30,000 Prize Pool: We'll be directly rewarding devs, gamers, and the community! You can find the full prize breakdown in our Discord!
+
+Event Timeline
+Bootcamp (first week of Sept): Community gathering, brainstorming, team formation, and foundation building before the jam begins.
+Game Jam (4 weeks, deadline Oct 6): Build your game. New projects encouraged; existing games welcome. Judges reward progress made during this phase.
+Migration (post-submission): Get your game tournament-ready on Funtico.com with dedicated dev team support.
+Live Tournament (end of Oct): Global competition begins. Players worldwide compete for thousands in prizes while you watch your creation come alive.
+Why Partner with Funtico?
+Funtico is the largest gaming platform on Avalanche, but they've done more than just build games. They've created a fully scalable, secured, and compliant environment wrapped around a Publisher-as-a-Service solution—with zero barriers for Web2 players and developers.
+
+With almost 4 years in development, Funtico has proven that "build it and they will come" works in Web3, not just Web2.
+
+We've Seen It Work
+The most valuable opportunities often come from showing up, participating, and making your own luck.
+
+One of the most active developers in our last jam didn't even get to finish their entry. But because he was part of the community, sharing his work and connecting with others, he landed a deal to make one of his games live on Funtico.com, with real revenue share!
+
+He didn't "win" the jam, but he won. It's a powerful reminder that showing up and participating is often the most important step. The network you build and the eyes you get on your work are the real prizes.
+
+Let's Build Something That Lasts
+We want to create a place where more developers get to take their shot and see their projects come to life. If our first event was a test run, GameLoop is the chance to build a real engine for developer success.
+
+I'm genuinely excited to see who shows up and what we all build together.
+
+DoraHacks
+FOLLOW US
+About
+Jobs
+Hiring
+Dora Research Blog
+DoraHacks Blog
+Dora Factory
+Changelog
+Resources
+MACI/aMACI Voting
+Host a Hackathon
+Contact us
+
+Report Issue
+
+Message
+Telegram ↗
+Discord ↗
+Email ↗
+© 2025 DoraHacks. All rights reserved.
+
+Code of conduct
+|
+Privacy policy
+|
+Terms of service
+Share

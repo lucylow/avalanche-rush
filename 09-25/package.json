@@ -1,0 +1,60 @@
+{
+  "name": "avalanche-rush-game",
+  "version": "2.0.0",
+  "description": "Decentralized blockchain game with Reactive Smart Contracts for learn-to-earn education",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "test": "cd frontend && npm run test",
+    "compile": "npx hardhat compile",
+    "deploy": "npx hardhat run scripts/deploy.js",
+    "deploy:reactive": "npx hardhat run scripts/deploy-reactive.js --network reactive",
+    "deploy:avalanche": "npx hardhat run scripts/deploy-avalanche.js --network fuji",
+    "test:contracts": "npx hardhat test",
+    "coverage": "npx hardhat coverage",
+    "verify": "npx hardhat verify",
+    "verify:deployment": "hardhat run scripts/verify-deployment.js",
+    "verify:compliance": "hardhat run scripts/verify-deployment.js --network fuji",
+    "monitor:production": "node scripts/monitor-production.js",
+    "initialize:quests": "hardhat run scripts/initialize-quests.js",
+    "setup": "npm install && cd frontend && npm install"
+  },
+  "keywords": [
+    "blockchain",
+    "gaming",
+    "web3",
+    "avalanche",
+    "reactive",
+    "learn-to-earn",
+    "nft",
+    "defi"
+  ],
+  "author": "Avalanche Rush Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@chainlink/contracts": "^0.8.0",
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "@reactive-chain/contracts": "^1.0.0",
+    "hardhat": "^2.19.0",
+    "hardhat-gas-reporter": "^1.0.9",
+    "solidity-coverage": "^0.8.5"
+  },
+  "dependencies": {
+    "ethers": "^6.8.0",
+    "dotenv": "^16.3.1"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lucylow/avalanche-rush.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lucylow/avalanche-rush/issues"
+  },
+  "homepage": "https://avalanche-rush.lovable.app"
+}
