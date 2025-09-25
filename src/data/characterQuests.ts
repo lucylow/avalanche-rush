@@ -936,3 +936,386 @@ export const getQuestProgress = (quest: CharacterQuest): {
   
   return { completed, total, percentage, isComplete };
 };
+
+// Enhanced Reactive Smart Contract Quests
+export const REACTIVE_QUESTS: ReactiveQuest[] = [
+  {
+    id: 'avalanche-first-transfer',
+    title: 'First AVAX Transfer - Reactive Adventure',
+    characterId: 'avalon-the-mountain-guardian',
+    eventTrigger: 'transfer',
+    verificationContract: '0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7', // WAVAX
+    minimumAmount: 1000000000000000, // 0.001 AVAX in wei
+    completionCriteria: {
+      eventSignature: 'Transfer(address,address,uint256)',
+      parameterChecks: [
+        {
+          paramName: 'value',
+          operator: '>=',
+          value: 1000000000000000
+        },
+        {
+          paramName: 'to',
+          operator: '!=',
+          value: '0x0000000000000000000000000000000000000000'
+        }
+      ],
+      timeWindow: 0, // No time limit
+      repeatability: 'once'
+    },
+    automaticRewards: [
+      {
+        type: 'nft',
+        nftMetadata: {
+          name: 'First Steps on Avalanche',
+          description: 'Commemorates your first AVAX transfer, marking the beginning of your Web3 journey.',
+          image: 'ipfs://QmFirstStepsNFT/avalanche-guardian.json',
+          rarity: 'common',
+          attributes: [
+            {
+              trait_type: 'Quest Type',
+              value: 'First Transfer'
+            },
+            {
+              trait_type: 'Blockchain',
+              value: 'Avalanche'
+            },
+            {
+              trait_type: 'Character Guide',
+              value: 'Avalon'
+            },
+            {
+              trait_type: 'Achievement Date',
+              value: Date.now(),
+              display_type: 'date'
+            }
+          ]
+        },
+        triggersChainlinkVRF: true,
+        vrfConfig: {
+          subscriptionId: 1234,
+          keyHash: '0x83250c5584ffa93feb6ee082981c5ebe484c865196750b39835ad4f13780435d',
+          callbackGasLimit: 100000,
+          numWords: 1,
+          rareDropChance: 5 // 5% chance for rare variant
+        }
+      },
+      {
+        type: 'token',
+        amount: 100 // 100 RUSH tokens
+      },
+      {
+        type: 'experience',
+        amount: 250
+      }
+    ],
+    vfxConfig: {
+      particleEffect: 'ice_crystal_burst',
+      screenShake: true,
+      colorTheme: 'blue_white_gradient',
+      duration: 3000,
+      soundEffect: 'avalanche_rumble'
+    }
+  },
+  
+  {
+    id: 'trader-joe-swap-master',
+    title: 'DeFi Swap Mastery with Lyra',
+    characterId: 'lyra-rush-weaver',
+    eventTrigger: 'swap',
+    verificationContract: '0x60aE616a2155Ee3d9A68541Ba4544862310933d4', // Trader Joe Router
+    minimumAmount: 1000000, // 1 USDC
+    completionCriteria: {
+      eventSignature: 'Swap(address,uint256,uint256,uint256,uint256,address)',
+      parameterChecks: [
+        {
+          paramName: 'amount0Out',
+          operator: '>',
+          value: 0
+        },
+        {
+          paramName: 'amount1Out', 
+          operator: '>',
+          value: 0
+        }
+      ],
+      timeWindow: 3600, // 1 hour to complete after starting
+      repeatability: 'daily'
+    },
+    automaticRewards: [
+      {
+        type: 'nft',
+        nftMetadata: {
+          name: 'DeFi Alchemist Apprentice',
+          description: 'Awarded for mastering your first DEX swap on Avalanche. Lyra is proud of your progress!',
+          image: 'ipfs://QmDeFiAlchemist/lyra-swap-master.json',
+          rarity: 'rare',
+          attributes: [
+            {
+              trait_type: 'DeFi Skill',
+              value: 'Token Swapping'
+            },
+            {
+              trait_type: 'Platform',
+              value: 'Trader Joe'
+            },
+            {
+              trait_type: 'Mentor',
+              value: 'Lyra the Rush Weaver'
+            },
+            {
+              trait_type: 'Efficiency Boost',
+              value: 15,
+              display_type: 'boost_percentage'
+            }
+          ],
+          animationUrl: 'ipfs://QmAnimations/token-weaving-effect.mp4'
+        },
+        triggersChainlinkVRF: true,
+        vrfConfig: {
+          subscriptionId: 1234,
+          keyHash: '0x83250c5584ffa93feb6ee082981c5ebe484c865196750b39835ad4f13780435d',
+          callbackGasLimit: 150000,
+          numWords: 2,
+          rareDropChance: 15 // 15% chance for epic variant
+        }
+      },
+      {
+        type: 'token',
+        amount: 300
+      },
+      {
+        type: 'experience',
+        amount: 500
+      }
+    ],
+    vfxConfig: {
+      particleEffect: 'energy_swirl_multi',
+      screenShake: false,
+      colorTheme: 'purple_gold_gradient',
+      duration: 4000,
+      soundEffect: 'token_fusion'
+    }
+  },
+
+  {
+    id: 'subnet-deployment-cipher',
+    title: 'Subnet Deployment Mastery with Cipher',
+    characterId: 'cipher-the-subnet-architect',
+    eventTrigger: 'contract_interaction',
+    verificationContract: '0xSubnetFactoryContract', // Placeholder for subnet factory
+    completionCriteria: {
+      eventSignature: 'SubnetCreated(address,uint256,string)',
+      parameterChecks: [
+        {
+          paramName: 'creator',
+          operator: '==',
+          value: 'USER_ADDRESS' // Will be replaced with actual user address
+        }
+      ],
+      timeWindow: 0,
+      repeatability: 'unlimited'
+    },
+    automaticRewards: [
+      {
+        type: 'nft',
+        nftMetadata: {
+          name: 'Subnet Architect Certification',
+          description: 'Official certification for deploying your first Avalanche subnet. Cipher recognizes your technical prowess.',
+          image: 'ipfs://QmSubnetArchitect/cipher-certification.json',
+          rarity: 'legendary',
+          attributes: [
+            {
+              trait_type: 'Technical Achievement',
+              value: 'Subnet Deployment'
+            },
+            {
+              trait_type: 'Certification Level',
+              value: 'Professional'
+            },
+            {
+              trait_type: 'Validator Boost',
+              value: 25,
+              display_type: 'boost_percentage'
+            },
+            {
+              trait_type: 'Network Contribution',
+              value: 'Subnet Creator'
+            }
+          ]
+        },
+        triggersChainlinkVRF: true,
+        vrfConfig: {
+          subscriptionId: 1234,
+          keyHash: '0x83250c5584ffa93feb6ee082981c5ebe484c865196750b39835ad4f13780435d',
+          callbackGasLimit: 200000,
+          numWords: 1,
+          rareDropChance: 25 // 25% chance for mythic variant
+        }
+      },
+      {
+        type: 'token',
+        amount: 1000
+      },
+      {
+        type: 'character_unlock',
+        // Unlocks advanced validator character
+      }
+    ],
+    vfxConfig: {
+      particleEffect: 'network_node_expansion',
+      screenShake: true,
+      colorTheme: 'cyan_electric_blue',
+      duration: 5000,
+      soundEffect: 'network_initialization'
+    }
+  },
+
+  {
+    id: 'defi-yield-farming-nova',
+    title: 'Advanced Yield Farming with Nova',
+    characterId: 'nova-defi-alchemist',
+    eventTrigger: 'contract_interaction',
+    verificationContract: '0xYieldFarmContract', // Placeholder for yield farming contract
+    minimumAmount: 100000000, // 100 USDC
+    completionCriteria: {
+      eventSignature: 'Deposit(address,uint256,uint256)',
+      parameterChecks: [
+        {
+          paramName: 'amount',
+          operator: '>=',
+          value: 100000000
+        }
+      ],
+      timeWindow: 0,
+      repeatability: 'weekly'
+    },
+    automaticRewards: [
+      {
+        type: 'nft',
+        nftMetadata: {
+          name: 'Master Yield Farmer',
+          description: 'Recognized by Nova for achieving advanced yield farming strategies with significant capital deployment.',
+          image: 'ipfs://QmYieldFarming/nova-master-farmer.json',
+          rarity: 'epic',
+          attributes: [
+            {
+              trait_type: 'DeFi Strategy',
+              value: 'Yield Farming'
+            },
+            {
+              trait_type: 'Capital Efficiency',
+              value: 'High'
+            },
+            {
+              trait_type: 'APY Boost',
+              value: 20,
+              display_type: 'boost_percentage'
+            },
+            {
+              trait_type: 'Risk Management',
+              value: 'Advanced'
+            }
+          ],
+          animationUrl: 'ipfs://QmAnimations/yield-compounding.mp4'
+        }
+      },
+      {
+        type: 'token',
+        amount: 750
+      },
+      {
+        type: 'evolution', // Triggers character evolution
+      }
+    ],
+    vfxConfig: {
+      particleEffect: 'compound_interest_spiral',
+      screenShake: false,
+      colorTheme: 'green_gold_prosperity',
+      duration: 4500,
+      soundEffect: 'alchemy_transformation'
+    }
+  },
+
+  {
+    id: 'temporal-mastery-echo',
+    title: 'Temporal Network Mastery with Echo',
+    characterId: 'echo-reactive-oracle',
+    eventTrigger: 'quest_completion',
+    verificationContract: '0xReactiveQuestEngine',
+    completionCriteria: {
+      eventSignature: 'MultiQuestMastery(address,uint256[])',
+      parameterChecks: [
+        {
+          paramName: 'questCount',
+          operator: '>=',
+          value: 10 // Must complete 10 different quests
+        }
+      ],
+      timeWindow: 604800, // 1 week
+      repeatability: 'once'
+    },
+    automaticRewards: [
+      {
+        type: 'nft',
+        nftMetadata: {
+          name: 'Temporal Network Oracle',
+          description: 'Ultimate recognition from Echo for mastering the interconnected nature of the Reactive Network. You have transcended normal limitations.',
+          image: 'ipfs://QmTemporalOracle/echo-ultimate.json',
+          rarity: 'mythic',
+          attributes: [
+            {
+              trait_type: 'Mastery Level',
+              value: 'Transcendent'
+            },
+            {
+              trait_type: 'Network Harmony',
+              value: 100,
+              display_type: 'number'
+            },
+            {
+              trait_type: 'Temporal Sight',
+              value: 'Unlocked'
+            },
+            {
+              trait_type: 'Oracle Blessing',
+              value: 'Active'
+            },
+            {
+              trait_type: 'All Rewards Multiplier',
+              value: 50,
+              display_type: 'boost_percentage'
+            }
+          ],
+          animationUrl: 'ipfs://QmAnimations/temporal-mastery.mp4'
+        },
+        triggersChainlinkVRF: true,
+        vrfConfig: {
+          subscriptionId: 1234,
+          keyHash: '0x83250c5584ffa93feb6ee082981c5ebe484c865196750b39835ad4f13780435d',
+          callbackGasLimit: 300000,
+          numWords: 3,
+          rareDropChance: 100 // Always triggers special VRF for ultimate rewards
+        }
+      },
+      {
+        type: 'token',
+        amount: 5000
+      },
+      {
+        type: 'character_unlock',
+        // Unlocks ultimate Echo form
+      }
+    ],
+    vfxConfig: {
+      particleEffect: 'reality_distortion_field',
+      screenShake: true,
+      colorTheme: 'prismatic_rainbow_cascade',
+      duration: 10000,
+      soundEffect: 'cosmic_convergence'
+    }
+  }
+];
+
+// Import ReactiveQuest interface at top of file
+import { ReactiveQuest } from './characters';

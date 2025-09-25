@@ -1,5 +1,5 @@
-// src/components/storytelling/StoryGameIntegration.tsx
-import React, { useEffect, useCallback } from 'react';
+// src/components/storytelling/StoryGameIntegration.tsx - Enhanced with Reactive Smart Contract Integration
+import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '../ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
@@ -12,9 +12,23 @@ import {
   Heart,
   Target,
   Zap,
-  Gift
+  Gift,
+  Activity,
+  Coins,
+  Flame,
+  ShieldCheck,
+  TrendingUp
 } from 'lucide-react';
-import { Character, getCharacterById, getRandomDialogue } from '../../data/characters';
+import { 
+  Character, 
+  ReactiveEvent, 
+  ReactiveCharacter, 
+  CharacterReactiveResponse,
+  ReactiveQuest,
+  AutomaticReward,
+  getCharacterById, 
+  getRandomDialogue 
+} from '../../data/characters';
 import DialogueSystem from './DialogueSystem';
 import { useAudioManager } from '../../hooks/useAudioManager';
 
@@ -35,10 +49,11 @@ interface StoryGameIntegrationProps {
     totalScore: number;
     achievements: string[];
     completedQuests: string[];
+    walletAddress?: string;
   } | null;
   
   // Selected character
-  selectedCharacter?: Character;
+  selectedCharacter?: ReactiveCharacter;
   
   // Events
   onGameStart?: () => void;
@@ -46,10 +61,21 @@ interface StoryGameIntegrationProps {
   onLevelComplete?: (level: number) => void;
   onAchievementUnlocked?: (achievement: string) => void;
   onQuestComplete?: (questId: string) => void;
+  onReactiveEvent?: (event: ReactiveEvent) => void;
+  onAutomaticReward?: (reward: AutomaticReward) => void;
   
   // Character relationships
   relationships: Record<string, number>;
   onRelationshipChange?: (characterId: string, change: number) => void;
+  
+  // Reactive Smart Contract Integration
+  reactiveEventStream?: ReactiveEvent[];
+  chainlinkVRFEnabled?: boolean;
+  contractAddresses?: {
+    questEngine: string;
+    nftRewards: string;
+    tokenRewards: string;
+  };
 }
 
 interface GameEvent {
@@ -79,20 +105,45 @@ const StoryGameIntegration: React.FC<StoryGameIntegrationProps> = ({
   onLevelComplete,
   onAchievementUnlocked,
   onQuestComplete,
+  onReactiveEvent,
+  onAutomaticReward,
   relationships,
-  onRelationshipChange
+  onRelationshipChange,
+  reactiveEventStream = [],
+  chainlinkVRFEnabled = false,
+  contractAddresses
 }) => {
   const audioManager = useAudioManager();
   
   const [recentEvents, setRecentEvents] = React.useState<GameEvent[]>([]);
+  const [reactiveEvents, setReactiveEvents] = React.useState<ReactiveEvent[]>([]);
+  const [pendingRewards, setPendingRewards] = React.useState<AutomaticReward[]>([]);
+  const [characterResponses, setCharacterResponses] = React.useState<CharacterReactiveResponse[]>([]);
+  const [evolutionAnimation, setEvolutionAnimation] = React.useState<{
+    isActive: boolean;
+    characterId: string;
+    evolutionStage: number;
+  } | null>(null);
+  
   const [activeDialogue, setActiveDialogue] = React.useState<{
     isVisible: boolean;
-    triggeredBy: 'victory' | 'defeat' | 'levelUp' | 'achievement' | 'questStart' | 'questComplete' | 'random' | 'greeting';
-    character?: Character;
+    triggeredBy: 'victory' | 'defeat' | 'levelUp' | 'achievement' | 'questStart' | 'questComplete' | 'random' | 'greeting' | 'reactive';
+    character?: ReactiveCharacter;
+    reactiveEvent?: ReactiveEvent;
   }>({ isVisible: false, triggeredBy: 'greeting' });
   
   const [storyTriggers, setStoryTriggers] = React.useState<StoryTrigger[]>([]);
   const [contextualNarration, setContextualNarration] = React.useState<string | null>(null);
+  const [vrfRequestPending, setVrfRequestPending] = React.useState<boolean>(false);
+  const [blockchainActivity, setBlockchainActivity] = React.useState<{
+    isActive: boolean;
+    activityType: ReactiveEvent['eventType'];
+    transactionHash?: string;
+  }>({ isActive: false, activityType: 'transfer' });
+  
+  // WebSocket connection for real-time blockchain events
+  const wsRef = useRef<WebSocket | null>(null);
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Track game events and trigger story responses
   useEffect(() => {

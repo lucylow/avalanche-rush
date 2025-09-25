@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useWeb3 } from './useAdvancedWeb3';
+import { useAdvancedWeb3 } from './useAdvancedWeb3';
 
 interface CrossmintConfig {
   clientId: string;
@@ -36,7 +36,7 @@ export const useCrossmint = () => {
   const [error, setError] = useState<string | null>(null);
   const [characters, setCharacters] = useState<CrossmintCharacter[]>([]);
   const [mintedCharacters, setMintedCharacters] = useState<Map<string, string>>(new Map());
-  const { account, isConnected } = useWeb3();
+  const { account, isConnected } = useAdvancedWeb3();
 
   // Crossmint configuration for Avalanche Rush
   const crossmintConfig: CrossmintConfig = {

@@ -38,6 +38,9 @@ Avalanche Rush represents a revolutionary approach to Web3 education through gam
 | **⚡ Reactive Automation** | Smart contracts that auto-reward achievements | ✅ Zero gas costs | ✅ Full ownership |
 | **🏆 Tournament Integration** | Compete in global leaderboards for real prizes | ✅ Credit card entry | ✅ Crypto payments |
 | **🌿 Social Integration** | Lens Protocol & Farcaster social features | ✅ Traditional social | ✅ Web3 social graph |
+| **👥 Multiplayer Modes** | Real-time competitive gameplay | ✅ Local multiplayer | ✅ Cross-chain tournaments |
+| **🏘️ Guild System** | Collaborative team-based challenges | ✅ Team formation | ✅ DAO governance |
+| **📱 Social Features** | Friend lists, chat, and achievements | ✅ In-app messaging | ✅ Decentralized social |
 | **🎨 Dynamic NFTs** | Evolving achievement tokens based on progress | ✅ Custodial wallets | ✅ Self-custody |
 | **🌐 Avalanche Subnets** | Custom subnet creation and management | ✅ Simple interface | ✅ Full subnet control |
 | **💎 Advanced DeFi** | Yield farming, liquidity provision, flash loans | ✅ Easy staking | ✅ Complex strategies |
@@ -47,12 +50,22 @@ Avalanche Rush represents a revolutionary approach to Web3 education through gam
 
 ### 🎮 Game Modes
 
+#### Single Player Modes
 - **Classic Mode**: Standard endless runner with increasing difficulty
 - **Tutorial Mode**: Guided learning with step-by-step Web3 education
 - **Challenge Mode**: Time-limited challenges with special rewards
 - **Quest Mode**: Story-driven missions with blockchain interactions
 - **Speed Run**: Time-based completion challenges
 - **Survival Mode**: Endurance-based gameplay with escalating difficulty
+
+#### 🎯 Multiplayer Modes
+- **Battle Royale**: 50-player elimination matches with shrinking play areas
+- **Team Rush**: 4v4 team-based competitive races
+- **Guild Wars**: Large-scale guild vs guild battles (20v20)
+- **Tournament Mode**: Bracket-style competitive tournaments
+- **Co-op Quest**: Collaborative quest completion with shared rewards
+- **Speed Racing**: Real-time head-to-head racing competitions
+- **King of the Hill**: Territory control with dynamic objectives
 
 ## 🏗️ Architecture
 
@@ -64,33 +77,55 @@ graph TB
         A[React Frontend] --> B[Game Engine]
         B --> C[Web3 Integration]
         C --> D[Wallet Connector]
+        B --> E[Multiplayer Engine]
+        E --> F[Real-time Sync]
+        B --> G[Social Features]
+        G --> H[Chat System]
+        G --> I[Friend Lists]
     end
     
     subgraph "Blockchain Layer"
-        E[Avalanche C-Chain] --> F[Game Logic Contract]
-        E --> G[Rush Token Contract]
-        E --> H[Mock DEX Contract]
-        E --> I[Educational NFT Contract]
+        J[Avalanche C-Chain] --> K[Game Logic Contract]
+        J --> L[Rush Token Contract]
+        J --> M[Mock DEX Contract]
+        J --> N[Educational NFT Contract]
+        J --> O[Guild Contract]
+        J --> P[Tournament Contract]
     end
     
     subgraph "Reactive Network"
-        J[Reactive Quest Engine] --> K[Event Detection]
-        K --> L[Automated Rewards]
-        L --> M[NFT Minting]
-        L --> N[Token Distribution]
+        Q[Reactive Quest Engine] --> R[Event Detection]
+        R --> S[Automated Rewards]
+        S --> T[NFT Minting]
+        S --> U[Token Distribution]
+        Q --> V[Multiplayer Events]
+        V --> W[Real-time Updates]
+    end
+    
+    subgraph "Social Layer"
+        X[Lens Protocol] --> Y[Social Graph]
+        Z[Farcaster] --> AA[Decentralized Chat]
+        BB[Guild System] --> CC[Team Management]
+        DD[Tournament System] --> EE[Competitive Play]
     end
     
     subgraph "External Services"
-        O[Chainlink VRF] --> P[Random Raffles]
-        Q[IPFS] --> R[NFT Metadata]
-        S[The Graph] --> T[Indexed Data]
+        FF[Chainlink VRF] --> GG[Random Raffles]
+        HH[IPFS] --> II[NFT Metadata]
+        JJ[The Graph] --> KK[Indexed Data]
+        LL[WebRTC] --> MM[P2P Communication]
     end
     
-    A --> E
-    E --> J
-    J --> O
+    A --> J
     J --> Q
-    E --> S
+    Q --> FF
+    Q --> HH
+    J --> JJ
+    E --> LL
+    G --> X
+    G --> Z
+    B --> BB
+    B --> DD
 ```
 
 ### Data Flow Architecture
@@ -882,6 +917,351 @@ graph TD
     K --> L[Quest Completed]
 ```
 
+## 👥 Social & Multiplayer Features
+
+### 🌐 Social Integration Architecture
+
+```mermaid
+graph TB
+    subgraph "Social Layer"
+        A[Lens Protocol] --> B[Social Graph]
+        C[Farcaster] --> D[Decentralized Chat]
+        E[Friend System] --> F[Social Connections]
+        G[Guild System] --> H[Team Management]
+    end
+    
+    subgraph "Multiplayer Engine"
+        I[Game Lobby] --> J[Matchmaking]
+        K[Real-time Sync] --> L[WebRTC P2P]
+        M[Tournament System] --> N[Bracket Management]
+        O[Guild Wars] --> P[Large-scale Battles]
+    end
+    
+    subgraph "Communication"
+        Q[Voice Chat] --> R[Proximity Audio]
+        S[Text Chat] --> T[Encrypted Messages]
+        U[Emotes] --> V[Social Expressions]
+        W[Streaming] --> X[Live Broadcasting]
+    end
+    
+    A --> I
+    C --> K
+    E --> M
+    G --> O
+```
+
+### 🏘️ Guild System
+
+#### Guild Creation & Management
+```solidity
+contract GuildSystem {
+    struct Guild {
+        uint256 guildId;
+        string name;
+        string description;
+        address leader;
+        address[] members;
+        uint256 treasury;
+        uint256 reputation;
+        uint256 level;
+        mapping(string => uint256) resources;
+    }
+    
+    // Guild creation with initial deposit
+    function createGuild(string memory name, uint256 initialDeposit) external;
+    
+    // Member management
+    function inviteMember(address member) external;
+    function removeMember(address member) external;
+    
+    // Guild treasury management
+    function contributeToTreasury(uint256 amount) external;
+    function withdrawFromTreasury(uint256 amount) external;
+    
+    // Guild wars and competitions
+    function declareWar(uint256 targetGuildId) external;
+    function participateInGuildWar(uint256 warId) external;
+}
+```
+
+#### Guild Features
+- **Guild Creation**: Create guilds with customizable names and descriptions
+- **Member Management**: Invite, remove, and promote guild members
+- **Treasury System**: Collective fund management for guild activities
+- **Reputation System**: Guild reputation based on achievements and victories
+- **Guild Wars**: Large-scale competitive battles between guilds
+- **Resource Sharing**: Share resources and rewards among guild members
+- **Guild Quests**: Collaborative quests with shared objectives
+- **Guild Halls**: Virtual meeting spaces for guild activities
+
+### 🎯 Multiplayer Game Modes
+
+#### Battle Royale Mode
+```mermaid
+graph TD
+    A[50 Players Join] --> B[Matchmaking]
+    B --> C[Game Lobby]
+    C --> D[Countdown Timer]
+    D --> E[Game Starts]
+    E --> F[Shrinking Play Area]
+    F --> G[Player Elimination]
+    G --> H{Players Remaining?}
+    H -->|>1| F
+    H -->|=1| I[Victory Royale]
+    I --> J[Rewards Distribution]
+```
+
+**Battle Royale Features:**
+- **50-Player Matches**: Large-scale elimination gameplay
+- **Shrinking Play Area**: Dynamic map boundaries that force encounters
+- **Power-ups**: Temporary abilities scattered across the map
+- **Spectator Mode**: Watch remaining players after elimination
+- **Real-time Leaderboard**: Live ranking during matches
+
+#### Team Rush Mode
+```mermaid
+graph TB
+    subgraph "Team Formation"
+        A[4v4 Teams] --> B[Role Selection]
+        B --> C[Team Strategy]
+    end
+    
+    subgraph "Gameplay"
+        D[Race Start] --> E[Checkpoint System]
+        E --> F[Team Coordination]
+        F --> G[Power-up Collection]
+        G --> H[Finish Line]
+    end
+    
+    subgraph "Scoring"
+        I[Individual Score] --> J[Team Score]
+        J --> K[Team Victory]
+        K --> L[Reward Distribution]
+    end
+```
+
+**Team Rush Features:**
+- **4v4 Team Battles**: Balanced team-based competition
+- **Role Specialization**: Tank, Speedster, Collector, Support roles
+- **Team Coordination**: Shared objectives and synchronized actions
+- **Team Power-ups**: Collective abilities that benefit the entire team
+- **Communication Tools**: In-game voice chat and quick commands
+
+#### Guild Wars Mode
+```mermaid
+graph LR
+    A[Guild Registration] --> B[War Declaration]
+    B --> C[Preparation Phase]
+    C --> D[Battle Phase]
+    D --> E[Victory Conditions]
+    E --> F[Reward Distribution]
+    F --> G[Guild Ranking Update]
+```
+
+**Guild Wars Features:**
+- **20v20 Large Battles**: Massive guild vs guild conflicts
+- **Territory Control**: Capture and defend strategic points
+- **Siege Mechanics**: Attack and defend guild strongholds
+- **Resource Management**: Manage guild resources during wars
+- **War Duration**: Multi-day campaigns with multiple phases
+
+### 💬 Social Communication Features
+
+#### Decentralized Chat System
+```typescript
+interface ChatSystem {
+  // Direct messaging
+  sendDirectMessage(to: string, message: string): Promise<void>;
+  
+  // Guild chat
+  sendGuildMessage(guildId: string, message: string): Promise<void>;
+  
+  // Global chat channels
+  sendGlobalMessage(channel: string, message: string): Promise<void>;
+  
+  // Voice chat
+  joinVoiceChannel(channelId: string): Promise<void>;
+  leaveVoiceChannel(): void;
+  
+  // Emotes and reactions
+  sendEmote(emoteId: string, target?: string): Promise<void>;
+  reactToMessage(messageId: string, reaction: string): Promise<void>;
+}
+```
+
+#### Social Features
+- **Friend System**: Add friends, see online status, and invite to games
+- **Chat Channels**: Global, guild, and private chat channels
+- **Voice Chat**: Proximity-based and channel-based voice communication
+- **Emotes**: Expressive animations and reactions
+- **Streaming Integration**: Broadcast gameplay to social platforms
+- **Achievement Sharing**: Share achievements and milestones
+- **Photo Mode**: Capture and share epic gaming moments
+
+### 🏆 Tournament System
+
+#### Tournament Architecture
+```mermaid
+graph TB
+    subgraph "Tournament Creation"
+        A[Tournament Setup] --> B[Bracket Generation]
+        B --> C[Registration Period]
+        C --> D[Match Scheduling]
+    end
+    
+    subgraph "Tournament Execution"
+        D --> E[Round 1]
+        E --> F[Round 2]
+        F --> G[Semifinals]
+        G --> H[Finals]
+    end
+    
+    subgraph "Rewards"
+        H --> I[Prize Distribution]
+        I --> J[Ranking Updates]
+        J --> K[Tournament NFTs]
+    end
+```
+
+#### Tournament Types
+- **Daily Tournaments**: Quick 1-hour competitions
+- **Weekly Championships**: Multi-day tournaments with brackets
+- **Seasonal Leagues**: Long-term competitive seasons
+- **Guild Tournaments**: Guild-only competitions
+- **Community Events**: User-created tournaments
+- **Pro Leagues**: High-stakes professional competitions
+
+### 🎮 Real-time Multiplayer Technology
+
+#### WebRTC P2P Architecture
+```typescript
+interface MultiplayerEngine {
+  // Connection management
+  connectToLobby(lobbyId: string): Promise<void>;
+  disconnectFromLobby(): void;
+  
+  // Real-time synchronization
+  syncGameState(state: GameState): void;
+  receiveGameUpdate(update: GameUpdate): void;
+  
+  // Player management
+  addPlayer(player: Player): void;
+  removePlayer(playerId: string): void;
+  
+  // Matchmaking
+  findMatch(preferences: MatchPreferences): Promise<string>;
+  joinMatch(matchId: string): Promise<void>;
+}
+```
+
+#### Technical Features
+- **WebRTC P2P**: Direct peer-to-peer connections for low latency
+- **State Synchronization**: Real-time game state updates
+- **Anti-cheat System**: Server-side validation and client prediction
+- **Lag Compensation**: Smooth gameplay despite network variations
+- **Spectator Mode**: Watch matches in real-time
+- **Replay System**: Record and playback matches
+
+### 📊 Social Analytics & Metrics
+
+#### Social Engagement Tracking
+```json
+{
+  "socialMetrics": {
+    "userEngagement": {
+      "averageSessionTime": 1840,
+      "dailyActiveUsers": 1247,
+      "friendConnections": 8920,
+      "guildMemberships": 2340,
+      "chatMessages": 45670
+    },
+    "multiplayerStats": {
+      "totalMatches": 15678,
+      "averageMatchDuration": 420,
+      "tournamentParticipation": 567,
+      "guildWars": 89,
+      "teamFormations": 2340
+    },
+    "socialFeatures": {
+      "voiceChatUsage": 0.67,
+      "emoteUsage": 0.89,
+      "achievementSharing": 0.45,
+      "streamingSessions": 123,
+      "friendInvitations": 2340
+    }
+  }
+}
+```
+
+### 🔧 Implementation Guide
+
+#### Adding Multiplayer Support
+```typescript
+// 1. Initialize multiplayer engine
+const multiplayerEngine = new MultiplayerEngine({
+  iceServers: ['stun:stun.l.google.com:19302'],
+  signalingServer: 'wss://signaling.avalanche-rush.com'
+});
+
+// 2. Set up game state synchronization
+multiplayerEngine.onGameStateUpdate((state) => {
+  updateLocalGameState(state);
+});
+
+// 3. Handle player connections
+multiplayerEngine.onPlayerJoin((player) => {
+  addPlayerToGame(player);
+});
+
+multiplayerEngine.onPlayerLeave((playerId) => {
+  removePlayerFromGame(playerId);
+});
+
+// 4. Send game updates
+function sendGameUpdate(update: GameUpdate) {
+  multiplayerEngine.broadcastUpdate(update);
+}
+```
+
+#### Guild System Integration
+```solidity
+// 1. Create guild
+function createGuild(string memory name) external {
+    require(balanceOf[msg.sender] >= GUILD_CREATION_FEE, "Insufficient funds");
+    
+    uint256 guildId = guildCount++;
+    guilds[guildId] = Guild({
+        guildId: guildId,
+        name: name,
+        leader: msg.sender,
+        members: [msg.sender],
+        treasury: 0,
+        reputation: 0,
+        level: 1
+    });
+    
+    userGuilds[msg.sender] = guildId;
+    emit GuildCreated(guildId, name, msg.sender);
+}
+
+// 2. Guild war declaration
+function declareWar(uint256 targetGuildId) external {
+    require(userGuilds[msg.sender] != 0, "Not in a guild");
+    require(guilds[userGuilds[msg.sender]].leader == msg.sender, "Not guild leader");
+    
+    uint256 warId = warCount++;
+    wars[warId] = War({
+        warId: warId,
+        attackerGuild: userGuilds[msg.sender],
+        defenderGuild: targetGuildId,
+        status: WarStatus.PREPARATION,
+        startTime: block.timestamp + WAR_PREPARATION_TIME
+    });
+    
+    emit WarDeclared(warId, userGuilds[msg.sender], targetGuildId);
+}
+```
+
 ## 📊 Mock Data & Examples
 
 ### 🎮 Game Session Mock Data
@@ -1333,6 +1713,8 @@ RUSH_TOKEN_CONTRACT=0x8a1d5C5E3A5E2a9E1aB8d8C6E6E9F4A5B8D35b0
 EDUCATIONAL_NFT_CONTRACT=0x9b2d5C5E3A5E2a9E1aB8d8C6E6E9F4A5B8D35c1
 MOCK_DEX_CONTRACT=0x7b2d5C5E3A5E2a9E1aB8d8C6E6E9F4A5B8D35e3
 REACTIVE_QUEST_ENGINE=0x6a1d5C5E3A5E2a9E1aB8d8C6E6E9F4A5B8D35d2
+GUILD_CONTRACT=0x5c0f6B7E8A9D2E3F4G5H6I7J8K9L0M1N2O3P4Q
+TOURNAMENT_CONTRACT=0x4b1e5A6D7C8B9E0F1G2H3I4J5K6L7M8N9O0P1Q2R
 
 # API Keys
 SNOWTRACE_API_KEY=your_snowtrace_api_key_here
@@ -1350,6 +1732,33 @@ QUEST_REWARD_MULTIPLIER=1.5
 NFT_MINT_GAS_LIMIT=500000
 TOKEN_TRANSFER_GAS_LIMIT=100000
 
+# Multiplayer Configuration
+MAX_PLAYERS_PER_MATCH=50
+BATTLE_ROYALE_PLAYERS=50
+TEAM_RUSH_PLAYERS=8
+GUILD_WAR_PLAYERS=40
+MATCHMAKING_TIMEOUT=300
+P2P_SIGNALING_SERVER=wss://signaling.avalanche-rush.com
+WEBRTC_ICE_SERVERS=stun:stun.l.google.com:19302
+
+# Social Configuration
+LENS_API_URL=https://api.lens.xyz
+FARCASTER_API_URL=https://api.farcaster.xyz
+CHAT_ENCRYPTION_ENABLED=true
+VOICE_CHAT_ENABLED=true
+STREAMING_ENABLED=true
+
+# Guild Configuration
+GUILD_CREATION_FEE=1000000000000000000000
+GUILD_WAR_COST=500000000000000000000
+MAX_GUILD_MEMBERS=50
+GUILD_TREASURY_LIMIT=100000000000000000000000
+
+# Tournament Configuration
+TOURNAMENT_ENTRY_FEE=500000000000000000000
+MAX_TOURNAMENT_PARTICIPANTS=256
+TOURNAMENT_PRIZE_POOL=10000000000000000000000
+
 # Security Configuration
 EMERGENCY_PAUSE_ENABLED=true
 MULTISIG_THRESHOLD=3
@@ -1359,6 +1768,374 @@ UPGRADE_DELAY=86400
 ANALYTICS_ENABLED=true
 MIXPANEL_TOKEN=your_mixpanel_token_here
 GOOGLE_ANALYTICS_ID=your_ga_id_here
+SOCIAL_ANALYTICS_ENABLED=true
+```
+
+### 👥 Multiplayer & Social Mock Data
+
+#### 🏘️ Guild System Mock Data
+
+```json
+{
+  "guilds": [
+    {
+      "guildId": 1,
+      "name": "Avalanche Warriors",
+      "description": "Elite guild of Web3 warriors",
+      "leader": "0x742d35Cc5A5E2a9E1aB8d8C6E6E9F4A5B8D35a9",
+      "members": [
+        "0x742d35Cc5A5E2a9E1aB8d8C6E6E9F4A5B8D35a9",
+        "0x8b3e6F7H9J2K4L6M8N0P1Q3R5S7T9U1V3W5X",
+        "0x9c4f7G8I1J3K5L7M9N1O2P4Q6R8S0T2U4V6W8X",
+        "0xAd5f8H9J2K4L6M8N0P1Q3R5S7T9U1V3W5X7Y"
+      ],
+      "treasury": "25000000000000000000000",
+      "reputation": 15420,
+      "level": 8,
+      "resources": {
+        "energy": 1500,
+        "materials": 890,
+        "knowledge": 2340
+      },
+      "createdAt": 1703000000,
+      "totalWars": 12,
+      "warsWon": 8,
+      "averageMemberLevel": 6.5
+    },
+    {
+      "guildId": 2,
+      "name": "DeFi Masters",
+      "description": "Masters of decentralized finance",
+      "leader": "0xBe6g9I2J5L8M1N4O7P0Q3R6S9T2U5V8W1X4Y7Z",
+      "members": [
+        "0xBe6g9I2J5L8M1N4O7P0Q3R6S9T2U5V8W1X4Y7Z",
+        "0xCf7h0J3K6M9N2O5P8Q1R4S7T0U3V6W9X2Y5Z8A"
+      ],
+      "treasury": "18000000000000000000000",
+      "reputation": 12890,
+      "level": 7,
+      "resources": {
+        "energy": 1200,
+        "materials": 650,
+        "knowledge": 1890
+      },
+      "createdAt": 1702900000,
+      "totalWars": 8,
+      "warsWon": 5,
+      "averageMemberLevel": 5.8
+    }
+  ]
+}
+```
+
+#### 🎮 Multiplayer Match Mock Data
+
+```json
+{
+  "matches": [
+    {
+      "matchId": "match_001",
+      "type": "battle_royale",
+      "status": "in_progress",
+      "players": [
+        {
+          "playerId": "0x742d35Cc5A5E2a9E1aB8d8C6E6E9F4A5B8D35a9",
+          "username": "CryptoRusher_2024",
+          "score": 15420,
+          "position": 1,
+          "isAlive": true,
+          "kills": 3,
+          "damageDealt": 1250
+        },
+        {
+          "playerId": "0x8b3e6F7H9J2K4L6M8N0P1Q3R5S7T9U1V3W5X",
+          "username": "AvalancheMaster",
+          "score": 14280,
+          "position": 2,
+          "isAlive": true,
+          "kills": 2,
+          "damageDealt": 980
+        }
+      ],
+      "currentPlayers": 47,
+      "maxPlayers": 50,
+      "startTime": 1703123456,
+      "duration": 420,
+      "map": "AvalanchePeaks",
+      "shrinkingArea": {
+        "currentRadius": 800,
+        "finalRadius": 100,
+        "shrinkRate": 2
+      }
+    },
+    {
+      "matchId": "match_002",
+      "type": "team_rush",
+      "status": "completed",
+      "teams": [
+        {
+          "teamId": "team_alpha",
+          "players": [
+            {
+              "playerId": "0x742d35Cc5A5E2a9E1aB8d8C6E6E9F4A5B8D35a9",
+              "username": "CryptoRusher_2024",
+              "role": "speedster",
+              "score": 8900
+            },
+            {
+              "playerId": "0x8b3e6F7H9J2K4L6M8N0P1Q3R5S7T9U1V3W5X",
+              "username": "AvalancheMaster",
+              "role": "tank",
+              "score": 7600
+            }
+          ],
+          "teamScore": 16500,
+          "position": 1
+        },
+        {
+          "teamId": "team_beta",
+          "players": [
+            {
+              "playerId": "0x9c4f7G8I1J3K5L7M9N1O2P4Q6R8S0T2U4V6W8X",
+              "username": "DeFiExplorer",
+              "role": "collector",
+              "score": 7200
+            },
+            {
+              "playerId": "0xAd5f8H9J2K4L6M8N0P1Q3R5S7T9U1V3W5X7Y",
+              "username": "BlockchainNinja",
+              "role": "support",
+              "score": 6800
+            }
+          ],
+          "teamScore": 14000,
+          "position": 2
+        }
+      ],
+      "startTime": 1703120000,
+      "endTime": 1703121800,
+      "duration": 1800,
+      "winner": "team_alpha"
+    }
+  ]
+}
+```
+
+#### 💬 Chat System Mock Data
+
+```json
+{
+  "chatChannels": [
+    {
+      "channelId": "global_general",
+      "name": "General Chat",
+      "type": "global",
+      "messages": [
+        {
+          "messageId": "msg_001",
+          "sender": "0x742d35Cc5A5E2a9E1aB8d8C6E6E9F4A5B8D35a9",
+          "username": "CryptoRusher_2024",
+          "content": "Anyone up for a Battle Royale?",
+          "timestamp": 1703123456,
+          "reactions": {
+            "👍": 3,
+            "🎮": 2,
+            "🔥": 1
+          }
+        },
+        {
+          "messageId": "msg_002",
+          "sender": "0x8b3e6F7H9J2K4L6M8N0P1Q3R5S7T9U1V3W5X",
+          "username": "AvalancheMaster",
+          "content": "I'm in! Let's go!",
+          "timestamp": 1703123500,
+          "reactions": {
+            "👍": 2,
+            "🚀": 1
+          }
+        }
+      ]
+    },
+    {
+      "channelId": "guild_001",
+      "name": "Avalanche Warriors",
+      "type": "guild",
+      "guildId": 1,
+      "messages": [
+        {
+          "messageId": "msg_003",
+          "sender": "0x742d35Cc5A5E2a9E1aB8d8C6E6E9F4A5B8D35a9",
+          "username": "CryptoRusher_2024",
+          "content": "Guild war against DeFi Masters tomorrow at 6 PM UTC",
+          "timestamp": 1703123000,
+          "reactions": {
+            "⚔️": 5,
+            "💪": 3
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### 🏆 Tournament Mock Data
+
+```json
+{
+  "tournaments": [
+    {
+      "tournamentId": "tournament_001",
+      "name": "Weekly Championship",
+      "type": "bracket",
+      "status": "registration",
+      "entryFee": "1000000000000000000000",
+      "prizePool": "50000000000000000000000",
+      "maxParticipants": 64,
+      "currentParticipants": 32,
+      "startTime": 1703200000,
+      "registrationEnd": 1703190000,
+      "bracket": {
+        "rounds": [
+          {
+            "roundNumber": 1,
+            "matches": [
+              {
+                "matchId": "t_match_001",
+                "player1": "0x742d35Cc5A5E2a9E1aB8d8C6E6E9F4A5B8D35a9",
+                "player2": "0x8b3e6F7H9J2K4L6M8N0P1Q3R5S7T9U1V3W5X",
+                "winner": null,
+                "scheduledTime": 1703200000
+              }
+            ]
+          }
+        ]
+      },
+      "prizes": [
+        {
+          "position": 1,
+          "reward": "25000000000000000000000",
+          "nftReward": "championship_trophy_nft"
+        },
+        {
+          "position": 2,
+          "reward": "15000000000000000000000",
+          "nftReward": "silver_medal_nft"
+        },
+        {
+          "position": 3,
+          "reward": "10000000000000000000000",
+          "nftReward": "bronze_medal_nft"
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### 👥 Friend System Mock Data
+
+```json
+{
+  "friendSystem": {
+    "friends": [
+      {
+        "friendId": "0x8b3e6F7H9J2K4L6M8N0P1Q3R5S7T9U1V3W5X",
+        "username": "AvalancheMaster",
+        "status": "online",
+        "lastSeen": 1703123456,
+        "level": 7,
+        "currentActivity": "playing_battle_royale",
+        "mutualFriends": 12,
+        "gamesPlayedTogether": 45,
+        "winRate": 0.68
+      },
+      {
+        "friendId": "0x9c4f7G8I1J3K5L7M9N1O2P4Q6R8S0T2U4V6W8X",
+        "username": "DeFiExplorer",
+        "status": "away",
+        "lastSeen": 1703120000,
+        "level": 6,
+        "currentActivity": "idle",
+        "mutualFriends": 8,
+        "gamesPlayedTogether": 23,
+        "winRate": 0.52
+      }
+    ],
+    "friendRequests": [
+      {
+        "requestId": "req_001",
+        "from": "0xAd5f8H9J2K4L6M8N0P1Q3R5S7T9U1V3W5X7Y",
+        "username": "BlockchainNinja",
+        "message": "Hey! Let's team up for some quests!",
+        "timestamp": 1703123000
+      }
+    ],
+    "blockedUsers": [
+      {
+        "userId": "0xBlockedUser123456789",
+        "username": "SpammerUser",
+        "blockedAt": 1703000000,
+        "reason": "spam"
+      }
+    ]
+  }
+}
+```
+
+#### 🎭 Social Features Mock Data
+
+```json
+{
+  "socialFeatures": {
+    "achievements": [
+      {
+        "achievementId": "social_001",
+        "name": "Social Butterfly",
+        "description": "Make 50 friends",
+        "progress": 32,
+        "target": 50,
+        "reward": "1000 RUSH tokens",
+        "nftReward": "social_butterfly_nft",
+        "isCompleted": false
+      },
+      {
+        "achievementId": "social_002",
+        "name": "Guild Leader",
+        "description": "Lead a guild to victory in 10 guild wars",
+        "progress": 7,
+        "target": 10,
+        "reward": "5000 RUSH tokens",
+        "nftReward": "guild_leader_nft",
+        "isCompleted": false
+      }
+    ],
+    "emotes": [
+      {
+        "emoteId": "emote_001",
+        "name": "Victory Dance",
+        "animation": "victory_dance.json",
+        "rarity": "common",
+        "unlocked": true
+      },
+      {
+        "emoteId": "emote_002",
+        "name": "Epic Fail",
+        "animation": "epic_fail.json",
+        "rarity": "rare",
+        "unlocked": false
+      }
+    ],
+    "streaming": {
+      "isStreaming": false,
+      "streamPlatform": "twitch",
+      "streamKey": "your_stream_key_here",
+      "viewers": 0,
+      "followers": 234,
+      "totalViews": 5678
+    }
+  }
+}
 ```
 
 ### Gas Usage Optimization

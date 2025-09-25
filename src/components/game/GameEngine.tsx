@@ -56,6 +56,9 @@ interface GameObject {
   type: string;
   color?: string;
   animation?: number;
+  powerupType?: 'shield' | 'speed' | 'magnet' | 'multiplier' | 'invincible' | 'slowmo';
+  duration?: number;
+  value?: number;
 }
 
 const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({

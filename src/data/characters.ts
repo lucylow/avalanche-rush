@@ -1043,6 +1043,151 @@ Despite her mystical nature, Echo is deeply caring about the future of all netwo
   }
 ];
 
+// Reactive Smart Contract Integration Types
+export interface ReactiveEvent {
+  eventType: 'transfer' | 'swap' | 'nft_mint' | 'contract_interaction' | 'quest_completion';
+  contractAddress: string;
+  transactionHash: string;
+  blockNumber: number;
+  timestamp: number;
+  data: any;
+  characterResponse?: CharacterReactiveResponse;
+}
+
+export interface CharacterReactiveResponse {
+  characterId: string;
+  responseType: 'celebration' | 'encouragement' | 'warning' | 'guidance';
+  dialogue: string;
+  animation: string;
+  soundEffect: string;
+  rewardTriggered?: boolean;
+  evolutionTriggered?: boolean;
+}
+
+export interface ReactiveQuest {
+  id: string;
+  title: string;
+  characterId: string;
+  eventTrigger: ReactiveEvent['eventType'];
+  verificationContract: string;
+  minimumAmount?: number;
+  completionCriteria: ReactiveQuestCriteria;
+  automaticRewards: AutomaticReward[];
+  vfxConfig: VFXConfig;
+}
+
+export interface ReactiveQuestCriteria {
+  eventSignature: string;
+  parameterChecks: ParameterCheck[];
+  timeWindow?: number; // seconds
+  repeatability: 'once' | 'daily' | 'weekly' | 'unlimited';
+}
+
+export interface ParameterCheck {
+  paramName: string;
+  operator: '>' | '<' | '==' | '!=' | '>=' | '<=';
+  value: any;
+}
+
+export interface AutomaticReward {
+  type: 'nft' | 'token' | 'experience' | 'character_unlock' | 'evolution';
+  amount?: number;
+  nftMetadata?: NFTMetadata;
+  triggersChainlinkVRF?: boolean;
+  vrfConfig?: VRFConfig;
+}
+
+export interface NFTMetadata {
+  name: string;
+  description: string;
+  image: string;
+  rarity: 'common' | 'rare' | 'epic' | 'legendary' | 'mythic';
+  attributes: NFTAttribute[];
+  animationUrl?: string;
+}
+
+export interface NFTAttribute {
+  trait_type: string;
+  value: string | number;
+  display_type?: 'boost_number' | 'boost_percentage' | 'number' | 'date';
+}
+
+export interface VRFConfig {
+  subscriptionId: number;
+  keyHash: string;
+  callbackGasLimit: number;
+  numWords: number;
+  rareDropChance: number; // 0-100 percentage
+}
+
+export interface VFXConfig {
+  particleEffect: string;
+  screenShake: boolean;
+  colorTheme: string;
+  duration: number;
+  soundEffect: string;
+}
+
+// Enhanced Character with Reactive Capabilities
+export interface ReactiveCharacter extends Character {
+  reactiveQuests: ReactiveQuest[];
+  onChainPersonality: OnChainPersonality;
+  evolutionTriggers: EvolutionTrigger[];
+  automaticDialogues: AutomaticDialogue[];
+}
+
+export interface OnChainPersonality {
+  responsePatterns: Record<ReactiveEvent['eventType'], CharacterReactiveResponse[]>;
+  adaptiveTraits: AdaptiveTrait[];
+  learningAlgorithm: LearningConfig;
+}
+
+export interface AdaptiveTrait {
+  traitName: string;
+  currentValue: number;
+  influenceFactors: InfluenceFactor[];
+  evolutionThresholds: number[];
+}
+
+export interface InfluenceFactor {
+  eventType: ReactiveEvent['eventType'];
+  impactMultiplier: number;
+  timeDecay: number;
+}
+
+export interface LearningConfig {
+  memoryWindow: number; // days
+  adaptationRate: number;
+  personalityShift: boolean;
+}
+
+export interface EvolutionTrigger {
+  eventType: ReactiveEvent['eventType'];
+  requiredCount: number;
+  timeframe: number; // seconds
+  chainlinkVRFRequired: boolean;
+  successProbability?: number; // 0-100 if VRF involved
+}
+
+export interface AutomaticDialogue {
+  trigger: ReactiveEvent['eventType'];
+  conditions: DialogueCondition[];
+  responses: WeightedResponse[];
+  cooldown: number;
+}
+
+export interface DialogueCondition {
+  type: 'event_count' | 'time_since' | 'character_level' | 'relationship_score';
+  operator: '>' | '<' | '==' | '!=' | '>=' | '<=';
+  value: any;
+}
+
+export interface WeightedResponse {
+  dialogue: DialogueNode;
+  weight: number;
+  unlockRequirements?: string[];
+}
+
 // Character utility functions
 export const getCharacterById = (id: string): Character | undefined => {
   return AVALANCHE_CHARACTERS.find(char => char.id === id);
