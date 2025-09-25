@@ -4,11 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import GameEngine from './GameEngine';
 import AudioEnhancedGameEngine from '../audio/AudioEnhancedGameEngine';
 import DynamicMusicSystem from '../audio/DynamicMusicSystem';
-import AudioSettings from '../components/ui/AudioSettings';
+import AudioSettings from '../ui/AudioSettings';
 import EnhancedWalletConnector from './EnhancedWalletConnector';
 import RewardPsychologyEngine from './RewardPsychologyEngine';
 import CharacterSelectionModal from './CharacterSelectionModal';
-import { useAdvancedWeb3 } from '../../hooks/useAdvancedWeb3';
+import QuestSystem from './QuestSystem';
+import LeaderboardSystem from './LeaderboardSystem';
+import NFTMarketplace from './NFTMarketplace';
+import { useSmartContracts } from '../../hooks/useSmartContracts';
 import { useCrossmint } from '../../hooks/useCrossmint';
 import { useAudioManager } from '../../hooks/useAudioManager';
 import { Volume2, VolumeX } from 'lucide-react';
@@ -49,6 +52,9 @@ interface PlayerProfile {
 }
 
 const AvalancheRushGame: React.FC = () => {
+  const navigate = useNavigate();
+  const audioManager = useAudioManager();
+  
   const {
     isConnected,
     account,
@@ -82,12 +88,14 @@ const AvalancheRushGame: React.FC = () => {
   const [showGameModeSelector, setShowGameModeSelector] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
+  const [showQuestSystem, setShowQuestSystem] = useState(false);
+  const [showLeaderboardSystem, setShowLeaderboardSystem] = useState(false);
+  const [showNFTMarketplace, setShowNFTMarketplace] = useState(false);
   const [showCharacterSelection, setShowCharacterSelection] = useState(false);
+  const [showAudioSettings, setShowAudioSettings] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState<any>(null);
   const [gameStartTime, setGameStartTime] = useState<number>(0);
   const [notifications, setNotifications] = useState<string[]>([]);
-  const [vrfEvents, setVrfEvents] = useState<any[]>([]);
-  const [currentSessionId, setCurrentSessionId] = useState<number>(0);
 
   const gameEngineRef = useRef<any>(null);
   const animationFrameRef = useRef<number>();
@@ -98,6 +106,20 @@ const AvalancheRushGame: React.FC = () => {
       loadPlayerProfile();
     }
   }, [isConnected, account]);
+
+  // Initialize audio system
+  useEffect(() => {
+    const initializeAudio = async () => {
+      try {
+        await audioManager.preloadAudio();
+        audioManager.playBackgroundMusic('menu');
+      } catch (error) {
+        console.warn('Failed to initialize audio:', error);
+      }
+    };
+
+    initializeAudio();
+  }, [audioManager]);
 
   const loadPlayerProfile = async () => {
     if (!account) return;
@@ -867,11 +889,39 @@ const AvalancheRushGame: React.FC = () => {
       )}
 
       {/* Modals */}
-      <AnimatePresence>
-        {showGameModeSelector && <GameModeSelector />}
-      </AnimatePresence>
-    </div>
-  );
-};
+            <AnimatePresence>
+              {showGameModeSelector && <GameModeSelector />}
+            </AnimatePresence>
+
+            {/* New System Components */}
+            <AnimatePresence>
+              {showQuestSystem && (
+                <QuestSystem 
+                  isOpen={showQuestSystem} 
+                  onClose={() => setShowQuestSystem(false)} 
+                />
+              )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+              {showLeaderboardSystem && (
+                <LeaderboardSystem 
+                  isOpen={showLeaderboardSystem} 
+                  onClose={() => setShowLeaderboardSystem(false)} 
+                />
+              )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+              {showNFTMarketplace && (
+                <NFTMarketplace 
+                  isOpen={showNFTMarketplace} 
+                  onClose={() => setShowNFTMarketplace(false)} 
+                />
+              )}
+            </AnimatePresence>
+          </div>
+        );
+      };
 
 export default AvalancheRushGame;
