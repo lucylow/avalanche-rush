@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import EnhancedWalletConnector from '../game/EnhancedWalletConnector';
-import TutorialManager from '../tutorial/TutorialManager';
+import MobileTutorialManager from './MobileTutorialManager';
 import MobileGameControls from './MobileGameControls';
 import { useSmartContracts } from '../../hooks/useSmartContracts';
 import { useAudioManager } from '../../hooks/useAudioManager';
@@ -498,7 +498,7 @@ const MobileAvalancheRushGame: React.FC = () => {
 
       {/* Tutorial System */}
       {showTutorial && (
-        <TutorialManager
+        <MobileTutorialManager
           isActive={showTutorial}
           onClose={() => setShowTutorial(false)}
           onTutorialComplete={handleTutorialComplete}
