@@ -1,5 +1,6 @@
 import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import QuestIntegration from '../quest/QuestIntegration';
 
 interface GameEngineProps {
   gameState: {
@@ -1198,6 +1199,23 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
             </div>
           </motion.div>
         )}
+
+        {/* Quest Integration */}
+        <QuestIntegration
+          gameState={{
+            isPlaying: gameState.isPlaying,
+            score: gameState.score,
+            lives: gameState.lives,
+            energy: gameState.energy,
+            currentLevel: gameState.currentLevel
+          }}
+          onQuestUpdate={(questId, objectiveId, progress) => {
+            console.log(`Quest ${questId} objective ${objectiveId} progress: ${progress}`);
+          }}
+          onQuestComplete={(questId, rewards) => {
+            console.log(`Quest ${questId} completed with rewards:`, rewards);
+          }}
+        />
       </div>
     </div>
   );

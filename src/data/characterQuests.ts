@@ -820,7 +820,7 @@ This quest transcends normal gameplay—you'll be making choices that affect not
         "Remarkable! The paradox dissolves before your decisive action!",
         "You have proven yourself capable of choices that transcend normal causality."
       ]
-    ],
+    },
     
     completionDialogue: [
       "The convergence is complete, and the optimal timeline is secured.",

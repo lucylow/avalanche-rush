@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import EnhancedWalletConnector from './EnhancedWalletConnector';
 import RewardPsychologyEngine from './RewardPsychologyEngine';
 import ReactiveNetworkDashboard from '../reactive/ReactiveNetworkDashboard';
 import QuestSystem from './QuestSystem';
+import QuestDashboard from '../quest/QuestDashboard';
 import LeaderboardSystem from './LeaderboardSystem';
 import NFTMarketplace from './NFTMarketplace';
 import TutorialManager from '../tutorial/TutorialManager';
@@ -68,6 +69,7 @@ const AvalancheRushGame = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showGameModeSelector, setShowGameModeSelector] = useState(false);
   const [showQuestSystem, setShowQuestSystem] = useState(false);
+  const [showQuestDashboard, setShowQuestDashboard] = useState(false);
   const [showLeaderboardSystem, setShowLeaderboardSystem] = useState(false);
   const [showNFTMarketplace, setShowNFTMarketplace] = useState(false);
   const [showReactiveDashboard, setShowReactiveDashboard] = useState(false);
@@ -79,7 +81,7 @@ const AvalancheRushGame = () => {
   // Load player profile when wallet connects
   useEffect(() => {
     const loadProfile = async () => {
-      if (isConnected && account) {
+    if (isConnected && account) {
         const profile = await getPlayerProfile(account);
         setPlayerProfile(profile);
         
@@ -126,7 +128,7 @@ const AvalancheRushGame = () => {
     try {
       const sessionId = await startGameSession(0, 1, 1);
       setCurrentSessionId(sessionId);
-      
+
       setGameState(prev => ({
         ...prev,
         isPlaying: true,
@@ -137,7 +139,7 @@ const AvalancheRushGame = () => {
         lives: 3,
         energy: 100
       }));
-      
+
       setShowGameModeSelector(false);
       setNotifications(prev => [...prev, `🎮 Started ${mode} game!`]);
     } catch (error) {
@@ -190,7 +192,7 @@ const AvalancheRushGame = () => {
               Avalanche Rush
             </h1>
             <div className="text-sm text-white/70 font-medium tracking-wide">
-              Learn • Play • Earn
+            Learn • Play • Earn
             </div>
           </div>
         </div>
@@ -293,7 +295,7 @@ const AvalancheRushGame = () => {
             </button>
 
             <button
-              onClick={() => setShowQuestSystem(true)}
+              onClick={() => setShowQuestDashboard(true)}
               className="bg-gradient-to-br from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-8 px-6 rounded-2xl shadow-2xl transition-all duration-300"
             >
               <div className="text-4xl mb-3">⚔️</div>
@@ -307,19 +309,19 @@ const AvalancheRushGame = () => {
               <div className="text-4xl mb-3">⚡</div>
               <div className="text-lg font-bold">Reactive</div>
             </button>
-          </div>
+              </div>
         </div>
       </div>
 
       {/* Notifications */}
-      {notifications.map((notification, index) => (
+        {notifications.map((notification, index) => (
         <div
-          key={index}
+            key={index}
           className="fixed top-4 right-4 bg-white text-gray-900 px-4 py-2 rounded-lg shadow-lg z-50"
-        >
-          {notification}
+          >
+            {notification}
         </div>
-      ))}
+        ))}
 
       {/* Loading Screen */}
       {isLoading && (
@@ -380,17 +382,35 @@ const AvalancheRushGame = () => {
       )}
 
       {showLeaderboardSystem && (
-        <LeaderboardSystem 
-          isOpen={showLeaderboardSystem} 
-          onClose={() => setShowLeaderboardSystem(false)} 
-        />
+        <Suspense fallback={
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-gradient-to-br from-purple-900 to-blue-900 rounded-2xl p-8 flex flex-col items-center space-y-4 border border-purple-500/30">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400"></div>
+              <p className="text-white">Loading Leaderboard...</p>
+            </div>
+          </div>
+        }>
+          <LeaderboardSystem 
+            isOpen={showLeaderboardSystem} 
+            onClose={() => setShowLeaderboardSystem(false)} 
+          />
+        </Suspense>
       )}
 
       {showNFTMarketplace && (
-        <NFTMarketplace 
-          isOpen={showNFTMarketplace} 
-          onClose={() => setShowNFTMarketplace(false)} 
-        />
+        <Suspense fallback={
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-gradient-to-br from-purple-900 to-blue-900 rounded-2xl p-8 flex flex-col items-center space-y-4 border border-purple-500/30">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400"></div>
+              <p className="text-white">Loading NFT Marketplace...</p>
+            </div>
+          </div>
+        }>
+          <NFTMarketplace 
+            isOpen={showNFTMarketplace} 
+            onClose={() => setShowNFTMarketplace(false)} 
+          />
+        </Suspense>
       )}
 
       {/* Reactive Network Dashboard */}
@@ -399,7 +419,16 @@ const AvalancheRushGame = () => {
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setShowReactiveDashboard(false)}>
           </div>
           <div className="absolute inset-0 overflow-auto">
-            <ReactiveNetworkDashboard />
+            <Suspense fallback={
+              <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900">
+                <div className="bg-gradient-to-br from-purple-900 to-blue-900 rounded-2xl p-8 flex flex-col items-center space-y-4 border border-purple-500/30">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400"></div>
+                  <p className="text-white">Loading Reactive Network Dashboard...</p>
+                </div>
+              </div>
+            }>
+              <ReactiveNetworkDashboard />
+            </Suspense>
           </div>
           <button
             onClick={() => setShowReactiveDashboard(false)}
@@ -412,13 +441,22 @@ const AvalancheRushGame = () => {
 
       {/* Tutorial System */}
       {showTutorial && (
-        <TutorialManager
-          isActive={showTutorial}
-          onClose={() => setShowTutorial(false)}
-          onTutorialComplete={handleTutorialComplete}
-          playerLevel={playerProfile?.level || 1}
-          hasPlayedBefore={hasCompletedTutorial}
-        />
+        <Suspense fallback={
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-gradient-to-br from-purple-900 to-blue-900 rounded-2xl p-8 flex flex-col items-center space-y-4 border border-purple-500/30">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400"></div>
+              <p className="text-white">Loading Tutorial...</p>
+            </div>
+          </div>
+        }>
+          <TutorialManager
+            isActive={showTutorial}
+            onClose={() => setShowTutorial(false)}
+            onTutorialComplete={handleTutorialComplete}
+            playerLevel={playerProfile?.level || 1}
+            hasPlayedBefore={hasCompletedTutorial}
+          />
+        </Suspense>
       )}
     </div>
   );

@@ -3,13 +3,17 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import Index from "./pages/Index";
-import GamePage from "./pages/game/GamePage";
-import LeaderboardPage from "./pages/LeaderboardPage";
-import SocialLeaderboardPage from "./pages/SocialLeaderboardPage";
-import AchievementsPage from "./pages/AchievementsPage";
-import LearnWeb3Page from "./pages/LearnWeb3Page";
 import NotFound from "./pages/NotFound";
+import MobileResponsiveWrapper from "./components/mobile/MobileResponsiveWrapper";
+
+// Lazy load pages for better performance
+const GamePage = lazy(() => import("./pages/game/GamePage"));
+const LeaderboardPage = lazy(() => import("./pages/LeaderboardPage"));
+const SocialLeaderboardPage = lazy(() => import("./pages/SocialLeaderboardPage"));
+const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
+const LearnWeb3Page = lazy(() => import("./pages/LearnWeb3Page"));
 
 const queryClient = new QueryClient();
 
@@ -19,19 +23,28 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/play" element={<GamePage />} />
-          <Route path="/game" element={<GamePage />} />
-          <Route path="/leaderboard" element={<LeaderboardPage />} />
-          <Route path="/social-leaderboard" element={<SocialLeaderboardPage />} />
-          <Route path="/tournaments" element={<SocialLeaderboardPage />} />
-          <Route path="/achievements" element={<AchievementsPage />} />
-          <Route path="/learn" element={<LearnWeb3Page />} />
-          <Route path="/learn-web3" element={<LearnWeb3Page />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Suspense fallback={
+          <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+              <p className="text-white text-lg">Loading Avalanche Rush...</p>
+            </div>
+          </div>
+        }>
+          <Routes>
+            <Route path="/" element={<MobileResponsiveWrapper><Index /></MobileResponsiveWrapper>} />
+            <Route path="/play" element={<MobileResponsiveWrapper><GamePage /></MobileResponsiveWrapper>} />
+            <Route path="/game" element={<MobileResponsiveWrapper><GamePage /></MobileResponsiveWrapper>} />
+            <Route path="/leaderboard" element={<MobileResponsiveWrapper><LeaderboardPage /></MobileResponsiveWrapper>} />
+            <Route path="/social-leaderboard" element={<MobileResponsiveWrapper><SocialLeaderboardPage /></MobileResponsiveWrapper>} />
+            <Route path="/tournaments" element={<MobileResponsiveWrapper><SocialLeaderboardPage /></MobileResponsiveWrapper>} />
+            <Route path="/achievements" element={<MobileResponsiveWrapper><AchievementsPage /></MobileResponsiveWrapper>} />
+            <Route path="/learn" element={<MobileResponsiveWrapper><LearnWeb3Page /></MobileResponsiveWrapper>} />
+            <Route path="/learn-web3" element={<MobileResponsiveWrapper><LearnWeb3Page /></MobileResponsiveWrapper>} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<MobileResponsiveWrapper><NotFound /></MobileResponsiveWrapper>} />
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

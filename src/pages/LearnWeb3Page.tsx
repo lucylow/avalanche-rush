@@ -10,6 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs'
 import { Progress } from '../components/ui/progress';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
+import InteractiveTutorial from '../components/education/InteractiveTutorial';
+import LearningPath from '../components/education/LearningPath';
+import QuizSystem from '../components/education/QuizSystem';
 import { 
   BookOpen, 
   Play, 
@@ -32,7 +35,14 @@ import {
   Code,
   Wallet,
   Eye,
-  ArrowRight
+  ArrowRight,
+  Brain,
+  Trophy,
+  GraduationCap,
+  BookMarked,
+  Video,
+  FileText,
+  Puzzle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 

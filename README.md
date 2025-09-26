@@ -259,6 +259,35 @@ npm run build
 
 ## 🎮 Gameplay
 
+### 🎯 Enhanced Quest System
+
+The Enhanced Quest System transforms Avalanche Rush into a character-driven narrative experience:
+
+#### 👥 **Character-Driven Storylines**
+- **5 Unique Characters**: Each with distinct personalities, backstories, and quest chains
+- **Relationship System**: Build bonds with characters through quest completion and social interaction
+- **Evolving Narratives**: Character stories change based on your choices and relationship levels
+- **Character Evolution**: Unlock new character forms and abilities through quest progression
+
+#### 🎯 **Quest Types**
+- **Main Story Quests**: Drive the overarching narrative with major character unlocks
+- **Side Quests**: Explore character backgrounds and world-building
+- **Personal Quests**: Character-specific missions that deepen individual relationships
+- **Relationship Quests**: Build bonds between characters and unlock group content
+- **Evolution Quests**: Transform characters into their ultimate forms
+
+#### 🌐 **Social Integration**
+- **Lens Protocol**: Share quest achievements and progress with your Lens followers
+- **Farcaster Integration**: Post quest updates and engage with the gaming community
+- **Social Multipliers**: Earn bonus rewards for sharing quest progress and achievements
+- **Community Challenges**: Collaborative quests that require community participation
+
+#### 🏆 **Advanced Rewards**
+- **Multi-Layered Rewards**: RUSH tokens, NFTs, character unlocks, experience points, and cosmetic items
+- **Dynamic Rarity**: Rewards scale with quest difficulty and social engagement
+- **Character-Specific Rewards**: Unique items and abilities tied to each character's theme
+- **Achievement NFTs**: Commemorative NFTs for major quest milestones
+
 ### Game Mechanics
 
 ```mermaid
