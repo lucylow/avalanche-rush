@@ -237,7 +237,7 @@ const ProgressTracker: React.FC<ProgressTrackerProps> = ({
                 <div className="text-sm text-gray-600">Quizzes Passed</div>
               </div>
             </div>
-          </div>
+          </CardContent>
         </Card>
 
         <Card>
