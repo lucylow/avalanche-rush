@@ -374,12 +374,36 @@ const AvalancheRushGame = () => {
       )}
 
       {/* System Modals */}
-      {showQuestSystem && (
-        <QuestSystem 
-          isOpen={showQuestSystem} 
-          onClose={() => setShowQuestSystem(false)} 
-        />
-      )}
+       {showQuestSystem && (
+         <Suspense fallback={
+           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+             <div className="bg-gradient-to-br from-purple-900 to-blue-900 rounded-2xl p-8 flex flex-col items-center space-y-4 border border-purple-500/30">
+               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400"></div>
+               <p className="text-white">Loading Quest System...</p>
+             </div>
+           </div>
+         }>
+           <QuestSystem 
+             isOpen={showQuestSystem} 
+             onClose={() => setShowQuestSystem(false)} 
+           />
+         </Suspense>
+       )}
+       {showQuestDashboard && (
+         <Suspense fallback={
+           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+             <div className="bg-gradient-to-br from-purple-900 to-blue-900 rounded-2xl p-8 flex flex-col items-center space-y-4 border border-purple-500/30">
+               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-400"></div>
+               <p className="text-white">Loading Quest Dashboard...</p>
+             </div>
+           </div>
+         }>
+           <QuestDashboard 
+             isOpen={showQuestDashboard} 
+             onClose={() => setShowQuestDashboard(false)} 
+           />
+         </Suspense>
+       )}
 
       {showLeaderboardSystem && (
         <Suspense fallback={
