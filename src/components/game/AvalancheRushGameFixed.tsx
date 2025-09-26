@@ -464,4 +464,4 @@ const AvalancheRushGame: React.FC = () => {
   );
 };
 
-export default AvalancheRushGameFixed;
+export default AvalancheRushGame;

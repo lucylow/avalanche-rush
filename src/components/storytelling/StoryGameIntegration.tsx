@@ -332,6 +332,7 @@ const StoryGameIntegration: React.FC<StoryGameIntegrationProps> = ({
         }
         
         return availableCharacters[0];
+      }
     }
   };
 

@@ -1,5 +1,6 @@
 // src/components/game/AvalancheEnhancedGame.tsx
 import React, { useState, useEffect, useCallback } from 'react';
+import { ethers } from 'ethers';
 import { useAvalancheFeatures, AvalancheQuestType } from '../../hooks/useAvalancheFeatures';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
@@ -12,7 +13,7 @@ import { Alert, AlertDescription } from '../ui/alert';
 import { 
   Mountain, 
   Zap, 
-  Bridge, 
+  Link, 
   Coins, 
   TrendingUp, 
   Network, 

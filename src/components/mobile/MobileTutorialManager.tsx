@@ -8,6 +8,7 @@ import {
   Play,
   ArrowUp,
   ArrowDown,
+  BookOpen,
   ArrowLeft,
   ArrowRight,
   Volume2,

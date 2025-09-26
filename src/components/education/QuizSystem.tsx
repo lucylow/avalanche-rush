@@ -390,16 +390,16 @@ const QuizSystem: React.FC<QuizSystemProps> = ({
                     key={index}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => handleAnswerSelect(index === 0)}
+                    onClick={() => handleAnswerSelect(index)}
                     className={`w-full text-left p-4 rounded-lg border transition-all ${
-                      selectedAnswer === (index === 0)
+                      selectedAnswer === index
                         ? 'border-blue-500 bg-blue-50'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     <div className="flex items-center space-x-3">
                       <div className={`w-4 h-4 rounded-full border-2 ${
-                        selectedAnswer === (index === 0)
+                        selectedAnswer === index
                           ? 'border-blue-500 bg-blue-500'
                           : 'border-gray-300'
                       }`} />
