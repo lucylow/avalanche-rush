@@ -149,10 +149,11 @@ const NFTMarketplace: React.FC = () => {
       case 'PRICE_HIGH':
         filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
         break;
-      case 'RARITY':
+      case 'RARITY': {
         const rarityOrder = { PLATINUM: 4, GOLD: 3, SILVER: 2, BRONZE: 1 };
         filtered.sort((a, b) => rarityOrder[b.rarity] - rarityOrder[a.rarity]);
         break;
+      }
       case 'RECENT':
         filtered.sort((a, b) => b.timestamp - a.timestamp);
         break;

@@ -268,13 +268,14 @@ const EnhancedGameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
         obj.active = false;
         break;
       
-      case 'collectible':
+      case 'collectible': {
         const newScore = currentScore + (obj.value || 100);
         setCurrentScore(newScore);
         onScoreUpdate(newScore);
         createParticles(obj.x + obj.width/2, obj.y + obj.height/2, '#F59E0B', 8);
         obj.active = false;
         break;
+      }
       
       case 'powerup':
         applyPowerup(obj.effect || 'shield');

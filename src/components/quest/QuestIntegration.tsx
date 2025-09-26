@@ -11,7 +11,7 @@ interface QuestIntegrationProps {
     currentLevel: number;
   };
   onQuestUpdate?: (questId: string, objectiveId: string, progress: number) => void;
-  onQuestComplete?: (questId: string, rewards: any[]) => void;
+  onQuestComplete?: (questId: string, rewards: Array<{type: string; amount?: number; item?: string}>) => void;
 }
 
 const QuestIntegration: React.FC<QuestIntegrationProps> = ({

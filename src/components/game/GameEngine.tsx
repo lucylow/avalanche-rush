@@ -562,7 +562,7 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
     drawBackground(ctx, canvas);
 
     // Update player position based on input
-    let newPlayerPosition = { ...playerPosition };
+    const newPlayerPosition = { ...playerPosition };
     
     if (keys['ArrowUp'] || keys['w'] || keys[' ']) {
       newPlayerPosition.y = Math.max(50, newPlayerPosition.y - 6);

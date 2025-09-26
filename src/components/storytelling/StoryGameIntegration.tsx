@@ -283,7 +283,7 @@ const StoryGameIntegration: React.FC<StoryGameIntegrationProps> = ({
 
     // Character selection logic based on event type and relationships
     switch (eventType) {
-      case 'defeat':
+      case 'defeat': {
         // Prefer wise, encouraging characters for defeats
         const mentorChars = availableCharacters.filter((char: Character) => 
           char.personality.includes('Wise') || char.personality.includes('Patient')
@@ -291,8 +291,9 @@ const StoryGameIntegration: React.FC<StoryGameIntegrationProps> = ({
         return mentorChars.length > 0 
           ? mentorChars[Math.floor(Math.random() * mentorChars.length)]
           : availableCharacters[0];
+      }
           
-      case 'achievement':
+      case 'achievement': {
         // Prefer characters with high relationship scores
         const highRelationshipChars = availableCharacters.filter((char: Character) => 
           (relationships[char.id] || 0) > 50
@@ -300,8 +301,9 @@ const StoryGameIntegration: React.FC<StoryGameIntegrationProps> = ({
         return highRelationshipChars.length > 0
           ? highRelationshipChars[Math.floor(Math.random() * highRelationshipChars.length)]
           : availableCharacters[Math.floor(Math.random() * availableCharacters.length)];
+      }
           
-      case 'level_complete':
+      case 'level_complete': {
         // Prefer supportive characters
         const supportiveChars = availableCharacters.filter((char: Character) => 
           char.type === 'Support' || char.personality.includes('Encouraging')
@@ -309,8 +311,9 @@ const StoryGameIntegration: React.FC<StoryGameIntegrationProps> = ({
         return supportiveChars.length > 0
           ? supportiveChars[Math.floor(Math.random() * supportiveChars.length)]
           : availableCharacters[Math.floor(Math.random() * availableCharacters.length)];
+      }
           
-      default:
+      default: {
         // Random selection with relationship weighting
         const weightedChars = availableCharacters.map((char: Character) => ({
           character: char,

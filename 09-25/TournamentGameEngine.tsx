@@ -286,7 +286,7 @@ const TournamentGameEngine: React.FC<{ config: TournamentConfig }> = ({ config }
 
   const updateGameLogic = (deltaTime: number) => {
     setGameState(prev => {
-      let newState = { ...prev };
+      const newState = { ...prev };
 
       // Update timer
       newState.timeRemaining = Math.max(0, prev.timeRemaining - deltaTime / 1000);

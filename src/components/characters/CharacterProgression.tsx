@@ -101,10 +101,11 @@ const CharacterProgression: React.FC<CharacterProgressionProps> = ({
             return achievements.includes(requirement.value as string);
           case 'quest':
             return completedQuests.includes(requirement.value as string);
-          case 'character':
+          case 'character': {
             // Check if required character is unlocked
             const requiredChar = getCharacterById(requirement.value as string);
             return requiredChar ? isCharacterUnlocked(requiredChar) : false;
+          }
           default:
             return true;
         }
