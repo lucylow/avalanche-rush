@@ -69,12 +69,12 @@ const QuizSystem: React.FC<QuizSystemProps> = ({
   onRetry
 }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [answers, setAnswers] = useState<Record<string, string | number>>({});
   const [timeRemaining, setTimeRemaining] = useState(timeLimit ? timeLimit * 60 : null);
   const [startTime, setStartTime] = useState(Date.now());
   const [showResult, setShowResult] = useState(false);
   const [showExplanation, setShowExplanation] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState<any>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | number | null>(null);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
 
   const currentQ = questions[currentQuestion];
@@ -91,7 +91,7 @@ const QuizSystem: React.FC<QuizSystemProps> = ({
     }
   }, [timeRemaining]);
 
-  const handleAnswerSelect = (answer: any) => {
+  const handleAnswerSelect = (answer: string | number) => {
     setSelectedAnswer(answer);
     setAnswers(prev => ({ ...prev, [currentQ.id]: answer }));
   };
@@ -152,7 +152,7 @@ const QuizSystem: React.FC<QuizSystemProps> = ({
     onComplete(result);
   };
 
-  const checkAnswer = (question: QuizQuestion, userAnswer: any): boolean => {
+  const checkAnswer = (question: QuizQuestion, userAnswer: string | number): boolean => {
     switch (question.type) {
       case 'multiple-choice':
         return userAnswer === question.correctAnswer;

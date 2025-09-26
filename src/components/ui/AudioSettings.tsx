@@ -43,13 +43,13 @@ const AudioSettings: React.FC<AudioSettingsProps> = ({ isOpen, onClose }) => {
 
   const testSound = (sound: string) => {
     setIsTestingAudio(true);
-    audioManager.playSound(sound as any);
+    audioManager.playSound(sound);
     setTimeout(() => setIsTestingAudio(false), 1000);
   };
 
   const testMusic = (track: string) => {
     setIsTestingAudio(true);
-    audioManager.playBackgroundMusic(track as any);
+    audioManager.playBackgroundMusic(track);
     setTimeout(() => {
       audioManager.stopBackgroundMusic();
       setIsTestingAudio(false);

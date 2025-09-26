@@ -1,25 +1,67 @@
 // Supabase client configuration for Avalanche Rush
 // This provides a mock implementation for development
 
+interface AuthResponse {
+  user: { id: string; email: string } | null;
+  error: { message: string } | null;
+}
+
+interface AuthSession {
+  user: { id: string; email: string };
+  access_token: string;
+}
+
+interface QueryBuilder {
+  eq: (column: string, value: string | number) => QueryBuilder;
+  neq: (column: string, value: string | number) => QueryBuilder;
+  gt: (column: string, value: string | number) => QueryBuilder;
+  gte: (column: string, value: string | number) => QueryBuilder;
+  lt: (column: string, value: string | number) => QueryBuilder;
+  lte: (column: string, value: string | number) => QueryBuilder;
+  like: (column: string, pattern: string) => QueryBuilder;
+  ilike: (column: string, pattern: string) => QueryBuilder;
+  is: (column: string, value: string | number | null) => QueryBuilder;
+  in: (column: string, values: (string | number)[]) => QueryBuilder;
+  contains: (column: string, value: string | number | Record<string, unknown>) => QueryBuilder;
+  containedBy: (column: string, value: string | number | Record<string, unknown>) => QueryBuilder;
+  rangeGt: (column: string, value: string | number) => QueryBuilder;
+  rangeGte: (column: string, value: string | number) => QueryBuilder;
+  rangeLt: (column: string, value: string | number) => QueryBuilder;
+  rangeLte: (column: string, value: string | number) => QueryBuilder;
+  rangeAdjacent: (column: string, value: string | number) => QueryBuilder;
+  overlaps: (column: string, value: string | number) => QueryBuilder;
+  textSearch: (column: string, query: string) => QueryBuilder;
+  match: (query: Record<string, unknown>) => QueryBuilder;
+  not: (column: string, operator: string, value: string | number) => QueryBuilder;
+  or: (filters: string) => QueryBuilder;
+  filter: (column: string, operator: string, value: string | number) => QueryBuilder;
+  order: (column: string, options?: { ascending?: boolean }) => QueryBuilder;
+  limit: (count: number) => QueryBuilder;
+  range: (from: number, to: number) => QueryBuilder;
+  single: () => Promise<Record<string, unknown>>;
+  maybeSingle: () => Promise<Record<string, unknown> | null>;
+  csv: () => Promise<string>;
+  geojson: () => Promise<Record<string, unknown>>;
+  explain: (options?: Record<string, unknown>) => Promise<Record<string, unknown>>;
+  rollback: () => QueryBuilder;
+  returns: (columns?: string) => QueryBuilder;
+  then: (onfulfilled?: (value: Record<string, unknown>[]) => unknown, onrejected?: (reason: unknown) => unknown) => Promise<unknown>;
+  abort: (reason?: unknown) => QueryBuilder;
+}
+
 export interface SupabaseClient {
   auth: {
-    signUp: (email: string, password: string) => Promise<any>;
-    signIn: (email: string, password: string) => Promise<any>;
-    signOut: () => Promise<any>;
-    getUser: () => Promise<any>;
-    onAuthStateChange: (callback: (event: string, session: any) => void) => any;
+    signUp: (email: string, password: string) => Promise<AuthResponse>;
+    signIn: (email: string, password: string) => Promise<AuthResponse>;
+    signOut: () => Promise<{ error: { message: string } | null }>;
+    getUser: () => Promise<{ user: { id: string; email: string } | null; error: { message: string } | null }>;
+    onAuthStateChange: (callback: (event: string, session: AuthSession | null) => void) => { data: { subscription: { unsubscribe: () => void } } };
   };
-  from: (table: string) => {
-    select: (columns?: string) => any;
-    insert: (data: any) => any;
-    update: (data: any) => any;
-    delete: () => any;
-    upsert: (data: any) => any;
-  };
+  from: (table: string) => QueryBuilder;
   channel: (name: string) => {
-    on: (event: string, callback: (payload: any) => void) => any;
-    subscribe: () => any;
-    unsubscribe: () => any;
+    on: (event: string, callback: (payload: Record<string, unknown>) => void) => { subscribe: () => void };
+    subscribe: () => void;
+    unsubscribe: () => void;
   };
 }
 

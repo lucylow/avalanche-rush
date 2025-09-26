@@ -67,7 +67,7 @@ export interface NFTReward {
   name: string;
   rarity: 'Common' | 'Rare' | 'Epic' | 'Legendary' | 'Mythic';
   imageUrl: string;
-  attributes: { [key: string]: any };
+  attributes: { [key: string]: string | number | boolean };
 }
 
 export interface CosmeticReward {

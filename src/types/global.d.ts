@@ -2,7 +2,7 @@
 
 declare global {
   interface Window {
-    triggerReward?: (type: string, data: any) => void;
+    triggerReward?: (type: string, data: Record<string, unknown>) => void;
   }
 }
 

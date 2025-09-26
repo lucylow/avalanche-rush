@@ -1050,7 +1050,7 @@ export interface ReactiveEvent {
   transactionHash: string;
   blockNumber: number;
   timestamp: number;
-  data: any;
+  data: Record<string, unknown>;
   characterResponse?: CharacterReactiveResponse;
 }
 
@@ -1086,7 +1086,7 @@ export interface ReactiveQuestCriteria {
 export interface ParameterCheck {
   paramName: string;
   operator: '>' | '<' | '==' | '!=' | '>=' | '<=';
-  value: any;
+  value: string | number | boolean;
 }
 
 export interface AutomaticReward {
@@ -1179,7 +1179,7 @@ export interface AutomaticDialogue {
 export interface DialogueCondition {
   type: 'event_count' | 'time_since' | 'character_level' | 'relationship_score';
   operator: '>' | '<' | '==' | '!=' | '>=' | '<=';
-  value: any;
+  value: string | number | boolean;
 }
 
 export interface WeightedResponse {
@@ -1211,10 +1211,11 @@ export const getUnlockedCharacters = (playerLevel: number, achievements: string[
           return achievements.includes(requirement.value as string);
         case 'quest':
           return completedQuests.includes(requirement.value as string);
-        case 'character':
+        case 'character': {
           // Check if required character is unlocked
           const requiredChar = getCharacterById(requirement.value as string);
           return requiredChar ? getUnlockedCharacters(playerLevel, achievements, completedQuests).includes(requiredChar) : false;
+        }
         default:
           return true;
       }

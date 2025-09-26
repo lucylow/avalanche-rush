@@ -31,7 +31,7 @@ module.exports = {
       gas: 8000000,
       timeout: 120000,
       confirmations: 3
-    }ce: 25000000000, // 25 gwei
+    },
     },
     reactive: {
       url: "https://rpc.reactive.network",

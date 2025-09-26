@@ -20,11 +20,22 @@ import {
 } from 'lucide-react';
 import { useCrossmint } from '../../hooks/useCrossmint';
 
+interface Character {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  rarity: string;
+  unlockRequirements: Array<{ type: string; value: string | number }>;
+  specialAbilities: string[];
+  questBonus: number;
+}
+
 interface CharacterSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCharacterSelect: (character: any) => void;
-  selectedCharacter?: any;
+  onCharacterSelect: (character: Character) => void;
+  selectedCharacter?: Character;
   playerLevel: number;
 }
 
@@ -67,12 +78,12 @@ const CharacterSelectionModal: React.FC<CharacterSelectionModalProps> = ({
     }
   };
 
-  const handleCharacterSelect = (character: any) => {
+  const handleCharacterSelect = (character: Character) => {
     onCharacterSelect(character);
     onClose();
   };
 
-  const handleMintCharacter = async (character: any) => {
+  const handleMintCharacter = async (character: Character) => {
     try {
       const result = await mintCharacter(character);
       if (result.success) {

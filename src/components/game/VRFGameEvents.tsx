@@ -4,7 +4,7 @@ import { useChainlinkVRF, RandomEventType } from '../../hooks/useChainlinkVRF';
 
 interface VRFGameEventsProps {
   gameSessionId: number;
-  onRandomEvent: (eventType: string, data: any) => void;
+  onRandomEvent: (eventType: string, data: Record<string, unknown>) => void;
 }
 
 const VRFGameEvents: React.FC<VRFGameEventsProps> = ({ gameSessionId, onRandomEvent }) => {
@@ -22,7 +22,7 @@ const VRFGameEvents: React.FC<VRFGameEventsProps> = ({ gameSessionId, onRandomEv
   } = useChainlinkVRF();
 
   const [activeEvents, setActiveEvents] = useState<string[]>([]);
-  const [lastRandomEvent, setLastRandomEvent] = useState<any>(null);
+  const [lastRandomEvent, setLastRandomEvent] = useState<Record<string, unknown> | null>(null);
 
   // Trigger random events based on game progression
   useEffect(() => {
@@ -59,10 +59,10 @@ const VRFGameEvents: React.FC<VRFGameEventsProps> = ({ gameSessionId, onRandomEv
     handleVRFResults();
   }, [pendingRequests]);
 
-  const handleRandomResult = useCallback((request: any) => {
+  const handleRandomResult = useCallback((request: Record<string, unknown>) => {
     const { eventType, randomResult, gameSessionId } = request;
     
-    let eventData: any = {};
+    let eventData: Record<string, unknown> = {};
     
     switch (eventType) {
       case RandomEventType.DAILY_CHALLENGE:

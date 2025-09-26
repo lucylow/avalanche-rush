@@ -467,7 +467,7 @@ export class SmartContractService {
       );
       
       const receipt = await tx.wait();
-      const event = receipt.logs?.find((log: any) => log.fragment?.name === 'Swap');
+      const event = receipt.logs?.find((log: { fragment?: { name: string } }) => log.fragment?.name === 'Swap');
       return formatEther(event?.args?.amountOut || 0);
     } catch (error) {
       console.error('Error swapping tokens:', error);

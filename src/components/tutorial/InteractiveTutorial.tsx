@@ -52,7 +52,7 @@ const InteractiveTutorial: React.FC<InteractiveTutorialProps> = ({
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [tutorialProgress, setTutorialProgress] = useState<Record<string, boolean>>({});
-  const [demoData, setDemoData] = useState<any>(null);
+  const [demoData, setDemoData] = useState<Record<string, unknown> | null>(null);
   const [highlightedElement, setHighlightedElement] = useState<{ x: number; y: number; type: string } | null>(null);
 
   // Tutorial steps configuration

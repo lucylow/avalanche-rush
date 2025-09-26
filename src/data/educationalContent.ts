@@ -7,7 +7,7 @@ export interface EducationalContent {
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   duration: number; // in minutes
   description: string;
-  content: any;
+  content: Record<string, unknown>;
   prerequisites: string[];
   tags: string[];
   author: string;

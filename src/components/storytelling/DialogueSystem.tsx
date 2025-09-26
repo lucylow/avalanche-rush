@@ -117,7 +117,7 @@ const DialogueSystem: React.FC<DialogueSystemProps> = ({
 
     // Play voice effect if available
     if (dialogue.voiceEffect) {
-      audioManager.playSound(dialogue.voiceEffect as any);
+      audioManager.playSound(dialogue.voiceEffect);
     }
 
     // Record interaction
@@ -126,6 +126,7 @@ const DialogueSystem: React.FC<DialogueSystemProps> = ({
 
   const selectContextualCharacter = (): Character | null => {
     // Import characters and select based on context
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { AVALANCHE_CHARACTERS } = require('../../data/characters');
     
     // Filter available characters based on player level and relationships

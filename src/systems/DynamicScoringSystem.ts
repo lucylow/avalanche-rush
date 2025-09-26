@@ -117,7 +117,7 @@ export class DynamicScoringSystem {
     return finalScore;
   }
 
-  public addScoreEvent(type: ScoreEvent['type'], value: number, additionalData?: any): void {
+  public addScoreEvent(type: ScoreEvent['type'], value: number, additionalData?: Record<string, unknown>): void {
     if (!this.currentSession) {
       throw new Error('No active game session');
     }
@@ -138,7 +138,7 @@ export class DynamicScoringSystem {
     this.updateStyleScore(type, value, additionalData);
   }
 
-  private calculateEventMultiplier(type: ScoreEvent['type'], additionalData?: any): number {
+  private calculateEventMultiplier(type: ScoreEvent['type'], additionalData?: Record<string, unknown>): number {
     let baseMultiplier = this.baseMultipliers.get(type) || 1.0;
     
     // Apply skill bonuses from level system
@@ -160,7 +160,7 @@ export class DynamicScoringSystem {
     return baseMultiplier;
   }
 
-  private calculateEventBonus(type: ScoreEvent['type'], value: number, additionalData?: any): number {
+  private calculateEventBonus(type: ScoreEvent['type'], value: number, additionalData?: Record<string, unknown>): number {
     let bonus = 0;
 
     switch (type) {
@@ -215,7 +215,7 @@ export class DynamicScoringSystem {
     this.comboChains.set(comboKey, combo);
   }
 
-  private updateStyleScore(type: ScoreEvent['type'], value: number, additionalData?: any): void {
+  private updateStyleScore(type: ScoreEvent['type'], value: number, additionalData?: Record<string, unknown>): void {
     if (type === 'style' && additionalData?.styleType) {
       const styleScore: StyleScore = {
         type: additionalData.styleType,

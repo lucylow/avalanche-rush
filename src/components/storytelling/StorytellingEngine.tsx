@@ -29,8 +29,8 @@ interface StorytellingEngineProps {
   playerLevel: number;
   achievements: string[];
   completedQuests: string[];
-  onStoryComplete?: (storyId: string, rewards: any[]) => void;
-  onChoiceMade?: (choiceId: string, consequences: any) => void;
+  onStoryComplete?: (storyId: string, rewards: Array<{type: string; amount?: number; item?: string}>) => void;
+  onChoiceMade?: (choiceId: string, consequences: Record<string, unknown>) => void;
 }
 
 interface StoryState {
@@ -204,7 +204,7 @@ const StorytellingEngine: React.FC<StorytellingEngineProps> = ({
       // Play dialogue sound based on emotion
       const currentDialogue = scene.dialogue[nextIndex];
       if (currentDialogue.voiceEffect) {
-        audioManager.playSound(currentDialogue.voiceEffect as any);
+        audioManager.playSound(currentDialogue.voiceEffect);
       } else {
         audioManager.playSound('buttonClick');
       }
