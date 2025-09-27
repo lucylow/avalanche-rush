@@ -403,31 +403,40 @@ const VRFGameEvents: React.FC<VRFGameEventsProps> = ({ gameSessionId, onRandomEv
       <AnimatePresence>
         {lastRandomEvent && (
           <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.8 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -50, scale: 0.8 }}
-            className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50"
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50"
           >
             <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white p-6 rounded-2xl shadow-2xl border border-green-400/30 max-w-md">
               <div className="text-center">
-                <motion.div
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 0.5 }}
-                  className="text-4xl mb-3"
-                >
-      const randomEvent: any = lastRandomEvent.data;
-      const icon = randomEvent?.icon || '🎲';
-      const name = randomEvent?.name || randomEvent?.title || 'Random Event';
-      const description = randomEvent?.description || 'A random event occurred!';
-      const reward = randomEvent?.reward;
-                </motion.div>
-                <h3 className="text-xl font-bold mb-2">{name}</h3>
-                <p className="text-sm text-green-200 mb-3">{description}</p>
-                {reward && (
-                  <div className="bg-green-500/20 px-3 py-1 rounded-full text-xs font-semibold">
-                    Reward: {reward}
-                  </div>
-                )}
+                {(() => {
+                  const randomEvent: any = lastRandomEvent.data;
+                  const eventIcon = randomEvent?.icon || '🎲';
+                  const eventName = randomEvent?.name || randomEvent?.title || 'Random Event';
+                  const eventDescription = randomEvent?.description || 'A random event occurred!';
+                  const eventReward = randomEvent?.reward;
+
+                  return (
+                    <>
+                      <motion.div
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 0.5 }}
+                        className="text-4xl mb-3"
+                      >
+                        {eventIcon}
+                      </motion.div>
+                      <h3 className="text-xl font-bold mb-2">{eventName}</h3>
+                      <p className="text-sm text-green-200 mb-3">{eventDescription}</p>
+                      {eventReward && (
+                        <div className="bg-green-500/20 px-3 py-1 rounded-full text-xs font-semibold">
+                          Reward: {eventReward}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             </div>
           </motion.div>

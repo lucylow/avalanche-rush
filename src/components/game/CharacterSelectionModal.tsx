@@ -85,9 +85,23 @@ const CharacterSelectionModal: React.FC<CharacterSelectionModalProps> = ({
 
   const handleMintCharacter = async (character: Character) => {
     try {
-      const result = await mintCharacter(character);
+      // Convert Character to CrossmintCharacter format (using type assertion for properties)
+      const crossmintChar = {
+        id: character.id,
+        name: character.name,
+        rarity: character.rarity,
+        type: (character as any).type || 'Warrior',
+        imageUrl: (character as any).imageUrl || character.imageUrl,
+        description: (character as any).backstory || 'No description',
+        attributes: (character as any).attributes || {},
+        skills: (character as any).skills || [],
+        specialAbilities: (character as any).specialAbilities || [],
+        tournamentBonus: (character as any).tournamentBonus || 0,
+        unlockRequirements: character.unlockRequirements || []
+      } as any;
+      
+      const result = await mintCharacter(crossmintChar);
       if (result.success) {
-        // Character minted successfully
         console.log('Character minted:', result.tokenId);
       } else {
         console.error('Failed to mint character:', result.error);
@@ -284,7 +298,7 @@ const CharacterSelectionModal: React.FC<CharacterSelectionModalProps> = ({
               <div>
                 <h5 className="font-medium text-sm mb-1">Skills</h5>
                 <div className="flex flex-wrap gap-1">
-                  {selectedCharacter.skills?.map((skill: string, index: number) => (
+                  {(selectedCharacter as any).skills?.map((skill: string, index: number) => (
                     <Badge key={index} variant="outline" className="text-xs">
                       {skill}
                     </Badge>

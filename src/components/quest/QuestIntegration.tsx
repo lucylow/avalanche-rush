@@ -145,7 +145,15 @@ const QuestIntegration: React.FC<QuestIntegrationProps> = ({
         }
 
         if (shouldUpdate && progressIncrement > 0) {
-          updateQuestProgress(questProgress.questId);
+          const gameEvent = {
+            type: 'complete' as const,
+            questId: questProgress.questId,
+            objectiveId: objective.id,
+            progress: progressIncrement,
+            timestamp: Date.now(),
+            value: progressIncrement
+          };
+          updateQuestProgress(gameEvent);
           
           // Notify parent component
           if (onQuestUpdate) {

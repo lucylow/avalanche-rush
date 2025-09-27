@@ -204,9 +204,9 @@ const StorytellingEngine: React.FC<StorytellingEngineProps> = ({
       // Play dialogue sound based on emotion
       const currentDialogue = scene.dialogue[nextIndex];
       if (currentDialogue.voiceEffect) {
-        audioManager.playSound(currentDialogue.voiceEffect);
+        audioManager.playSound(currentDialogue.voiceEffect as any);
       } else {
-        audioManager.playSound('buttonClick');
+        audioManager.playSound('buttonClick' as any);
       }
     } else {
       // Scene finished, check for choices or next scene
