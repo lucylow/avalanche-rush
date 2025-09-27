@@ -61,19 +61,19 @@ export const useSmartContracts = () => {
       const network = await provider.getNetwork();
 
       if (accounts.length > 0) {
-        const account = accounts[0];
-        const chainId = network.chainId;
+        const account = await accounts[0].getAddress();
+        const chainId = Number(network.chainId);
         
         // Initialize contract service
-        contractService.initializeContracts(provider, signer);
+        contractService.initializeContracts(provider, await provider.getSigner());
         
         // Get contract instances
         const contractInstances = {
-          avalancheRushCore: contractService.contracts.avalancheRushCore,
-          reactiveQuestEngine: contractService.contracts.reactiveQuestEngine,
-          educationalNFT: contractService.contracts.educationalNFT,
-          rushToken: contractService.contracts.rushToken,
-          mockDEX: contractService.contracts.mockDEX
+          avalancheRushCore: (contractService as any).contracts.avalancheRushCore,
+          reactiveQuestEngine: (contractService as any).contracts.reactiveQuestEngine,
+          educationalNFT: (contractService as any).contracts.educationalNFT,
+          rushToken: (contractService as any).contracts.rushToken,
+          mockDEX: (contractService as any).contracts.mockDEX
         };
 
         setContracts(contractInstances);
@@ -115,15 +115,15 @@ export const useSmartContracts = () => {
       const network = await provider.getNetwork();
 
       // Initialize contract service
-      contractService.initializeContracts(provider, signer);
+      contractService.initializeContracts(provider, await provider.getSigner());
 
       // Get contract instances
       const contractInstances = {
-        avalancheRushCore: contractService.contracts.avalancheRushCore,
-        reactiveQuestEngine: contractService.contracts.reactiveQuestEngine,
-        educationalNFT: contractService.contracts.educationalNFT,
-        rushToken: contractService.contracts.rushToken,
-        mockDEX: contractService.contracts.mockDEX
+        avalancheRushCore: (contractService as any).contracts.avalancheRushCore,
+        reactiveQuestEngine: (contractService as any).contracts.reactiveQuestEngine,
+        educationalNFT: (contractService as any).contracts.educationalNFT,
+        rushToken: (contractService as any).contracts.rushToken,
+        mockDEX: (contractService as any).contracts.mockDEX
       };
 
       setContracts(contractInstances);
@@ -131,8 +131,8 @@ export const useSmartContracts = () => {
       setWeb3State({
         isConnected: true,
         account: accounts[0],
-        chainId: network.chainId,
-        networkName: getNetworkName(network.chainId),
+        chainId: Number(network.chainId),
+        networkName: getNetworkName(Number(network.chainId)),
         isLoading: false,
         error: null
       });

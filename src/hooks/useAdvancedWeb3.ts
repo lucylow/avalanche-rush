@@ -1,13 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { ethers } from 'ethers';
-import SmartContractService, { 
-  CONTRACT_ADDRESSES, 
-  NETWORKS, 
-  PlayerProfile, 
-  Quest, 
-  NFTAchievement, 
-  RaffleInfo 
-} from '../services/SmartContractService';
+import SmartContractService from '../services/SmartContractService';
 
 // Enhanced contract ABIs with full functionality
 const AVALANCHE_RUSH_CORE_ABI = [

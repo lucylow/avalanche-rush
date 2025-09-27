@@ -111,7 +111,7 @@ export const useReactiveNetwork = () => {
 
   // Load data from Avalanche origin contract
   const loadOriginData = async (provider: ethers.BrowserProvider, playerAddress: string, chainId: number) => {
-    const contractAddress = CONTRACT_ADDRESSES[chainId as keyof typeof CONTRACT_ADDRESSES]?.gameSessionTracker;
+    const contractAddress = (CONTRACT_ADDRESSES[chainId as keyof typeof CONTRACT_ADDRESSES] as any)?.gameSessionTracker;
     if (!contractAddress) return;
 
     const contract = new ethers.Contract(contractAddress, GAME_SESSION_TRACKER_ABI, provider);
@@ -190,7 +190,7 @@ export const useReactiveNetwork = () => {
         throw new Error('Must be on Avalanche C-Chain to record game sessions');
       }
 
-      const contractAddress = CONTRACT_ADDRESSES[chainId as keyof typeof CONTRACT_ADDRESSES]?.gameSessionTracker;
+      const contractAddress = (CONTRACT_ADDRESSES[chainId as keyof typeof CONTRACT_ADDRESSES] as any)?.gameSessionTracker;
       if (!contractAddress) {
         throw new Error('Game session tracker not deployed on this network');
       }

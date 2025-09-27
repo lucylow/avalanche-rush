@@ -98,7 +98,8 @@ const CharacterSelectionModal: React.FC<CharacterSelectionModalProps> = ({
         skills: character.skills || [],
         specialAbilities: character.specialAbilities || [],
         questBonus: character.questBonus || 0,
-        unlockRequirements: character.unlockRequirements || []
+        tournamentBonus: character.tournamentBonus || 0,
+        unlockRequirements: (character as any).unlockRequirements || []
       };
       
       const result = await mintCharacter(crossmintChar);
@@ -169,7 +170,7 @@ const CharacterSelectionModal: React.FC<CharacterSelectionModalProps> = ({
               className={`relative border rounded-lg p-4 cursor-pointer transition-all duration-200 hover:shadow-lg ${
                 selectedCharacter?.id === character.id ? 'ring-2 ring-primary bg-primary/5' : 'hover:border-primary/50'
               }`}
-              onClick={() => handleCharacterSelect(character)}
+              onClick={() => handleCharacterSelect(character as any)}
             >
                   {selectedCharacter?.id === character.id && (
                     <div className="absolute top-2 right-2">
@@ -215,7 +216,7 @@ const CharacterSelectionModal: React.FC<CharacterSelectionModalProps> = ({
                       className="flex-1"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleCharacterSelect(character);
+                        handleCharacterSelect(character as any);
                       }}
                     >
                       Select
@@ -226,7 +227,7 @@ const CharacterSelectionModal: React.FC<CharacterSelectionModalProps> = ({
                         variant="outline"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleMintCharacter(character);
+                          handleMintCharacter(character as any);
                         }}
                       >
                         <Crown className="h-3 w-3" />

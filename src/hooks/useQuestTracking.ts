@@ -120,7 +120,7 @@ export const useQuestTracking = () => {
       objectives: quest.objectives.map(obj => ({
         id: obj.id,
         current: 0,
-        target: obj.target,
+        target: typeof obj.target === 'string' ? parseInt(obj.target) || 0 : obj.target,
         isCompleted: false,
         lastUpdate: Date.now()
       })),

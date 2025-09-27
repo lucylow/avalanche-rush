@@ -132,7 +132,7 @@ export const useAvalancheCChain = () => {
             setIsConnected(true);
             
             // Load player stats
-            await loadPlayerStats(signer.address);
+            await loadPlayerStats((signer as any).address);
             
             // Setup event listeners
             setupEventListeners(avalancheContract);
@@ -215,8 +215,8 @@ export const useAvalancheCChain = () => {
       
       // Reload stats
       const signer = contract.runner;
-      if (signer && signer.address) {
-        await loadPlayerStats(signer.address);
+      if (signer && (signer as any).address) {
+        await loadPlayerStats((signer as any).address);
       }
       
       return true;
@@ -240,8 +240,8 @@ export const useAvalancheCChain = () => {
       
       // Reload stats
       const signer = contract.runner;
-      if (signer && signer.address) {
-        await loadPlayerStats(signer.address);
+      if (signer && (signer as any).address) {
+        await loadPlayerStats((signer as any).address);
       }
       
       return true;
@@ -265,8 +265,8 @@ export const useAvalancheCChain = () => {
       
       // Reload stats
       const signer = contract.runner;
-      if (signer && signer.address) {
-        await loadPlayerStats(signer.address);
+      if (signer && (signer as any).address) {
+        await loadPlayerStats((signer as any).address);
       }
       
       return true;
@@ -290,8 +290,8 @@ export const useAvalancheCChain = () => {
       
       // Reload stats
       const signer = contract.runner;
-      if (signer && signer.address) {
-        await loadPlayerStats(signer.address);
+      if (signer && (signer as any).address) {
+        await loadPlayerStats((signer as any).address);
       }
       
       return true;
@@ -352,8 +352,8 @@ export const useAvalancheCChain = () => {
       
       // Reload stats
       const signer = contract.runner;
-      if (signer && signer.address) {
-        await loadPlayerStats(signer.address);
+      if (signer && (signer as any).address) {
+        await loadPlayerStats((signer as any).address);
       }
       
       return true;
@@ -377,8 +377,8 @@ export const useAvalancheCChain = () => {
       
       // Reload stats
       const signer = contract.runner;
-      if (signer && signer.address) {
-        await loadPlayerStats(signer.address);
+      if (signer && (signer as any).address) {
+        await loadPlayerStats((signer as any).address);
       }
       
       return true;

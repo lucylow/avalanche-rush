@@ -131,7 +131,7 @@ export const useChainlinkVRF = () => {
         // Add to pending requests
         const newRequest: RandomnessRequest = {
           requestId,
-          player: await contract.signer.getAddress(),
+          player: await (contract.runner as any)?.getAddress(),
           eventType,
           gameSessionId,
           timestamp: Date.now(),
