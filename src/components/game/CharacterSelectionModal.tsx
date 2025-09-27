@@ -97,7 +97,7 @@ const CharacterSelectionModal: React.FC<CharacterSelectionModalProps> = ({
         attributes: character.attributes || {},
         skills: character.skills || [],
         specialAbilities: character.specialAbilities || [],
-        tournamentBonus: character.tournamentBonus || 0,
+        questBonus: character.questBonus || 0,
         unlockRequirements: character.unlockRequirements || []
       };
       

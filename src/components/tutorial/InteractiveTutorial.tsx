@@ -98,7 +98,7 @@ const InteractiveTutorial: React.FC<InteractiveTutorialProps> = ({
         size: 40,
         color: '#2196F3'
       },
-      successCondition: () => demoData?.movementCompleted || false,
+      successCondition: () => Boolean(demoData?.movementCompleted) || false,
       reward: { points: 150 }
     },
     {
@@ -142,7 +142,7 @@ const InteractiveTutorial: React.FC<InteractiveTutorialProps> = ({
         size: 40,
         color: '#FF4444'
       },
-      successCondition: () => demoData?.obstaclesAvoided >= 2,
+      successCondition: () => Number(demoData?.obstaclesAvoided) >= 2,
       reward: { points: 250 }
     },
     {
@@ -165,7 +165,7 @@ const InteractiveTutorial: React.FC<InteractiveTutorialProps> = ({
         size: 35,
         color: '#9C27B0'
       },
-      successCondition: () => demoData?.powerupsCollected >= 1,
+      successCondition: () => Number(demoData?.powerupsCollected) >= 1,
       reward: { points: 300, achievement: 'Power-Up Master' }
     },
     {
@@ -187,7 +187,7 @@ const InteractiveTutorial: React.FC<InteractiveTutorialProps> = ({
         size: 25,
         color: '#E91E63'
       },
-      successCondition: () => demoData?.abilitiesUsed >= 2,
+      successCondition: () => Number(demoData?.abilitiesUsed) >= 2,
       reward: { points: 400, achievement: 'Ability Expert' }
     },
     {
@@ -209,7 +209,7 @@ const InteractiveTutorial: React.FC<InteractiveTutorialProps> = ({
         size: 60,
         color: '#FF6B6B'
       },
-      successCondition: () => demoData?.maxCombo >= 5,
+      successCondition: () => Number(demoData?.maxCombo) >= 5,
       reward: { points: 500, achievement: 'Combo Master' }
     },
     {
@@ -231,7 +231,7 @@ const InteractiveTutorial: React.FC<InteractiveTutorialProps> = ({
         size: 45,
         color: '#00BCD4'
       },
-      successCondition: () => demoData?.minigameCompleted || false,
+      successCondition: () => Boolean(demoData?.minigameCompleted) || false,
       reward: { points: 600, achievement: 'Mini-Game Champion' }
     },
     {

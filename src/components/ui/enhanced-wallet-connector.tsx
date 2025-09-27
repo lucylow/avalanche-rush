@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAdvancedWeb3 } from '../hooks/useAdvancedWeb3';
+import { useAdvancedWeb3 } from '../../hooks/useAdvancedWeb3';
 
 interface WalletState {
   isConnecting: boolean;
