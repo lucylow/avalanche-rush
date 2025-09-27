@@ -190,7 +190,7 @@ const AvalancheCChainDashboard: React.FC = () => {
         ].map(({ id, label, icon }) => (
           <button
             key={id}
-            onClick={() => setSelectedTab(id as any)}
+            onClick={() => setSelectedTab(id as 'overview' | 'transactions' | 'contracts' | 'analytics')}
             className={`flex-1 flex items-center justify-center space-x-2 px-4 py-3 rounded-lg font-semibold transition-all duration-200 ${
               selectedTab === id
                 ? 'bg-red-600 text-white shadow-lg'

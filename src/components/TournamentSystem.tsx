@@ -248,7 +248,7 @@ const TournamentSystem: React.FC = () => {
               {['ALL', 'JOINED', 'COMPLETED'].map((tab) => (
                 <button
                   key={tab}
-                  onClick={() => setActiveTab(tab as any)}
+                  onClick={() => setActiveTab(tab as 'ALL' | 'JOINED' | 'COMPLETED')}
                   className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                     activeTab === tab
                       ? 'bg-white text-blue-600 shadow-sm'

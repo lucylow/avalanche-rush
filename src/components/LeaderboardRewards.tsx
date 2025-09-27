@@ -263,7 +263,7 @@ const LeaderboardRewards: React.FC = () => {
           {['daily', 'weekly', 'monthly', 'season'].map((period) => (
             <button
               key={period}
-              onClick={() => setSelectedPeriod(period as any)}
+              onClick={() => setSelectedPeriod(period as 'daily' | 'weekly' | 'monthly' | 'season')}
               className={`px-6 py-3 rounded-full font-medium transition-all duration-200 ${
                 selectedPeriod === period
                   ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg scale-105'

@@ -250,7 +250,7 @@ const PlayerProfile: React.FC<PlayerProfileProps> = ({
         ].map(({ id, label, icon: Icon }) => (
           <button
             key={id}
-            onClick={() => setActiveTab(id as any)}
+            onClick={() => setActiveTab(id as 'overview' | 'achievements' | 'stats' | 'rewards')}
             className={`flex-1 flex items-center justify-center space-x-2 py-3 px-6 rounded-md font-medium transition-all duration-200 ${
               activeTab === id
                 ? 'bg-white text-blue-600 shadow-sm'

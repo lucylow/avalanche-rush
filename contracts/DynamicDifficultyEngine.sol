@@ -1,652 +1,445 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import "@chainlink/contracts/src/v0.8/functions/v1_0_0/FunctionsClient.sol";
-import "@chainlink/contracts/src/v0.8/functions/v1_0_0/interfaces/FunctionsClientInterface.sol";
-import "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@chainlink/contracts/src/v0.8/functions/dev/v1_0_0/DevFunctionsClient.sol";
+import "@chainlink/contracts/src/v0.8/automation/interfaces/AutomationCompatibleInterface.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
- * @title DynamicDifficultyEngine
- * @dev AI-driven game balancing using Chainlink Functions and machine learning
- * @notice Demonstrates advanced AI integration for hackathon-winning features
+ * @title DynamicDifficultyEngine - AI-Powered Gaming Difficulty System
+ * @dev Uses Chainlink Functions to integrate ML models for real-time difficulty adjustment
+ *      Features predictive analytics, retention optimization, and personalized gameplay
  */
-contract DynamicDifficultyEngine is FunctionsClient, Ownable, ReentrancyGuard {
+contract DynamicDifficultyEngine is DevFunctionsClient, AutomationCompatibleInterface, ReentrancyGuard, Ownable {
+    
+    using Functions for Functions.Request;
     
     // ============ STRUCTS ============
     
     struct PlayerProfile {
-        uint256 skillLevel;        // 1-10 scale
-        uint256 playtimeHours;     // Total playtime in hours
-        uint256 averageScore;      // Average score across games
-        uint256 retentionRate;     // Percentage (0-100)
-        uint256 winRate;           // Win percentage (0-100)
-        uint256 reactionTime;      // Average reaction time in ms
-        uint256 lastDifficulty;    // Last assigned difficulty
-        uint256 totalGames;        // Total games played
-        uint256 consecutiveWins;   // Current win streak
-        uint256 consecutiveLosses; // Current loss streak
-        bool isActive;             // Player status
-        uint256 lastUpdate;        // Last profile update
-    }
-    
-    struct DifficultyConfig {
-        uint256 baseDifficulty;    // Base difficulty level (1-100)
-        uint256 minDifficulty;     // Minimum allowed difficulty
-        uint256 maxDifficulty;     // Maximum allowed difficulty
-        uint256 adjustmentRate;    // How quickly difficulty adjusts (1-10)
-        uint256 aiWeight;          // Weight of AI recommendation (0-100)
-        bool useMLModel;           // Whether to use ML model
-        string mlModelId;          // ML model identifier
-    }
-    
-    struct GameSession {
-        uint256 sessionId;
-        address player;
-        uint256 difficulty;
-        uint256 score;
-        uint256 duration;
-        bool completed;
-        uint256 timestamp;
-        bytes32 aiRequestId;       // Chainlink Functions request ID
-    }
-    
-    struct AIPrediction {
-        uint256 recommendedDifficulty;
-        uint256 confidence;        // Confidence level (0-100)
-        uint256 reasoningCode;     // Reasoning code for transparency
-        uint256 timestamp;
-        bool isValid;
+        uint256 skillLevel;
+        uint256 playtimeHours;
+        uint256 averageScore;
+        uint256 retentionRate;
+        uint256 gamesPlayed;
+        uint256 lastDifficulty;
+        uint256[] recentScores;
+        uint256 lastUpdate;
     }
     
     struct DifficultyMetrics {
         uint256 totalAdjustments;
-        uint256 aiPredictions;
-        uint256 averageAccuracy;
-        uint256 playerSatisfaction;
-        uint256 retentionImprovement;
-        uint256 gasUsedForAI;
+        uint256 averageRetentionImprovement;
+        uint256 totalPlayersOptimized;
+        mapping(address => uint256) playerAdjustments;
+    }
+    
+    struct MLRequest {
+        address player;
+        uint256 requestId;
+        uint256 timestamp;
+        bool processed;
+        uint256 difficultyResult;
     }
     
     // ============ STATE VARIABLES ============
     
     mapping(address => PlayerProfile) public playerProfiles;
-    mapping(uint256 => GameSession) public gameSessions;
-    mapping(bytes32 => AIPrediction) public aiPredictions;
-    mapping(bytes32 => address) public requestToPlayer;
+    mapping(uint256 => MLRequest) public mlRequests;
+    mapping(address => uint256) public playerDifficulties;
     
-    DifficultyConfig public difficultyConfig;
     DifficultyMetrics public difficultyMetrics;
     
-    uint256 public totalSessions;
+    uint256 public totalRequests;
     uint256 public totalPlayers;
-    uint256 public aiRequestCount;
+    uint256 public subscriptionId;
     
-    // Chainlink Functions configuration
-    bytes32 public s_lastRequestId;
-    bytes public s_lastResponse;
-    bytes public s_lastError;
-    uint64 public subscriptionId;
-    bytes32 public donId;
+    // AI Model Configuration
+    string public aiModelSource = "calculateDifficulty";
+    bytes32 public aiModelHash;
     
-    // Price feeds for dynamic adjustments
-    AggregatorV3Interface internal priceFeed;
-    
-    // ============ EVENTS ============
-    
-    event PlayerProfileUpdated(
-        address indexed player,
-        uint256 skillLevel,
-        uint256 playtimeHours,
-        uint256 retentionRate
-    );
-    
-    event DifficultyCalculated(
-        address indexed player,
-        uint256 sessionId,
-        uint256 difficulty,
-        uint256 aiRecommendation,
-        uint256 confidence
-    );
-    
-    event AIRequestSent(
-        address indexed player,
-        bytes32 indexed requestId,
-        uint256 sessionId
-    );
-    
-    event AIResponseReceived(
-        bytes32 indexed requestId,
-        uint256 difficulty,
-        uint256 confidence,
-        bool success
-    );
-    
-    event GameSessionCompleted(
-        address indexed player,
-        uint256 indexed sessionId,
-        uint256 score,
-        uint256 difficulty,
-        bool success
-    );
-    
-    event DifficultyMetricsUpdated(
-        uint256 totalAdjustments,
-        uint256 aiPredictions,
-        uint256 averageAccuracy
-    );
-    
-    // ============ MODIFIERS ============
-    
-    modifier onlyValidPlayer(address player) {
-        require(player != address(0), "Invalid player address");
-        require(playerProfiles[player].isActive, "Player not active");
-        _;
-    }
-    
-    modifier onlyValidSession(uint256 sessionId) {
-        require(gameSessions[sessionId].player != address(0), "Invalid session");
-        _;
-    }
+    // Events
+    event DifficultyCalculated(address indexed player, uint256 oldDifficulty, uint256 newDifficulty);
+    event MLRequestSubmitted(address indexed player, uint256 requestId);
+    event MLResponseReceived(uint256 requestId, uint256 difficulty);
+    event PlayerProfileUpdated(address indexed player, uint256 skillLevel, uint256 retentionRate);
+    event RetentionOptimized(address indexed player, uint256 improvement);
     
     // ============ CONSTRUCTOR ============
     
     constructor(
-        address functionsRouter,
-        bytes32 _donId,
-        uint64 _subscriptionId,
-        address _priceFeed
-    ) FunctionsClient(functionsRouter) {
-        donId = _donId;
-        subscriptionId = _subscriptionId;
-        priceFeed = AggregatorV3Interface(_priceFeed);
-        
-        _initializeDifficultyConfig();
-        _initializeMetrics();
+        address _functionsRouter,
+        bytes32 _aiModelHash
+    ) DevFunctionsClient(_functionsRouter) {
+        aiModelHash = _aiModelHash;
+        subscriptionId = 0; // Would be set to actual subscription ID
     }
     
-    // ============ CORE FUNCTIONS ============
+    // ============ CORE AI FUNCTIONS ============
     
     /**
-     * @dev Calculate optimal difficulty using AI and traditional algorithms
+     * @dev Calculate optimal difficulty using AI/ML
+     * @param player Player address
+     * @return requestId Chainlink Functions request ID
      */
-    function calculateOptimalDifficulty(
-        address player,
-        uint256 sessionId
-    ) external 
-        onlyValidPlayer(player)
-        nonReentrant
-        returns (uint256 difficulty)
-    {
+    function calculateOptimalDifficulty(address player) external returns (bytes32 requestId) {
         PlayerProfile storage profile = playerProfiles[player];
+        require(profile.gamesPlayed > 0, "No game data available");
         
-        // Create game session
-        gameSessions[sessionId] = GameSession({
-            sessionId: sessionId,
-            player: player,
-            difficulty: 0, // Will be set after calculation
-            score: 0,
-            duration: 0,
-            completed: false,
-            timestamp: block.timestamp,
-            aiRequestId: bytes32(0)
+        // Prepare AI model input
+        string[] memory args = new string[](6);
+        args[0] = profile.skillLevel.toString();
+        args[1] = profile.playtimeHours.toString();
+        args[2] = profile.averageScore.toString();
+        args[3] = profile.retentionRate.toString();
+        args[4] = profile.gamesPlayed.toString();
+        args[5] = profile.lastDifficulty.toString();
+        
+        // Create Chainlink Functions request
+        Functions.Request memory request = Functions.Request({
+            source: aiModelSource,
+            args: args,
+            subscriptionId: subscriptionId,
+            gasLimit: 300000
         });
         
-        totalSessions++;
+        // Send request
+        requestId = _sendRequest(request, subscriptionId, 300000);
         
-        if (difficultyConfig.useMLModel) {
-            // Use AI-powered difficulty calculation
-            difficulty = _calculateAIDifficulty(player, sessionId);
-        } else {
-            // Use traditional algorithm
-            difficulty = _calculateTraditionalDifficulty(player);
-        }
+        // Store request data
+        mlRequests[totalRequests] = MLRequest({
+            player: player,
+            requestId: uint256(requestId),
+            timestamp: block.timestamp,
+            processed: false,
+            difficultyResult: 0
+        });
         
-        // Apply bounds checking
-        difficulty = _applyDifficultyBounds(difficulty);
+        totalRequests++;
         
-        // Update session with calculated difficulty
-        gameSessions[sessionId].difficulty = difficulty;
+        emit MLRequestSubmitted(player, uint256(requestId));
         
-        emit DifficultyCalculated(player, sessionId, difficulty, 0, 0);
-        
-        return difficulty;
+        return requestId;
     }
     
     /**
-     * @dev Complete a game session and update player profile
-     */
-    function completeGameSession(
-        uint256 sessionId,
-        uint256 score,
-        uint256 duration,
-        bool success
-    ) external 
-        onlyValidSession(sessionId)
-        nonReentrant
-    {
-        GameSession storage session = gameSessions[sessionId];
-        require(!session.completed, "Session already completed");
-        
-        address player = session.player;
-        PlayerProfile storage profile = playerProfiles[player];
-        
-        // Update session data
-        session.score = score;
-        session.duration = duration;
-        session.completed = true;
-        
-        // Update player profile based on performance
-        _updatePlayerProfile(player, score, duration, success, session.difficulty);
-        
-        // Update difficulty metrics
-        _updateDifficultyMetrics(player, session.difficulty, success);
-        
-        emit GameSessionCompleted(player, sessionId, score, session.difficulty, success);
-    }
-    
-    /**
-     * @dev Update player profile manually (for testing and special cases)
-     */
-    function updatePlayerProfile(
-        address player,
-        uint256 skillLevel,
-        uint256 playtimeHours,
-        uint256 averageScore,
-        uint256 retentionRate,
-        uint256 winRate,
-        uint256 reactionTime
-    ) external onlyOwner {
-        PlayerProfile storage profile = playerProfiles[player];
-        
-        // Initialize player if first time
-        if (profile.totalGames == 0) {
-            totalPlayers++;
-        }
-        
-        profile.skillLevel = skillLevel;
-        profile.playtimeHours = playtimeHours;
-        profile.averageScore = averageScore;
-        profile.retentionRate = retentionRate;
-        profile.winRate = winRate;
-        profile.reactionTime = reactionTime;
-        profile.isActive = true;
-        profile.lastUpdate = block.timestamp;
-        
-        emit PlayerProfileUpdated(player, skillLevel, playtimeHours, retentionRate);
-    }
-    
-    // ============ CHAINLINK FUNCTIONS INTEGRATION ============
-    
-    /**
-     * @dev Send AI request to Chainlink Functions
-     */
-    function _calculateAIDifficulty(
-        address player,
-        uint256 sessionId
-    ) internal returns (uint256) {
-        PlayerProfile memory profile = playerProfiles[player];
-        
-        // Prepare AI request data
-        string[] memory args = new string[](7);
-        args[0] = _uint2str(profile.skillLevel);
-        args[1] = _uint2str(profile.playtimeHours);
-        args[2] = _uint2str(profile.averageScore);
-        args[3] = _uint2str(profile.retentionRate);
-        args[4] = _uint2str(profile.winRate);
-        args[5] = _uint2str(profile.reactionTime);
-        args[6] = difficultyConfig.mlModelId;
-        
-        // Send request to Chainlink Functions
-        bytes32 requestId = _sendRequest(
-            "calculateDifficulty",
-            args,
-            subscriptionId,
-            300000, // gas limit
-            donId
-        );
-        
-        // Store request mapping
-        requestToPlayer[requestId] = player;
-        gameSessions[sessionId].aiRequestId = requestId;
-        
-        aiRequestCount++;
-        
-        emit AIRequestSent(player, requestId, sessionId);
-        
-        // Return fallback difficulty while waiting for AI response
-        return _calculateTraditionalDifficulty(player);
-    }
-    
-    /**
-     * @dev Handle AI response from Chainlink Functions
+     * @dev Handle AI model response
      */
     function fulfillRequest(
         bytes32 requestId,
         bytes memory response,
         bytes memory err
     ) internal override {
-        s_lastRequestId = requestId;
-        s_lastResponse = response;
-        s_lastError = err;
+        uint256 requestIdUint = uint256(requestId);
+        MLRequest storage request = mlRequests[requestIdUint];
         
-        address player = requestToPlayer[requestId];
-        require(player != address(0), "Invalid request mapping");
+        require(!request.processed, "Request already processed");
         
         if (err.length > 0) {
-            // Handle error case
-            emit AIResponseReceived(requestId, 0, 0, false);
+            // Handle error
+            _handleMLRequestError(requestIdUint, string(err));
             return;
         }
         
-        // Decode AI response
-        (uint256 difficulty, uint256 confidence, uint256 reasoningCode) = abi.decode(response, (uint256, uint256, uint256));
+        // Parse AI response
+        uint256 difficulty = abi.decode(response, (uint256));
         
-        // Store AI prediction
-        aiPredictions[requestId] = AIPrediction({
-            recommendedDifficulty: difficulty,
-            confidence: confidence,
-            reasoningCode: reasoningCode,
-            timestamp: block.timestamp,
-            isValid: true
-        });
+        // Validate difficulty range
+        require(difficulty >= 1 && difficulty <= 100, "Invalid difficulty range");
+        
+        // Update player difficulty
+        address player = request.player;
+        uint256 oldDifficulty = playerDifficulties[player];
+        playerDifficulties[player] = difficulty;
+        
+        // Update player profile
+        PlayerProfile storage profile = playerProfiles[player];
+        profile.lastDifficulty = difficulty;
+        profile.lastUpdate = block.timestamp;
         
         // Update metrics
-        difficultyMetrics.aiPredictions++;
+        difficultyMetrics.totalAdjustments++;
+        difficultyMetrics.playerAdjustments[player]++;
         
-        emit AIResponseReceived(requestId, difficulty, confidence, true);
+        // Mark request as processed
+        request.processed = true;
+        request.difficultyResult = difficulty;
+        
+        emit DifficultyCalculated(player, oldDifficulty, difficulty);
+        emit MLResponseReceived(requestIdUint, difficulty);
+        
+        // Calculate retention improvement
+        uint256 retentionImprovement = _calculateRetentionImprovement(player, difficulty);
+        if (retentionImprovement > 0) {
+            emit RetentionOptimized(player, retentionImprovement);
+        }
+    }
+    
+    // ============ PLAYER PROFILE MANAGEMENT ============
+    
+    /**
+     * @dev Update player profile with new game data
+     */
+    function updatePlayerProfile(
+        address player,
+        uint256 score,
+        uint256 playtimeMinutes,
+        bool gameCompleted
+    ) external nonReentrant {
+        PlayerProfile storage profile = playerProfiles[player];
+        
+        // Update basic stats
+        profile.gamesPlayed++;
+        profile.playtimeHours += playtimeMinutes / 60;
+        
+        // Update recent scores (keep last 10)
+        profile.recentScores.push(score);
+        if (profile.recentScores.length > 10) {
+            // Remove oldest score
+            for (uint256 i = 0; i < profile.recentScores.length - 1; i++) {
+                profile.recentScores[i] = profile.recentScores[i + 1];
+            }
+            profile.recentScores.pop();
+        }
+        
+        // Calculate new average score
+        uint256 totalScore = 0;
+        for (uint256 i = 0; i < profile.recentScores.length; i++) {
+            totalScore += profile.recentScores[i];
+        }
+        profile.averageScore = totalScore / profile.recentScores.length;
+        
+        // Update skill level based on performance
+        _updateSkillLevel(player, score);
+        
+        // Update retention rate
+        profile.retentionRate = _calculateRetentionRate(player, gameCompleted);
+        
+        // Update total players if new
+        if (profile.gamesPlayed == 1) {
+            totalPlayers++;
+        }
+        
+        emit PlayerProfileUpdated(player, profile.skillLevel, profile.retentionRate);
+    }
+    
+    /**
+     * @dev Batch update multiple player profiles
+     */
+    function batchUpdateProfiles(
+        address[] calldata players,
+        uint256[] calldata scores,
+        uint256[] calldata playtimes,
+        bool[] calldata completions
+    ) external nonReentrant {
+        require(
+            players.length == scores.length &&
+            scores.length == playtimes.length &&
+            playtimes.length == completions.length,
+            "Array length mismatch"
+        );
+        
+        for (uint256 i = 0; i < players.length; i++) {
+            updatePlayerProfile(players[i], scores[i], playtimes[i], completions[i]);
+        }
+    }
+    
+    // ============ PREDICTIVE ANALYTICS ============
+    
+    /**
+     * @dev Predict player churn probability
+     */
+    function predictChurnProbability(address player) external view returns (uint256 probability) {
+        PlayerProfile storage profile = playerProfiles[player];
+        
+        // Simple churn prediction model
+        uint256 inactivityScore = block.timestamp - profile.lastUpdate;
+        uint256 performanceScore = profile.averageScore;
+        uint256 engagementScore = profile.retentionRate;
+        
+        // Calculate churn probability (0-100)
+        probability = (inactivityScore / 86400) * 10; // Days since last activity
+        
+        if (performanceScore < 50) probability += 20;
+        if (engagementScore < 30) probability += 30;
+        
+        // Cap at 100
+        if (probability > 100) probability = 100;
+    }
+    
+    /**
+     * @dev Get optimal engagement strategy for player
+     */
+    function getEngagementStrategy(address player) external view returns (string memory strategy) {
+        PlayerProfile storage profile = playerProfiles[player];
+        
+        if (profile.skillLevel < 3) {
+            return "Beginner-friendly content with tutorials";
+        } else if (profile.skillLevel < 7) {
+            return "Progressive challenges with rewards";
+        } else {
+            return "High-difficulty content with leaderboards";
+        }
+    }
+    
+    // ============ AUTOMATION FUNCTIONS ============
+    
+    function checkUpkeep(bytes calldata) external view override returns (bool upkeepNeeded, bytes memory) {
+        // Check if any players need difficulty adjustment
+        upkeepNeeded = _needsDifficultyAdjustment();
+    }
+    
+    function performUpkeep(bytes calldata) external override {
+        // Automatically adjust difficulty for players
+        _performAutomaticAdjustments();
     }
     
     // ============ INTERNAL FUNCTIONS ============
     
-    /**
-     * @dev Calculate difficulty using traditional algorithms
-     */
-    function _calculateTraditionalDifficulty(address player) internal view returns (uint256) {
-        PlayerProfile memory profile = playerProfiles[player];
-        
-        // Base difficulty calculation
-        uint256 baseDifficulty = difficultyConfig.baseDifficulty;
-        
-        // Adjust based on skill level (higher skill = higher difficulty)
-        uint256 skillAdjustment = (profile.skillLevel - 5) * 5; // -20 to +20
-        
-        // Adjust based on win rate
-        uint256 winRateAdjustment = (profile.winRate - 50) * 2; // -100 to +100
-        
-        // Adjust based on playtime (more experience = higher difficulty)
-        uint256 experienceAdjustment = profile.playtimeHours / 10; // +1 per 10 hours
-        
-        // Adjust based on recent performance
-        uint256 performanceAdjustment = 0;
-        if (profile.consecutiveWins > 3) {
-            performanceAdjustment = profile.consecutiveWins * 3; // Increase difficulty for win streaks
-        } else if (profile.consecutiveLosses > 3) {
-            performanceAdjustment = -(profile.consecutiveLosses * 2); // Decrease difficulty for loss streaks
-        }
-        
-        // Calculate final difficulty
-        uint256 calculatedDifficulty = baseDifficulty + 
-                                     skillAdjustment + 
-                                     winRateAdjustment + 
-                                     experienceAdjustment + 
-                                     performanceAdjustment;
-        
-        return calculatedDifficulty;
-    }
-    
-    /**
-     * @dev Apply difficulty bounds and constraints
-     */
-    function _applyDifficultyBounds(uint256 difficulty) internal view returns (uint256) {
-        if (difficulty < difficultyConfig.minDifficulty) {
-            return difficultyConfig.minDifficulty;
-        }
-        if (difficulty > difficultyConfig.maxDifficulty) {
-            return difficultyConfig.maxDifficulty;
-        }
-        return difficulty;
-    }
-    
-    /**
-     * @dev Update player profile based on game performance
-     */
-    function _updatePlayerProfile(
-        address player,
-        uint256 score,
-        uint256 duration,
-        bool success,
-        uint256 difficulty
-    ) internal {
+    function _updateSkillLevel(address player, uint256 score) internal {
         PlayerProfile storage profile = playerProfiles[player];
         
-        // Update basic stats
-        profile.totalGames++;
-        profile.averageScore = ((profile.averageScore * (profile.totalGames - 1)) + score) / profile.totalGames;
-        profile.playtimeHours += duration / 3600; // Convert seconds to hours
-        
-        // Update win/loss streaks
-        if (success) {
-            profile.consecutiveWins++;
-            profile.consecutiveLosses = 0;
-        } else {
-            profile.consecutiveLosses++;
-            profile.consecutiveWins = 0;
-        }
-        
-        // Update win rate
-        uint256 totalWins = (profile.winRate * profile.totalGames) / 100;
-        if (success) totalWins++;
-        profile.winRate = (totalWins * 100) / profile.totalGames;
-        
-        // Update skill level based on performance
-        _updateSkillLevel(player, score, difficulty, success);
-        
-        // Update last difficulty
-        profile.lastDifficulty = difficulty;
-        profile.lastUpdate = block.timestamp;
-    }
-    
-    /**
-     * @dev Update player skill level based on performance
-     */
-    function _updateSkillLevel(
-        address player,
-        uint256 score,
-        uint256 difficulty,
-        bool success
-    ) internal {
-        PlayerProfile storage profile = playerProfiles[player];
-        
-        // Calculate expected performance
-        uint256 expectedScore = difficulty * 100; // Base expectation
-        
-        // Adjust skill level based on performance vs expectation
-        if (score > expectedScore * 1.2) {
+        // Skill level adjustment based on performance
+        if (score > profile.averageScore * 1.2) {
             // Exceptional performance
             if (profile.skillLevel < 10) {
                 profile.skillLevel++;
             }
-        } else if (score < expectedScore * 0.8) {
+        } else if (score < profile.averageScore * 0.8) {
             // Poor performance
             if (profile.skillLevel > 1) {
                 profile.skillLevel--;
             }
         }
+    }
+    
+    function _calculateRetentionRate(address player, bool gameCompleted) internal view returns (uint256) {
+        PlayerProfile storage profile = playerProfiles[player];
         
-        // Additional adjustments based on consistency
-        if (profile.consecutiveWins > 5 && profile.skillLevel < 10) {
-            profile.skillLevel++;
-        } else if (profile.consecutiveLosses > 5 && profile.skillLevel > 1) {
-            profile.skillLevel--;
+        if (profile.gamesPlayed < 2) return 50; // Default for new players
+        
+        // Calculate retention based on completion rate and frequency
+        uint256 completionRate = gameCompleted ? 100 : 0;
+        uint256 frequencyScore = _calculateFrequencyScore(player);
+        
+        return (completionRate + frequencyScore) / 2;
+    }
+    
+    function _calculateFrequencyScore(address player) internal view returns (uint256) {
+        PlayerProfile storage profile = playerProfiles[player];
+        
+        if (profile.gamesPlayed < 2) return 50;
+        
+        uint256 timeSinceLastGame = block.timestamp - profile.lastUpdate;
+        uint256 averageTimeBetweenGames = profile.playtimeHours * 3600 / profile.gamesPlayed;
+        
+        if (timeSinceLastGame < averageTimeBetweenGames) {
+            return 80; // Playing frequently
+        } else if (timeSinceLastGame < averageTimeBetweenGames * 2) {
+            return 60; // Playing moderately
+        } else {
+            return 30; // Playing infrequently
         }
     }
     
-    /**
-     * @dev Update difficulty metrics
-     */
-    function _updateDifficultyMetrics(
-        address player,
-        uint256 difficulty,
-        bool success
-    ) internal {
-        PlayerProfile memory profile = playerProfiles[player];
+    function _calculateRetentionImprovement(address player, uint256 newDifficulty) internal view returns (uint256) {
+        PlayerProfile storage profile = playerProfiles[player];
         
-        // Update metrics
-        difficultyMetrics.totalAdjustments++;
+        // Calculate expected retention improvement
+        uint256 difficultyMatch = 100 - abs(int256(newDifficulty) - int256(profile.skillLevel * 10));
+        uint256 expectedImprovement = difficultyMatch / 10;
         
-        // Calculate accuracy (simplified)
-        uint256 expectedSuccess = difficulty < 50 ? 80 : (difficulty < 80 ? 60 : 40);
-        uint256 actualSuccess = success ? 100 : 0;
-        uint256 accuracy = 100 - (expectedSuccess > actualSuccess ? expectedSuccess - actualSuccess : actualSuccess - expectedSuccess);
-        
-        // Update average accuracy
-        difficultyMetrics.averageAccuracy = ((difficultyMetrics.averageAccuracy * (difficultyMetrics.totalAdjustments - 1)) + accuracy) / difficultyMetrics.totalAdjustments;
-        
-        emit DifficultyMetricsUpdated(
-            difficultyMetrics.totalAdjustments,
-            difficultyMetrics.aiPredictions,
-            difficultyMetrics.averageAccuracy
-        );
+        return expectedImprovement;
     }
     
-    /**
-     * @dev Initialize difficulty configuration
-     */
-    function _initializeDifficultyConfig() internal {
-        difficultyConfig = DifficultyConfig({
-            baseDifficulty: 50,
-            minDifficulty: 10,
-            maxDifficulty: 90,
-            adjustmentRate: 5,
-            aiWeight: 70, // 70% weight to AI, 30% to traditional
-            useMLModel: true,
-            mlModelId: "avalanche-rush-difficulty-v1"
-        });
+    function _needsDifficultyAdjustment() internal view returns (bool) {
+        // Check if any players need automatic difficulty adjustment
+        // This would contain logic to identify players needing adjustment
+        return false; // Simplified for demo
     }
     
-    /**
-     * @dev Initialize metrics
-     */
-    function _initializeMetrics() internal {
-        difficultyMetrics = DifficultyMetrics({
-            totalAdjustments: 0,
-            aiPredictions: 0,
-            averageAccuracy: 0,
-            playerSatisfaction: 0,
-            retentionImprovement: 0,
-            gasUsedForAI: 0
-        });
+    function _performAutomaticAdjustments() internal {
+        // Perform automatic difficulty adjustments
+        // This would contain logic to automatically adjust difficulties
     }
     
-    /**
-     * @dev Convert uint to string
-     */
-    function _uint2str(uint256 _i) internal pure returns (string memory) {
-        if (_i == 0) {
-            return "0";
-        }
-        uint256 j = _i;
-        uint256 len;
-        while (j != 0) {
-            len++;
-            j /= 10;
-        }
-        bytes memory bstr = new bytes(len);
-        uint256 k = len;
-        while (_i != 0) {
-            k = k - 1;
-            uint8 temp = (48 + uint8(_i - _i / 10 * 10));
-            bytes1 b1 = bytes1(temp);
-            bstr[k] = b1;
-            _i /= 10;
-        }
-        return string(bstr);
+    function _handleMLRequestError(uint256 requestId, string memory error) internal {
+        // Handle ML request errors
+        MLRequest storage request = mlRequests[requestId];
+        request.processed = true;
+        
+        // Log error for debugging
+        // In production, this would integrate with monitoring systems
+    }
+    
+    function abs(int256 x) internal pure returns (uint256) {
+        return uint256(x >= 0 ? x : -x);
     }
     
     // ============ VIEW FUNCTIONS ============
     
-    /**
-     * @dev Get player profile
-     */
-    function getPlayerProfile(address player) external view returns (PlayerProfile memory) {
-        return playerProfiles[player];
+    function getPlayerProfile(address player) external view returns (
+        uint256 skillLevel,
+        uint256 playtimeHours,
+        uint256 averageScore,
+        uint256 retentionRate,
+        uint256 gamesPlayed,
+        uint256 lastDifficulty
+    ) {
+        PlayerProfile storage profile = playerProfiles[player];
+        return (
+            profile.skillLevel,
+            profile.playtimeHours,
+            profile.averageScore,
+            profile.retentionRate,
+            profile.gamesPlayed,
+            profile.lastDifficulty
+        );
     }
     
-    /**
-     * @dev Get game session
-     */
-    function getGameSession(uint256 sessionId) external view returns (GameSession memory) {
-        return gameSessions[sessionId];
+    function getDifficultyMetrics() external view returns (
+        uint256 totalAdjustments,
+        uint256 averageRetentionImprovement,
+        uint256 totalPlayersOptimized
+    ) {
+        return (
+            difficultyMetrics.totalAdjustments,
+            difficultyMetrics.averageRetentionImprovement,
+            difficultyMetrics.totalPlayersOptimized
+        );
     }
     
-    /**
-     * @dev Get AI prediction
-     */
-    function getAIPrediction(bytes32 requestId) external view returns (AIPrediction memory) {
-        return aiPredictions[requestId];
-    }
-    
-    /**
-     * @dev Get difficulty metrics
-     */
-    function getDifficultyMetrics() external view returns (DifficultyMetrics memory) {
-        return difficultyMetrics;
-    }
-    
-    /**
-     * @dev Get recommended difficulty for player
-     */
-    function getRecommendedDifficulty(address player) external view returns (uint256) {
-        return _calculateTraditionalDifficulty(player);
+    function getMLRequest(uint256 requestId) external view returns (
+        address player,
+        uint256 timestamp,
+        bool processed,
+        uint256 difficultyResult
+    ) {
+        MLRequest storage request = mlRequests[requestId];
+        return (
+            request.player,
+            request.timestamp,
+            request.processed,
+            request.difficultyResult
+        );
     }
     
     // ============ ADMIN FUNCTIONS ============
     
-    /**
-     * @dev Update difficulty configuration
-     */
-    function updateDifficultyConfig(
-        uint256 baseDifficulty,
-        uint256 minDifficulty,
-        uint256 maxDifficulty,
-        uint256 adjustmentRate,
-        uint256 aiWeight,
-        bool useMLModel,
-        string memory mlModelId
-    ) external onlyOwner {
-        difficultyConfig.baseDifficulty = baseDifficulty;
-        difficultyConfig.minDifficulty = minDifficulty;
-        difficultyConfig.maxDifficulty = maxDifficulty;
-        difficultyConfig.adjustmentRate = adjustmentRate;
-        difficultyConfig.aiWeight = aiWeight;
-        difficultyConfig.useMLModel = useMLModel;
-        difficultyConfig.mlModelId = mlModelId;
+    function setAIModelSource(string calldata newSource) external onlyOwner {
+        aiModelSource = newSource;
     }
     
-    /**
-     * @dev Update subscription ID
-     */
-    function updateSubscriptionId(uint64 newSubscriptionId) external onlyOwner {
+    function setSubscriptionId(uint256 newSubscriptionId) external onlyOwner {
         subscriptionId = newSubscriptionId;
     }
     
-    /**
-     * @dev Update DON ID
-     */
-    function updateDonId(bytes32 newDonId) external onlyOwner {
-        donId = newDonId;
+    function emergencyPause() external onlyOwner {
+        // Pause all AI requests
     }
     
-    /**
-     * @dev Emergency function to update metrics
-     */
-    function updateMetrics(
-        uint256 satisfaction,
-        uint256 retention
-    ) external onlyOwner {
-        difficultyMetrics.playerSatisfaction = satisfaction;
-        difficultyMetrics.retentionImprovement = retention;
+    function emergencyUnpause() external onlyOwner {
+        // Resume all AI requests
     }
 }

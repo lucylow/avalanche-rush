@@ -97,7 +97,7 @@ const DynamicMusicSystem: React.FC<DynamicMusicSystemProps> = ({
       
       // Add a small delay for smooth transitions
       setTimeout(() => {
-        audioManager.playBackgroundMusic(currentTrack as any);
+        audioManager.playBackgroundMusic(currentTrack);
       }, 100);
     }
   }, [
@@ -146,7 +146,7 @@ const DynamicMusicSystem: React.FC<DynamicMusicSystemProps> = ({
         // Play victory theme for special achievements
         audioManager.playBackgroundMusic('victory');
         setTimeout(() => {
-          audioManager.playBackgroundMusic(getMusicTrack() as any);
+          audioManager.playBackgroundMusic(getMusicTrack());
         }, 5000);
       }
     }

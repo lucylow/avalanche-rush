@@ -49,7 +49,7 @@ const AudioEnhancedGameEngine = forwardRef<AudioEnhancedGameEngineRef, AudioEnha
   const [playerPosition, setPlayerPosition] = useState({ x: 100, y: 300 });
   const [keys, setKeys] = useState<{ [key: string]: boolean }>({});
   const [gameSpeed, setGameSpeed] = useState(2);
-  const [particles, setParticles] = useState<any[]>([]);
+  const [particles, setParticles] = useState<Array<{id: number; x: number; y: number; vx: number; vy: number; life: number; color: string}>>([]);
   const [backgroundOffset, setBackgroundOffset] = useState(0);
   
   // Enhanced game state with audio tracking
@@ -124,7 +124,7 @@ const AudioEnhancedGameEngine = forwardRef<AudioEnhancedGameEngineRef, AudioEnha
     
     // Play different hit sounds based on obstacle type
     const obstacleTypes = ['iceBreak', 'avalancheCrash', 'obstacleHit'];
-    audioManager.playRandomSound(obstacleTypes as any);
+    audioManager.playRandomSound(obstacleTypes);
   }, [audioManager]);
 
   const playComboSound = useCallback(() => {

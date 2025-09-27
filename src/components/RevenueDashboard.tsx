@@ -137,7 +137,7 @@ const RevenueDashboard: React.FC = () => {
           {['7d', '30d', '90d'].map((range) => (
             <button
               key={range}
-              onClick={() => setSelectedTimeRange(range as any)}
+              onClick={() => setSelectedTimeRange(range as '7d' | '30d' | '90d')}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 selectedTimeRange === range
                   ? 'bg-blue-600 text-white'

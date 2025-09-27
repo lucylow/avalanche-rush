@@ -314,7 +314,7 @@ const EnhancedLeaderboard: React.FC<LeaderboardProps> = ({
           {['daily', 'weekly', 'monthly', 'allTime'].map((period) => (
             <button
               key={period}
-              onClick={() => setSelectedTimeframe(period as any)}
+              onClick={() => setSelectedTimeframe(period as 'daily' | 'weekly' | 'monthly' | 'all-time')}
               className={`px-6 py-2 rounded-full font-medium transition-all duration-200 ${
                 selectedTimeframe === period
                   ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
