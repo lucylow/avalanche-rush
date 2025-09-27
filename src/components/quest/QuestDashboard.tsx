@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 import { useQuestTracking } from '../../hooks/useQuestTracking';
 import { useLens } from '../../hooks/useLens';
-import { useFarcaster } from '../../hooks/useFarcaster';
+import { CHARACTER_QUESTS } from '../../data/characterQuests';
 
 interface QuestDashboardProps {
   isOpen: boolean;
@@ -57,7 +57,7 @@ const QuestDashboard: React.FC<QuestDashboardProps> = ({ isOpen, onClose }) => {
   } = useQuestTracking();
 
   const { profile: lensProfile, shareAchievement } = useLens();
-  const { user: farcasterUser, shareAchievement: shareFarcasterAchievement } = useFarcaster();
+  // const { user: farcasterUser, shareAchievement: shareFarcasterAchievement } = useFarcaster();
 
   const stats = getQuestStats();
   const availableQuests = getAvailableQuests();
@@ -501,7 +501,7 @@ const QuestDashboard: React.FC<QuestDashboardProps> = ({ isOpen, onClose }) => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {farcasterUser ? (
+                  {/* {farcasterUser ? (
                     <div>
                       <p className="text-white/70 mb-2">Connected as: @{farcasterUser.username}</p>
                       <div className="space-y-2">
@@ -515,9 +515,9 @@ const QuestDashboard: React.FC<QuestDashboardProps> = ({ isOpen, onClose }) => {
                         </Badge>
                       </div>
                     </div>
-                  ) : (
+                  ) : ( */}
                     <p className="text-white/70">Connect to Farcaster to share quest progress</p>
-                  )}
+                  {/* )} */}
                 </CardContent>
               </Card>
             </div>

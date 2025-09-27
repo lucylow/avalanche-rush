@@ -62,7 +62,7 @@ const PlayerProfile: React.FC<PlayerProfileProps> = ({
   avatar,
   isOwn = false
 }) => {
-  const [activeTab, setActiveTab] = useState<'stats' | 'achievements' | 'nfts'>('stats');
+  const [activeTab, setActiveTab] = useState<'stats' | 'achievements' | 'nfts' | 'overview' | 'rewards'>('stats');
   const [isEditingProfile, setIsEditingProfile] = useState(false);
 
   // Mock player data - replace with actual API calls

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ethers } from 'ethers';
+import { ethers, BrowserProvider } from 'ethers';
 import { 
   Zap, 
   Brain, 
@@ -54,7 +54,7 @@ const DYNAMIC_DIFFICULTY_ABI = [
 
 interface AdvancedGameIntegrationProps {
   account: string | null;
-  provider: ethers.providers.Web3Provider | null;
+  provider: BrowserProvider | null;
   chainId: number;
 }
 
@@ -111,28 +111,32 @@ const AdvancedGameIntegration: React.FC<AdvancedGameIntegrationProps> = ({
   // Initialize contracts
   useEffect(() => {
     if (provider && account) {
-      const signer = provider.getSigner();
+      const initContracts = async () => {
+        const signer = await provider.getSigner();
+        
+        setReactiveQuestEngine(new ethers.Contract(
+          CONTRACT_ADDRESSES.reactiveQuestEngine,
+          REACTIVE_QUEST_ENGINE_ABI,
+          signer
+        ));
+        
+        setAvalancheSubnet(new ethers.Contract(
+          CONTRACT_ADDRESSES.avalancheSubnet,
+          AVALANCHE_SUBNET_ABI,
+          signer
+        ));
+        
+        setDynamicDifficulty(new ethers.Contract(
+          CONTRACT_ADDRESSES.dynamicDifficulty,
+          DYNAMIC_DIFFICULTY_ABI,
+          signer
+        ));
+        
+        setIsConnected(true);
+        loadPlayerData();
+      };
       
-      setReactiveQuestEngine(new ethers.Contract(
-        CONTRACT_ADDRESSES.reactiveQuestEngine,
-        REACTIVE_QUEST_ENGINE_ABI,
-        signer
-      ));
-      
-      setAvalancheSubnet(new ethers.Contract(
-        CONTRACT_ADDRESSES.avalancheSubnet,
-        AVALANCHE_SUBNET_ABI,
-        signer
-      ));
-      
-      setDynamicDifficulty(new ethers.Contract(
-        CONTRACT_ADDRESSES.dynamicDifficulty,
-        DYNAMIC_DIFFICULTY_ABI,
-        signer
-      ));
-      
-      setIsConnected(true);
-      loadPlayerData();
+      initContracts();
     }
   }, [provider, account]);
 
@@ -237,7 +241,7 @@ const AdvancedGameIntegration: React.FC<AdvancedGameIntegrationProps> = ({
         lives: 3,
         energy: 100,
         timestamp: Math.floor(Date.now() / 1000),
-        gameHash: ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(
+        gameHash: ethers.keccak256(ethers.AbiCoder.defaultAbiCoder().encode(
           ['address', 'uint256', 'uint256'],
           [account, score, level]
         ))
@@ -270,9 +274,9 @@ const AdvancedGameIntegration: React.FC<AdvancedGameIntegrationProps> = ({
     try {
       setIsLoading(true);
       
-      const messageBytes = ethers.utils.toUtf8Bytes(message);
+      const messageBytes = ethers.toUtf8Bytes(message);
       await avalancheSubnet.sendCrossSubnetMessage(targetSubnet, messageBytes, {
-        value: ethers.utils.parseEther("0.01") // 0.01 AVAX for gas
+        value: ethers.parseEther("0.01") // 0.01 AVAX for gas
       });
       
       addNotification(`Cross-subnet message sent to subnet ${targetSubnet}`);
@@ -301,7 +305,7 @@ const AdvancedGameIntegration: React.FC<AdvancedGameIntegrationProps> = ({
       const destinationChainSelector = chainSelectors[destinationChain as keyof typeof chainSelectors];
       
       await reactiveQuestEngine.migrateNFT(tokenId, destinationChainSelector, account, {
-        value: ethers.utils.parseEther("0.01") // 0.01 AVAX for gas
+        value: ethers.parseEther("0.01") // 0.01 AVAX for gas
       });
       
       addNotification(`NFT ${tokenId} migrated to chain ${destinationChain}`);

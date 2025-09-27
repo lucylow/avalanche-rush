@@ -145,7 +145,7 @@ const QuestIntegration: React.FC<QuestIntegrationProps> = ({
         }
 
         if (shouldUpdate && progressIncrement > 0) {
-          updateQuestProgress(questProgress.questId, objective.id, progressIncrement);
+          updateQuestProgress(questProgress.questId);
           
           // Notify parent component
           if (onQuestUpdate) {
@@ -162,7 +162,6 @@ const QuestIntegration: React.FC<QuestIntegrationProps> = ({
     
     activeQuests.forEach(questProgress => {
       const allRequiredCompleted = questProgress.objectives
-        .filter(obj => !obj.isOptional)
         .every(obj => obj.isCompleted);
 
       if (allRequiredCompleted && !questProgress.isCompleted) {
