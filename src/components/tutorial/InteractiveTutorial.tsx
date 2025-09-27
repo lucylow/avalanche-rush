@@ -75,7 +75,7 @@ const InteractiveTutorial: React.FC<InteractiveTutorialProps> = ({
         size: 50,
         color: '#4CAF50'
       },
-      successCondition: () => demoData?.movementCompleted || false,
+      successCondition: () => Boolean(demoData?.movementCompleted) || false,
       reward: { points: 100, achievement: 'First Steps' }
     },
     {
@@ -120,7 +120,7 @@ const InteractiveTutorial: React.FC<InteractiveTutorialProps> = ({
         size: 30,
         color: '#FFD700'
       },
-      successCondition: () => demoData?.collectiblesCollected >= 3,
+      successCondition: () => Number(demoData?.collectiblesCollected || 0) >= 3,
       reward: { points: 200, achievement: 'Coin Collector' }
     },
     {

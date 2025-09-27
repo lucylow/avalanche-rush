@@ -177,7 +177,7 @@ const MobileAvalancheRushGame: React.FC = () => {
 
     setIsLoading(true);
     try {
-      await completeGameSession(currentSessionId, finalScore, newAchievements.length);
+      await completeGameSession(currentSessionId, finalScore, newAchievements);
       setGameState(prev => ({
         ...prev,
         isPlaying: false,

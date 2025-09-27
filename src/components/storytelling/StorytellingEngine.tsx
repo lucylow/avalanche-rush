@@ -139,7 +139,7 @@ const StorytellingEngine: React.FC<StorytellingEngineProps> = ({
           );
           
           if (meetsLevelRequirement && meetsPrerequisites && !storyState.unlockedStories.includes(arc.id)) {
-            allStories.push({ ...arc, characterId: character.id });
+            allStories.push({ ...arc });
             
             // Add notification for newly unlocked story
             addNotification({

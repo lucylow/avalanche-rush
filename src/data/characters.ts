@@ -76,7 +76,7 @@ export interface StoryScene {
 export interface DialogueNode {
   speaker: string; // character name or 'narrator'
   text: string;
-  emotion: 'neutral' | 'happy' | 'sad' | 'angry' | 'excited' | 'mysterious' | 'determined';
+  emotion: 'neutral' | 'happy' | 'sad' | 'angry' | 'excited' | 'mysterious' | 'determined' | 'wise' | 'pleased' | 'proud' | 'respectful' | 'encouraging' | 'amazed' | 'nostalgic' | 'enthusiastic' | 'ecstatic' | 'helpful' | 'impressed' | 'focused' | 'analytical' | 'satisfied' | 'approving' | 'intrigued' | 'mystical' | 'delighted' | 'educational' | 'conspiratorial' | 'otherworldly' | 'guidance' | 'warning' | 'prophetic';
   voiceEffect?: string; // Sound effect to play
 }
 

@@ -124,7 +124,7 @@ const TutorialManager: React.FC<TutorialManagerProps> = ({
         title: 'Tutorial Graduate',
         description: 'Completed the entire tutorial',
         icon: '🎓',
-        rarity: 'mythic',
+        rarity: 'legendary' as 'common' | 'rare' | 'epic' | 'legendary',
         points: 1000,
         unlocked: false
       }

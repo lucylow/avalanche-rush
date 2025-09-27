@@ -116,7 +116,7 @@ const EnhancedWalletConnector: React.FC = () => {
     try {
       setWalletState(prev => ({ ...prev, error: null }));
       const success = await switchNetwork(targetChainId);
-      if (success) {
+      if (typeof success === 'boolean' && success) {
         setShowNetworkModal(false);
       } else {
         setWalletState(prev => ({ 

@@ -117,7 +117,7 @@ const DialogueSystem: React.FC<DialogueSystemProps> = ({
 
     // Play voice effect if available
     if (dialogue.voiceEffect) {
-      audioManager.playSound(dialogue.voiceEffect);
+      audioManager.playSound(dialogue.voiceEffect as any);
     }
 
     // Record interaction
