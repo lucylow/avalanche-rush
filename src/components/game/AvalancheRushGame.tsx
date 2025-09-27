@@ -93,6 +93,21 @@ const AvalancheRushGame = () => {
     loadProfile();
   }, [isConnected, account, getPlayerProfile]);
 
+  // Game loop for score increase
+  useEffect(() => {
+    if (!gameState.isPlaying || gameState.isPaused) return;
+
+    const interval = setInterval(() => {
+      setGameState(prev => ({
+        ...prev,
+        score: prev.score + 1,
+        currentLevel: Math.floor(prev.score / 1000) + 1
+      }));
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [gameState.isPlaying, gameState.isPaused]);
+
   // Handle tutorial completion
   const handleTutorialComplete = (achievements: string[], totalPoints: number) => {
     setHasCompletedTutorial(true);
@@ -252,6 +267,46 @@ const AvalancheRushGame = () => {
                   <BookOpen className="w-5 h-5" />
                   Start Tutorial
                 </button>
+              </div>
+            </div>
+          )}
+
+          {/* Game Canvas */}
+          {gameState.isPlaying && (
+            <div className="mb-8">
+              <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 border border-white/10">
+                <div className="text-center mb-4">
+                  <h3 className="text-2xl font-bold text-white mb-2">Avalanche Rush Game</h3>
+                  <div className="flex items-center justify-center space-x-6 text-white">
+                    <div>Score: <span className="font-bold text-green-400">{gameState.score}</span></div>
+                    <div>Level: <span className="font-bold text-blue-400">{gameState.currentLevel}</span></div>
+                    <div>Lives: <span className="font-bold text-red-400">{gameState.lives}</span></div>
+                  </div>
+                </div>
+                
+                <div className="bg-black rounded-lg p-4 text-center">
+                  <div className="text-white text-lg mb-4">
+                    🏃‍♂️ Game Running... Press SPACE to jump!
+                  </div>
+                  <div className="text-white/70 text-sm">
+                    Score increases automatically. Complete quests to earn bonus points!
+                  </div>
+                </div>
+                
+                <div className="flex justify-center space-x-4 mt-4">
+                  <button
+                    onClick={() => setGameState(prev => ({ ...prev, isPaused: !prev.isPaused }))}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg"
+                  >
+                    {gameState.isPaused ? 'Resume' : 'Pause'}
+                  </button>
+                  <button
+                    onClick={() => endGame(gameState.score)}
+                    className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg"
+                  >
+                    End Game
+                  </button>
+                </div>
               </div>
             </div>
           )}

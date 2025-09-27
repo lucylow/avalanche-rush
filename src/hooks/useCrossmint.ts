@@ -22,6 +22,7 @@ interface CrossmintCharacter {
   specialAbilities: string[];
   questBonus: number;
   tournamentBonus: number;
+  unlockRequirements: Array<{ type: string; value: string | number }>;
 }
 
 interface CrossmintMintResult {

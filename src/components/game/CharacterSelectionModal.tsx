@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +16,7 @@ import {
   Check
 } from 'lucide-react';
 import { useCrossmint } from '../../hooks/useCrossmint';
+import ErrorBoundary from '../common/ErrorBoundary';
 
 interface Character {
   id: string;
@@ -40,7 +41,7 @@ interface CharacterSelectionModalProps {
   playerLevel: number;
 }
 
-const CharacterSelectionModal: React.FC<CharacterSelectionModalProps> = ({
+const CharacterSelectionModal: React.FC<CharacterSelectionModalProps> = React.memo(({
   isOpen,
   onClose,
   onCharacterSelect,
@@ -113,12 +114,16 @@ const CharacterSelectionModal: React.FC<CharacterSelectionModalProps> = ({
     }
   };
 
-  const availableCharacters = characters.filter(char => 
-    isCharacterMinted(char.id) || char.rarity === 'Common'
+  const availableCharacters = useMemo(() => 
+    characters.filter(char => 
+      isCharacterMinted(char.id) || char.rarity === 'Common'
+    ), [characters, isCharacterMinted]
   );
 
-  const lockedCharacters = characters.filter(char => 
-    !isCharacterMinted(char.id) && char.rarity !== 'Common'
+  const lockedCharacters = useMemo(() => 
+    characters.filter(char => 
+      !isCharacterMinted(char.id) && char.rarity !== 'Common'
+    ), [characters, isCharacterMinted]
   );
 
   if (isLoading) {
@@ -134,7 +139,15 @@ const CharacterSelectionModal: React.FC<CharacterSelectionModalProps> = ({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <ErrorBoundary
+      onError={(error, errorInfo) => {
+        console.error('CharacterSelectionModal Error:', error, errorInfo);
+      }}
+      showDetails={process.env.NODE_ENV === 'development'}
+      resetOnPropsChange={true}
+      resetKeys={[playerLevel, selectedCharacter?.id]}
+    >
+      <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -320,8 +333,11 @@ const CharacterSelectionModal: React.FC<CharacterSelectionModalProps> = ({
           </Button>
         </div>
       </DialogContent>
-    </Dialog>
+      </Dialog>
+    </ErrorBoundary>
   );
-};
+});
+
+CharacterSelectionModal.displayName = 'CharacterSelectionModal';
 
 export default CharacterSelectionModal;

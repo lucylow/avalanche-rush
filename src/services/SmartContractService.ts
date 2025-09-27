@@ -218,8 +218,8 @@ export interface RaffleInfo {
 }
 
 export class SmartContractService {
-  private provider: ethers.providers.Provider | null = null;
-  private signer: ethers.Signer | null = null;
+  private provider: ethers.BrowserProvider | null = null;
+  private signer: ethers.JsonRpcSigner | null = null;
   private contracts: ContractInstances = {
     avalancheRushCore: null,
     reactiveQuestEngine: null,
@@ -228,13 +228,13 @@ export class SmartContractService {
     mockDEX: null
   };
 
-  constructor(provider?: ethers.providers.Provider, signer?: ethers.Signer) {
+  constructor(provider?: ethers.BrowserProvider, signer?: ethers.JsonRpcSigner) {
     this.provider = provider || null;
     this.signer = signer || null;
   }
 
   // Initialize contracts
-  public initializeContracts(provider: ethers.providers.Provider, signer?: ethers.Signer): void {
+  public initializeContracts(provider: ethers.BrowserProvider, signer?: ethers.JsonRpcSigner): void {
     this.provider = provider;
     this.signer = signer || null;
 

@@ -53,7 +53,7 @@ export interface Achievement {
   icon: string;
   category: string;
   points: number;
-  requirements: Record<string, any>;
+  requirements: Record<string, unknown>;
   created_at?: string;
 }
 

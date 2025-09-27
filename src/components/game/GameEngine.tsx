@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState, useCallback } from 'react';
+import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import QuestIntegration from '../quest/QuestIntegration';
 import TouchControls from './TouchControls';
@@ -118,7 +118,7 @@ interface GameObject {
   value?: number;
 }
 
-const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
+const GameEngine = React.memo(forwardRef<GameEngineRef, GameEngineProps>(({
   gameState,
   selectedCharacter,
   onScoreUpdate,
@@ -177,6 +177,19 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
     perfectRounds: 0
   });
 
+  // Memoized calculations for better performance
+  const gameCalculations = useMemo(() => {
+    const baseScore = gameStateRef.current.score;
+    const comboMultiplier = Math.max(1, gameStateRef.current.combo * 0.1);
+    const characterBonus = selectedCharacter ? (1 + selectedCharacter.questBonus / 100) : 1;
+    
+    return {
+      effectiveScore: Math.floor(baseScore * comboMultiplier * characterBonus),
+      nextLevelScore: (gameState.currentLevel + 1) * 1000,
+      progressPercentage: Math.min(100, (baseScore / ((gameState.currentLevel + 1) * 1000)) * 100)
+    };
+  }, [selectedCharacter, gameState.currentLevel]);
+
   // Particle system
   const createParticles = useCallback((x: number, y: number, type: 'explosion' | 'collect' | 'power' | 'trail', count: number = 5) => {
     const newParticles: Particle[] = [];
@@ -205,7 +218,7 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
   }, []);
 
   // Enhanced drawing functions
-  const drawPlayer = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
+  const drawPlayer = useCallback((ctx: CanvasRenderingContext2D, x: number, y: number) => {
     const time = Date.now() * 0.01;
     const bounce = Math.sin(time) * 2;
     const isInvulnerable = gameStateRef.current.invulnerable;
@@ -257,7 +270,7 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
     }
 
     ctx.restore();
-  };
+  }, [createParticles]);
 
   const drawObstacle = (ctx: CanvasRenderingContext2D, obstacle: GameObject) => {
     const time = Date.now() * 0.005;
@@ -515,7 +528,7 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
     ctx.restore();
   };
 
-  const drawBackground = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
+  const drawBackground = useCallback((ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
     // Gradient background
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
     gradient.addColorStop(0, '#1a1a2e');
@@ -557,7 +570,7 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
       ctx.lineTo(x, canvas.height);
       ctx.stroke();
     }
-  };
+  }, [backgroundOffset]);
 
   const updateParticles = () => {
     setParticles(prev => prev.map(particle => ({
@@ -570,7 +583,7 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
     })).filter(particle => particle.life > 0));
   };
 
-  const drawParticles = (ctx: CanvasRenderingContext2D) => {
+  const drawParticles = useCallback((ctx: CanvasRenderingContext2D) => {
     particles.forEach(particle => {
       ctx.save();
       ctx.globalAlpha = particle.life / particle.maxLife;
@@ -597,9 +610,224 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
       
       ctx.restore();
     });
-  };
+  }, [particles]);
 
-  // Enhanced game loop
+  // Enhanced game loop (will be defined at the end after all functions)
+
+  const drawEnhancedUI = useCallback((ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
+    // Main UI Background
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    ctx.fillRect(10, 10, 280, 180);
+    ctx.strokeStyle = '#4CAF50';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(10, 10, 280, 180);
+
+    // Score with glow effect
+    ctx.shadowColor = '#ffdd00';
+    ctx.shadowBlur = 10;
+    ctx.fillStyle = '#ffdd00';
+    ctx.font = 'bold 24px Arial';
+    ctx.fillText(`Score: ${gameStateRef.current.score.toLocaleString()}`, 20, 35);
+    
+    // Combo display
+    if (gameStateRef.current.combo > 0) {
+      ctx.shadowColor = '#ff4444';
+      ctx.shadowBlur = 8;
+      ctx.fillStyle = '#ff4444';
+      ctx.font = 'bold 16px Arial';
+      ctx.fillText(`${gameStateRef.current.combo}x COMBO!`, 20, 55);
+    }
+
+    ctx.shadowBlur = 0; // Reset shadow
+
+    // Lives with heart icons
+    ctx.fillStyle = '#ff4444';
+    ctx.font = '20px Arial';
+    for (let i = 0; i < gameStateRef.current.lives; i++) {
+      ctx.fillText('❤️', 20 + i * 25, 80);
+    }
+
+    // Energy bar with gradient
+    const energyGradient = ctx.createLinearGradient(20, 90, 220, 90);
+    energyGradient.addColorStop(0, '#00ff00');
+    energyGradient.addColorStop(0.5, '#ffff00');
+    energyGradient.addColorStop(1, '#ff0000');
+    
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.fillRect(20, 90, 200, 15);
+    
+    ctx.fillStyle = energyGradient;
+    ctx.fillRect(20, 90, (gameStateRef.current.energy / 100) * 200, 15);
+    
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(20, 90, 200, 15);
+    
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '12px Arial';
+    ctx.fillText(`Energy: ${gameStateRef.current.energy}%`, 25, 102);
+
+    // Level indicator
+    ctx.fillStyle = '#4CAF50';
+    ctx.font = 'bold 16px Arial';
+    ctx.fillText(`Level: ${gameState.currentLevel}`, 20, 120);
+
+    // Active Power-ups Display
+    let powerupY = 140;
+    Object.keys(gameStateRef.current.activePowerups).forEach(key => {
+      const powerup = gameStateRef.current.activePowerups[key as keyof typeof gameStateRef.current.activePowerups];
+      if (powerup.active && powerup.timeLeft > 0) {
+        const icons = {
+          shield: '🛡️',
+          speed: '⚡',
+          magnet: '🧲',
+          multiplier: '×',
+          invincible: '⭐',
+          slowmo: '⏰'
+        };
+        
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '14px Arial';
+        ctx.fillText(`${icons[key as keyof typeof icons]} ${Math.ceil(powerup.timeLeft / 60)}s`, 20, powerupY);
+        powerupY += 20;
+      }
+    });
+
+    // Special Abilities Cooldowns (Right side)
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+    ctx.fillRect(canvas.width - 200, 10, 190, 120);
+    ctx.strokeStyle = '#9C27B0';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(canvas.width - 200, 10, 190, 120);
+
+    ctx.fillStyle = '#9C27B0';
+    ctx.font = 'bold 16px Arial';
+    ctx.fillText('Special Abilities', canvas.width - 190, 30);
+
+    // Dash ability
+    const dashReady = gameStateRef.current.specialAbilities.dash.cooldown === 0;
+    ctx.fillStyle = dashReady ? '#4CAF50' : '#666666';
+    ctx.font = '12px Arial';
+    ctx.fillText(`Q - Dash ${dashReady ? 'READY' : Math.ceil(gameStateRef.current.specialAbilities.dash.cooldown / 60) + 's'}`, canvas.width - 190, 50);
+
+    // Time Freeze ability
+    const freezeReady = gameStateRef.current.specialAbilities.timeFreeze.cooldown === 0;
+    ctx.fillStyle = freezeReady ? '#2196F3' : '#666666';
+    ctx.fillText(`E - Time Freeze ${freezeReady ? 'READY' : Math.ceil(gameStateRef.current.specialAbilities.timeFreeze.cooldown / 60) + 's'}`, canvas.width - 190, 70);
+
+    // Mega Collect ability
+    const collectReady = gameStateRef.current.specialAbilities.megaCollect.cooldown === 0;
+    ctx.fillStyle = collectReady ? '#FF9800' : '#666666';
+    ctx.fillText(`R - Mega Collect ${collectReady ? 'READY' : Math.ceil(gameStateRef.current.specialAbilities.megaCollect.cooldown / 60) + 's'}`, canvas.width - 190, 90);
+
+    // Streak counter
+    if (gameStateRef.current.streakCount > 0) {
+      ctx.fillStyle = '#E91E63';
+      ctx.font = 'bold 14px Arial';
+      ctx.fillText(`Streak: ${gameStateRef.current.streakCount}`, canvas.width - 190, 110);
+    }
+  }, [gameState.currentLevel]);
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        window.innerWidth <= 768 ||
+        'ontouchstart' in window
+      );
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Touch control handlers
+  const handleTouchMove = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
+    setKeys(prev => ({ ...prev, [`Arrow${direction.charAt(0).toUpperCase() + direction.slice(1)}`]: true }));
+    
+    // Clear the key after a short delay to simulate key press
+    setTimeout(() => {
+      setKeys(prev => ({ ...prev, [`Arrow${direction.charAt(0).toUpperCase() + direction.slice(1)}`]: false }));
+    }, 100);
+  }, []);
+
+  const handleTouchJump = useCallback(() => {
+    setKeys(prev => ({ ...prev, ' ': true }));
+    setTimeout(() => {
+      setKeys(prev => ({ ...prev, ' ': false }));
+    }, 100);
+  }, []);
+
+  const handleTouchSlide = useCallback(() => {
+    setKeys(prev => ({ ...prev, 'ArrowDown': true }));
+    setTimeout(() => {
+      setKeys(prev => ({ ...prev, 'ArrowDown': false }));
+    }, 100);
+  }, []);
+
+  const handleSpecialAbility = useCallback((ability: 'dash' | 'timeFreeze' | 'megaCollect') => {
+    const keyMap = {
+      dash: 'q',
+      timeFreeze: 'e',
+      megaCollect: 'r'
+    };
+    
+    setKeys(prev => ({ ...prev, [keyMap[ability]]: true }));
+    setTimeout(() => {
+      setKeys(prev => ({ ...prev, [keyMap[ability]]: false }));
+    }, 100);
+  }, []);
+
+  // Initialize game (moved to end after startGame function)
+
+  // Handle keyboard input
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      setKeys(prev => ({ ...prev, [e.key]: true }));
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      setKeys(prev => ({ ...prev, [e.key]: false }));
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
+  // Initialize game (moved to end after gameLoop)
+
+  const pauseGame = useCallback(() => {
+    if (gameLoopRef.current) {
+      cancelAnimationFrame(gameLoopRef.current);
+    }
+  }, []);
+
+  // Resume game (moved to end after gameLoop)
+
+  const endGame = useCallback(() => {
+    gameStateRef.current.isRunning = false;
+    if (gameLoopRef.current) {
+      cancelAnimationFrame(gameLoopRef.current);
+    }
+    
+    const achievements = [];
+    if (gameStateRef.current.score >= 100) achievements.push('century');
+    if (gameStateRef.current.score >= 500) achievements.push('half_k');
+    if (gameStateRef.current.score >= 1000) achievements.push('thousand');
+    if (gameStateRef.current.combo >= 5) achievements.push('combo_master');
+    
+    onGameEnd(gameStateRef.current.score, achievements);
+  }, [onGameEnd]);
+
+  // Enhanced game loop (defined at the end to avoid dependency issues)
   const gameLoop = useCallback(() => {
     if (!gameState.isPlaying || isPaused) return;
 
@@ -942,210 +1170,18 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
 
     // Continue game loop
     gameLoopRef.current = requestAnimationFrame(gameLoop);
-  }, [gameState.isPlaying, isPaused, playerPosition, keys, gameSpeed, particles, createParticles, onScoreUpdate, selectedCharacter]);
-
-  const drawEnhancedUI = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
-    // Main UI Background
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-    ctx.fillRect(10, 10, 280, 180);
-    ctx.strokeStyle = '#4CAF50';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(10, 10, 280, 180);
-
-    // Score with glow effect
-    ctx.shadowColor = '#ffdd00';
-    ctx.shadowBlur = 10;
-    ctx.fillStyle = '#ffdd00';
-    ctx.font = 'bold 24px Arial';
-    ctx.fillText(`Score: ${gameStateRef.current.score.toLocaleString()}`, 20, 35);
-    
-    // Combo display
-    if (gameStateRef.current.combo > 0) {
-      ctx.shadowColor = '#ff4444';
-      ctx.shadowBlur = 8;
-      ctx.fillStyle = '#ff4444';
-      ctx.font = 'bold 16px Arial';
-      ctx.fillText(`${gameStateRef.current.combo}x COMBO!`, 20, 55);
-    }
-
-    ctx.shadowBlur = 0; // Reset shadow
-
-    // Lives with heart icons
-    ctx.fillStyle = '#ff4444';
-    ctx.font = '20px Arial';
-    for (let i = 0; i < gameStateRef.current.lives; i++) {
-      ctx.fillText('❤️', 20 + i * 25, 80);
-    }
-
-    // Energy bar with gradient
-    const energyGradient = ctx.createLinearGradient(20, 90, 220, 90);
-    energyGradient.addColorStop(0, '#00ff00');
-    energyGradient.addColorStop(0.5, '#ffff00');
-    energyGradient.addColorStop(1, '#ff0000');
-    
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-    ctx.fillRect(20, 90, 200, 15);
-    
-    ctx.fillStyle = energyGradient;
-    ctx.fillRect(20, 90, (gameStateRef.current.energy / 100) * 200, 15);
-    
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(20, 90, 200, 15);
-    
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '12px Arial';
-    ctx.fillText(`Energy: ${gameStateRef.current.energy}%`, 25, 102);
-
-    // Level indicator
-    ctx.fillStyle = '#4CAF50';
-    ctx.font = 'bold 16px Arial';
-    ctx.fillText(`Level: ${gameState.currentLevel}`, 20, 120);
-
-    // Active Power-ups Display
-    let powerupY = 140;
-    Object.keys(gameStateRef.current.activePowerups).forEach(key => {
-      const powerup = gameStateRef.current.activePowerups[key as keyof typeof gameStateRef.current.activePowerups];
-      if (powerup.active && powerup.timeLeft > 0) {
-        const icons = {
-          shield: '🛡️',
-          speed: '⚡',
-          magnet: '🧲',
-          multiplier: '×',
-          invincible: '⭐',
-          slowmo: '⏰'
-        };
-        
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '14px Arial';
-        ctx.fillText(`${icons[key as keyof typeof icons]} ${Math.ceil(powerup.timeLeft / 60)}s`, 20, powerupY);
-        powerupY += 20;
-      }
-    });
-
-    // Special Abilities Cooldowns (Right side)
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-    ctx.fillRect(canvas.width - 200, 10, 190, 120);
-    ctx.strokeStyle = '#9C27B0';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(canvas.width - 200, 10, 190, 120);
-
-    ctx.fillStyle = '#9C27B0';
-    ctx.font = 'bold 16px Arial';
-    ctx.fillText('Special Abilities', canvas.width - 190, 30);
-
-    // Dash ability
-    const dashReady = gameStateRef.current.specialAbilities.dash.cooldown === 0;
-    ctx.fillStyle = dashReady ? '#4CAF50' : '#666666';
-    ctx.font = '12px Arial';
-    ctx.fillText(`Q - Dash ${dashReady ? 'READY' : Math.ceil(gameStateRef.current.specialAbilities.dash.cooldown / 60) + 's'}`, canvas.width - 190, 50);
-
-    // Time Freeze ability
-    const freezeReady = gameStateRef.current.specialAbilities.timeFreeze.cooldown === 0;
-    ctx.fillStyle = freezeReady ? '#2196F3' : '#666666';
-    ctx.fillText(`E - Time Freeze ${freezeReady ? 'READY' : Math.ceil(gameStateRef.current.specialAbilities.timeFreeze.cooldown / 60) + 's'}`, canvas.width - 190, 70);
-
-    // Mega Collect ability
-    const collectReady = gameStateRef.current.specialAbilities.megaCollect.cooldown === 0;
-    ctx.fillStyle = collectReady ? '#FF9800' : '#666666';
-    ctx.fillText(`R - Mega Collect ${collectReady ? 'READY' : Math.ceil(gameStateRef.current.specialAbilities.megaCollect.cooldown / 60) + 's'}`, canvas.width - 190, 90);
-
-    // Streak counter
-    if (gameStateRef.current.streakCount > 0) {
-      ctx.fillStyle = '#E91E63';
-      ctx.font = 'bold 14px Arial';
-      ctx.fillText(`Streak: ${gameStateRef.current.streakCount}`, canvas.width - 190, 110);
-    }
-  };
-
-  // Mobile detection
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-        window.innerWidth <= 768 ||
-        'ontouchstart' in window
-      );
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  // Touch control handlers
-  const handleTouchMove = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
-    setKeys(prev => ({ ...prev, [`Arrow${direction.charAt(0).toUpperCase() + direction.slice(1)}`]: true }));
-    
-    // Clear the key after a short delay to simulate key press
-    setTimeout(() => {
-      setKeys(prev => ({ ...prev, [`Arrow${direction.charAt(0).toUpperCase() + direction.slice(1)}`]: false }));
-    }, 100);
-  }, []);
-
-  const handleTouchJump = useCallback(() => {
-    setKeys(prev => ({ ...prev, ' ': true }));
-    setTimeout(() => {
-      setKeys(prev => ({ ...prev, ' ': false }));
-    }, 100);
-  }, []);
-
-  const handleTouchSlide = useCallback(() => {
-    setKeys(prev => ({ ...prev, 'ArrowDown': true }));
-    setTimeout(() => {
-      setKeys(prev => ({ ...prev, 'ArrowDown': false }));
-    }, 100);
-  }, []);
-
-  const handleSpecialAbility = useCallback((ability: 'dash' | 'timeFreeze' | 'megaCollect') => {
-    const keyMap = {
-      dash: 'q',
-      timeFreeze: 'e',
-      megaCollect: 'r'
-    };
-    
-    setKeys(prev => ({ ...prev, [keyMap[ability]]: true }));
-    setTimeout(() => {
-      setKeys(prev => ({ ...prev, [keyMap[ability]]: false }));
-    }, 100);
-  }, []);
+  }, [gameState.isPlaying, isPaused, playerPosition, keys, gameSpeed, createParticles, onScoreUpdate, selectedCharacter, drawBackground, drawEnhancedUI, drawParticles, drawPlayer, endGame]);
 
   // Initialize game
-  useEffect(() => {
-    if (gameState.isPlaying && !gameStateRef.current.isRunning) {
-      startGame();
-    }
-  }, [gameState.isPlaying, startGame]);
-
-  // Handle keyboard input
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      setKeys(prev => ({ ...prev, [e.key]: true }));
-    };
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      setKeys(prev => ({ ...prev, [e.key]: false }));
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
-  }, []);
-
   const startGame = useCallback(() => {
     gameStateRef.current = {
       score: 0,
       lives: 3,
       energy: 100,
       isRunning: true,
-      obstacles: [],
-      collectibles: [],
-      powerups: [],
+      obstacles: [] as GameObject[],
+      collectibles: [] as GameObject[],
+      powerups: [] as GameObject[],
       lastObstacleTime: 0,
       lastCollectibleTime: 0,
       lastPowerupTime: 0,
@@ -1184,30 +1220,17 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
     gameLoopRef.current = requestAnimationFrame(gameLoop);
   }, [gameLoop]);
 
-  const pauseGame = () => {
-    if (gameLoopRef.current) {
-      cancelAnimationFrame(gameLoopRef.current);
+  // Initialize game
+  useEffect(() => {
+    if (gameState.isPlaying && !gameStateRef.current.isRunning) {
+      startGame();
     }
-  };
+  }, [gameState.isPlaying, startGame]);
 
+  // Resume game
   const resumeGame = useCallback(() => {
     gameLoopRef.current = requestAnimationFrame(gameLoop);
   }, [gameLoop]);
-
-  const endGame = () => {
-    gameStateRef.current.isRunning = false;
-    if (gameLoopRef.current) {
-      cancelAnimationFrame(gameLoopRef.current);
-    }
-    
-    const achievements = [];
-    if (gameStateRef.current.score >= 100) achievements.push('century');
-    if (gameStateRef.current.score >= 500) achievements.push('half_k');
-    if (gameStateRef.current.score >= 1000) achievements.push('thousand');
-    if (gameStateRef.current.combo >= 5) achievements.push('combo_master');
-    
-    onGameEnd(gameStateRef.current.score, achievements);
-  };
 
   // Expose methods to parent component
   useImperativeHandle(ref, () => ({
@@ -1230,8 +1253,11 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
     <ErrorBoundary
       onError={(error, errorInfo) => {
         console.error('GameEngine Error:', error, errorInfo);
-        // In production, you might want to send this to an error reporting service
+        // In production, this will be automatically sent to error reporting service
       }}
+      showDetails={process.env.NODE_ENV === 'development'}
+      resetOnPropsChange={true}
+      resetKeys={[gameState.currentLevel, gameState.gameMode]}
     >
       <div className="fixed inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
         <div className="relative">
@@ -1346,7 +1372,7 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
       </div>
     </ErrorBoundary>
   );
-});
+}));
 
 GameEngine.displayName = 'GameEngine';
 

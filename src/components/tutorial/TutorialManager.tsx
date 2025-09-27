@@ -1,188 +1,188 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  BookOpen, 
-  Play, 
-  SkipForward, 
-  Trophy, 
-  Star,
-  Zap,
-  Shield,
-  Target,
-  CheckCircle,
-  X
-} from 'lucide-react';
-import InteractiveTutorial from './InteractiveTutorial';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Progress } from '../ui/progress';
+import { X, BookOpen, CheckCircle, ArrowRight, Play } from 'lucide-react';
 
 interface TutorialManagerProps {
   isActive: boolean;
   onClose: () => void;
   onTutorialComplete: (achievements: string[], totalPoints: number) => void;
-  playerLevel?: number;
-  hasPlayedBefore?: boolean;
+  playerLevel: number;
+  hasPlayedBefore: boolean;
 }
 
-interface TutorialAchievement {
-  id: string;
+interface TutorialStep {
+  id: number;
   title: string;
   description: string;
-  icon: string;
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  content: string;
+  isCompleted: boolean;
   points: number;
-  unlocked: boolean;
 }
 
 const TutorialManager: React.FC<TutorialManagerProps> = ({
   isActive,
   onClose,
   onTutorialComplete,
-  playerLevel = 1,
-  hasPlayedBefore = false
+  playerLevel,
+  hasPlayedBefore
 }) => {
-  const [showTutorial, setShowTutorial] = useState(false);
-  const [tutorialCompleted, setTutorialCompleted] = useState(false);
-  const [achievements, setAchievements] = useState<TutorialAchievement[]>([]);
-  const [totalTutorialPoints, setTotalTutorialPoints] = useState(0);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [steps, setSteps] = useState<TutorialStep[]>([
+    {
+      id: 1,
+      title: 'Welcome to Avalanche Rush',
+      description: 'Learn the basics of Web3 gaming',
+      content: 'Avalanche Rush combines traditional gaming with blockchain technology. You\'ll earn RUSH tokens by playing and completing quests.',
+      isCompleted: false,
+      points: 50
+    },
+    {
+      id: 2,
+      title: 'Wallet Connection',
+      description: 'Connect your MetaMask wallet',
+      content: 'Your wallet is your identity in Web3. It stores your tokens, NFTs, and connects you to the blockchain.',
+      isCompleted: false,
+      points: 100
+    },
+    {
+      id: 3,
+      title: 'Understanding Tokens',
+      description: 'Learn about RUSH tokens and rewards',
+      content: 'RUSH tokens are earned by playing games and completing quests. They can be used to buy NFTs and participate in tournaments.',
+      isCompleted: false,
+      points: 75
+    },
+    {
+      id: 4,
+      title: 'Game Mechanics',
+      description: 'Master the endless runner gameplay',
+      content: 'Jump over obstacles, collect coins, and avoid hazards. Your score determines your rewards!',
+      isCompleted: false,
+      points: 100
+    },
+    {
+      id: 5,
+      title: 'Quest System',
+      description: 'Complete daily and weekly quests',
+      content: 'Quests give you specific objectives to complete for bonus rewards. Check the quest dashboard regularly!',
+      isCompleted: false,
+      points: 125
+    },
+    {
+      id: 6,
+      title: 'NFT Marketplace',
+      description: 'Buy, sell, and trade achievement NFTs',
+      content: 'Your achievements become NFTs that you can trade with other players. Rare NFTs have higher value!',
+      isCompleted: false,
+      points: 150
+    }
+  ]);
 
-  // Initialize tutorial achievements
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [totalPoints, setTotalPoints] = useState(0);
+
   useEffect(() => {
-    const tutorialAchievements: TutorialAchievement[] = [
-      {
-        id: 'first_steps',
-        title: 'First Steps',
-        description: 'Completed the welcome tutorial',
-        icon: '👶',
-        rarity: 'common',
-        points: 100,
-        unlocked: false
-      },
-      {
-        id: 'movement_master',
-        title: 'Movement Master',
-        description: 'Learned all movement controls',
-        icon: '🏃',
-        rarity: 'common',
-        points: 150,
-        unlocked: false
-      },
-      {
-        id: 'coin_collector',
-        title: 'Coin Collector',
-        description: 'Mastered coin and gem collection',
-        icon: '🪙',
-        rarity: 'rare',
-        points: 200,
-        unlocked: false
-      },
-      {
-        id: 'obstacle_dodger',
-        title: 'Obstacle Dodger',
-        description: 'Learned to avoid dangerous obstacles',
-        icon: '⚠️',
-        rarity: 'rare',
-        points: 250,
-        unlocked: false
-      },
-      {
-        id: 'powerup_master',
-        title: 'Power-Up Master',
-        description: 'Discovered all power-up types',
-        icon: '⚡',
-        rarity: 'epic',
-        points: 300,
-        unlocked: false
-      },
-      {
-        id: 'ability_expert',
-        title: 'Ability Expert',
-        description: 'Mastered special abilities',
-        icon: '🎯',
-        rarity: 'epic',
-        points: 400,
-        unlocked: false
-      },
-      {
-        id: 'combo_master',
-        title: 'Combo Master',
-        description: 'Built impressive combos',
-        icon: '🔥',
-        rarity: 'legendary',
-        points: 500,
-        unlocked: false
-      },
-      {
-        id: 'minigame_champion',
-        title: 'Mini-Game Champion',
-        description: 'Completed mini-game tutorial',
-        icon: '🎪',
-        rarity: 'legendary',
-        points: 600,
-        unlocked: false
-      },
-      {
-        id: 'tutorial_graduate',
-        title: 'Tutorial Graduate',
-        description: 'Completed the entire tutorial',
-        icon: '🎓',
-        rarity: 'legendary' as 'common' | 'rare' | 'epic' | 'legendary',
-        points: 1000,
-        unlocked: false
-      }
-    ];
+    if (isActive && !hasPlayedBefore) {
+      setCurrentStep(0);
+      setIsCompleted(false);
+      setTotalPoints(0);
+    }
+  }, [isActive, hasPlayedBefore]);
 
-    setAchievements(tutorialAchievements);
-  }, []);
-
-  const handleStartTutorial = () => {
-    setShowTutorial(true);
+  const handleNextStep = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      handleCompleteTutorial();
+    }
   };
 
-  const handleTutorialComplete = () => {
-    setShowTutorial(false);
-    setTutorialCompleted(true);
+  const handlePreviousStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleCompleteTutorial = () => {
+    const completedSteps = steps.map(step => ({ ...step, isCompleted: true }));
+    setSteps(completedSteps);
+    setIsCompleted(true);
     
-    // Unlock all achievements
-    const unlockedAchievements = achievements.map(achievement => ({
-      ...achievement,
-      unlocked: true
-    }));
-    setAchievements(unlockedAchievements);
+    const totalPointsEarned = steps.reduce((sum, step) => sum + step.points, 0);
+    setTotalPoints(totalPointsEarned);
     
-    // Calculate total points
-    const totalPoints = unlockedAchievements.reduce((sum, achievement) => sum + achievement.points, 0);
-    setTotalTutorialPoints(totalPoints);
-    
-    // Notify parent component
-    const achievementIds = unlockedAchievements.map(a => a.id);
-    onTutorialComplete(achievementIds, totalPoints);
+    const achievements = ['Tutorial Complete', 'First Steps', 'Web3 Explorer'];
+    onTutorialComplete(achievements, totalPointsEarned);
   };
 
   const handleSkipTutorial = () => {
-    setShowTutorial(false);
     onClose();
   };
 
-  const getRarityColor = (rarity: TutorialAchievement['rarity']) => {
-    switch (rarity) {
-      case 'common': return 'text-gray-400';
-      case 'rare': return 'text-blue-400';
-      case 'epic': return 'text-purple-400';
-      case 'legendary': return 'text-yellow-400';
-      default: return 'text-gray-400';
-    }
-  };
-
-  const getRarityBorder = (rarity: TutorialAchievement['rarity']) => {
-    switch (rarity) {
-      case 'common': return 'border-gray-500';
-      case 'rare': return 'border-blue-500';
-      case 'epic': return 'border-purple-500';
-      case 'legendary': return 'border-yellow-500';
-      default: return 'border-gray-500';
-    }
-  };
-
   if (!isActive) return null;
+
+  if (isCompleted) {
+    return (
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            className="bg-gradient-to-br from-green-800 to-green-900 rounded-3xl p-8 max-w-2xl w-full mx-4 shadow-2xl border border-green-500/30"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-center">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-6"
+              >
+                🎉
+              </motion.div>
+              
+              <h2 className="text-4xl font-black text-white mb-4">Tutorial Complete!</h2>
+              <p className="text-white/80 text-lg mb-6">
+                Congratulations! You've learned the basics of Avalanche Rush.
+              </p>
+              
+              <div className="bg-white/10 rounded-xl p-6 mb-8">
+                <div className="text-3xl font-bold text-yellow-400 mb-2">
+                  +{totalPoints} RUSH Tokens
+                </div>
+                <div className="text-white/70">
+                  Earned from completing the tutorial
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <Button
+                  onClick={onClose}
+                  className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-4 px-8 rounded-xl"
+                >
+                  Start Playing!
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      </AnimatePresence>
+    );
+  }
+
+  const currentStepData = steps[currentStep];
+  const progress = ((currentStep + 1) / steps.length) * 100;
 
   return (
     <AnimatePresence>
@@ -190,197 +190,133 @@ const TutorialManager: React.FC<TutorialManagerProps> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
+        className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+        onClick={onClose}
       >
         <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
+          initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.8, opacity: 0 }}
-          className="bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 rounded-2xl p-8 max-w-4xl w-full mx-4 border-2 border-purple-400 max-h-[90vh] overflow-y-auto"
+          exit={{ scale: 0.9, opacity: 0 }}
+          className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-8 max-w-4xl w-full mx-4 shadow-2xl border border-white/10"
+          onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
-                <BookOpen className="w-10 h-10 text-purple-400" />
-                Interactive Tutorial
-              </h1>
-              <p className="text-gray-300 text-lg">
-                {hasPlayedBefore 
-                  ? 'Refresh your skills with our comprehensive tutorial'
-                  : 'Learn everything you need to know to master Avalanche Rush!'
-                }
-              </p>
+              <h2 className="text-4xl font-black text-white mb-2">Tutorial</h2>
+              <p className="text-white/70 text-lg">Step {currentStep + 1} of {steps.length}</p>
             </div>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={onClose}
-              className="text-gray-400 hover:text-white transition-colors"
+            <button
+              onClick={handleSkipTutorial}
+              className="text-white/70 hover:text-white text-2xl transition-colors"
             >
               <X className="w-8 h-8" />
-            </motion.button>
+            </button>
           </div>
 
-          {/* Tutorial Status */}
-          {!showTutorial && !tutorialCompleted && (
-            <div className="space-y-6">
-              {/* Welcome Section */}
-              <div className="bg-black/30 rounded-lg p-6 border border-purple-400/30">
-                <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-                  <Star className="w-6 h-6 text-yellow-400" />
-                  What You'll Learn
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3 text-gray-300">
-                    <CheckCircle className="w-5 h-5 text-green-400" />
-                    <span>Basic movement and controls</span>
+          {/* Progress Bar */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between text-white mb-2">
+              <span className="font-medium">Progress</span>
+              <span className="text-sm">{Math.round(progress)}%</span>
                   </div>
-                  <div className="flex items-center gap-3 text-gray-300">
-                    <CheckCircle className="w-5 h-5 text-green-400" />
-                    <span>Collecting coins and gems</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-gray-300">
-                    <CheckCircle className="w-5 h-5 text-green-400" />
-                    <span>Avoiding obstacles safely</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-gray-300">
-                    <CheckCircle className="w-5 h-5 text-green-400" />
-                    <span>Power-up strategies</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-gray-300">
-                    <CheckCircle className="w-5 h-5 text-green-400" />
-                    <span>Special abilities (Q, E, R)</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-gray-300">
-                    <CheckCircle className="w-5 h-5 text-green-400" />
-                    <span>Building massive combos</span>
-                  </div>
-                </div>
+            <Progress value={progress} className="h-3" />
               </div>
 
-              {/* Rewards Section */}
-              <div className="bg-black/30 rounded-lg p-6 border border-yellow-400/30">
-                <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-                  <Trophy className="w-6 h-6 text-yellow-400" />
-                  Tutorial Rewards
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-yellow-400 mb-2">3,500+</div>
-                    <div className="text-gray-300">Total Points</div>
+          {/* Tutorial Content */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Step Info */}
+            <div className="lg:col-span-2">
+              <Card className="bg-white/5 border-white/10">
+                <CardHeader>
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-2xl">
+                      {currentStep + 1}
+                    </div>
+                    <div>
+                      <CardTitle className="text-white text-2xl">{currentStepData.title}</CardTitle>
+                      <CardDescription className="text-white/70 text-lg">
+                        {currentStepData.description}
+                      </CardDescription>
                   </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-purple-400 mb-2">9</div>
-                    <div className="text-gray-300">Achievements</div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-blue-400 mb-2">15-20</div>
-                    <div className="text-gray-300">Minutes</div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-white/80 text-lg leading-relaxed">
+                    {currentStepData.content}
                   </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex gap-4 justify-center">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleStartTutorial}
-                  className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all flex items-center gap-3"
-                >
-                  <Play className="w-6 h-6" />
-                  Start Tutorial
-                </motion.button>
-                
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleSkipTutorial}
-                  className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-colors flex items-center gap-3"
-                >
-                  <SkipForward className="w-6 h-6" />
-                  Skip Tutorial
-                </motion.button>
-              </div>
+                </CardContent>
+              </Card>
             </div>
-          )}
 
-          {/* Completion Screen */}
-          {tutorialCompleted && (
-            <div className="text-center space-y-6">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 200 }}
-                className="text-6xl mb-4"
-              >
-                🎉
-              </motion.div>
-              
-              <h2 className="text-3xl font-bold text-white mb-4">
-                Tutorial Complete!
-              </h2>
-              
-              <p className="text-gray-300 text-lg mb-6">
-                You've mastered all the essential skills for Avalanche Rush!
-              </p>
-
-              {/* Achievements Summary */}
-              <div className="bg-black/30 rounded-lg p-6 border border-green-400/30">
-                <h3 className="text-xl font-bold text-white mb-4">Achievements Unlocked</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {achievements.map((achievement) => (
-                    <motion.div
-                      key={achievement.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 }}
-                      className={`bg-gray-800 border-2 ${getRarityBorder(achievement.rarity)} rounded-lg p-3 flex items-center gap-3`}
-                    >
-                      <span className="text-2xl">{achievement.icon}</span>
-                      <div className="flex-1">
-                        <div className={`font-bold ${getRarityColor(achievement.rarity)}`}>
-                          {achievement.title}
+            {/* Step List */}
+            <div>
+              <Card className="bg-white/5 border-white/10">
+                <CardHeader>
+                  <CardTitle className="text-white">Tutorial Steps</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {steps.map((step, index) => (
+                      <div
+                        key={step.id}
+                        className={`flex items-center space-x-3 p-3 rounded-lg transition-colors ${
+                          index === currentStep
+                            ? 'bg-blue-500/20 border border-blue-500/30'
+                            : step.isCompleted
+                            ? 'bg-green-500/20 border border-green-500/30'
+                            : 'bg-white/5 hover:bg-white/10'
+                        }`}
+                      >
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                          step.isCompleted
+                            ? 'bg-green-500 text-white'
+                            : index === currentStep
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-white/20 text-white/70'
+                        }`}>
+                          {step.isCompleted ? (
+                            <CheckCircle className="w-4 h-4" />
+                          ) : (
+                            index + 1
+                          )}
                         </div>
-                        <div className="text-sm text-gray-400">
-                          +{achievement.points} points
+                        <div className="flex-1">
+                          <div className="text-white font-medium text-sm">{step.title}</div>
+                          <div className="text-white/60 text-xs">+{step.points} points</div>
                         </div>
                       </div>
-                    </motion.div>
                   ))}
                 </div>
-              </div>
-
-              {/* Total Points */}
-              <div className="bg-gradient-to-r from-yellow-600 to-orange-600 rounded-lg p-6">
-                <div className="text-4xl font-bold text-white mb-2">
-                  +{totalTutorialPoints.toLocaleString()} Points!
-                </div>
-                <div className="text-yellow-200">
-                  Added to your total score
+                </CardContent>
+              </Card>
                 </div>
               </div>
 
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={onClose}
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all"
-              >
-                Start Playing!
-              </motion.button>
+          {/* Navigation */}
+          <div className="flex items-center justify-between mt-8">
+            <Button
+              onClick={handlePreviousStep}
+              disabled={currentStep === 0}
+              variant="outline"
+              className="bg-white/10 text-white border-white/20 hover:bg-white/20 disabled:opacity-50"
+            >
+              Previous
+            </Button>
+            
+            <div className="flex items-center space-x-4">
+              <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
+                +{currentStepData.points} points
+              </Badge>
             </div>
-          )}
-
-          {/* Interactive Tutorial Component */}
-          {showTutorial && (
-            <InteractiveTutorial
-              isActive={showTutorial}
-              onComplete={handleTutorialComplete}
-              onSkip={handleSkipTutorial}
-            />
-          )}
+            
+            <Button
+              onClick={handleNextStep}
+              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
+            >
+              {currentStep === steps.length - 1 ? 'Complete' : 'Next'}
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
         </motion.div>
       </motion.div>
     </AnimatePresence>

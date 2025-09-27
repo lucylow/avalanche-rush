@@ -1,416 +1,237 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useReactiveNetwork } from '../../hooks/useReactiveNetwork';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Progress } from '../ui/progress';
+import { X, Zap, Network, Activity, TrendingUp, Shield } from 'lucide-react';
 
-const ReactiveNetworkDashboard: React.FC = () => {
-  const {
-    isConnected,
-    isLoading,
-    playerProgress,
-    reactiveStats,
-    gameStats,
-    currentChainId,
-    recordGameSession,
-    hasAchievement,
-    getAchievementRequirements,
-    isOnAvalanche,
-    isOnReactive,
-    getNetworkInfo
-  } = useReactiveNetwork();
+interface ReactiveNetworkDashboardProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
 
-  const [selectedTab, setSelectedTab] = useState<'overview' | 'achievements' | 'reactive-stats' | 'demo'>('overview');
-  const [notifications, setNotifications] = useState<string[]>([]);
-  const [demoScore, setDemoScore] = useState('1000');
-  const [achievementChecks, setAchievementChecks] = useState<Record<number, boolean>>({});
+interface NetworkStats {
+  totalNodes: number;
+  activeNodes: number;
+  transactionsPerSecond: number;
+  averageLatency: number;
+  networkHealth: number;
+  stakedTokens: number;
+  rewardsDistributed: number;
+}
 
-  const networkInfo = getNetworkInfo();
-  const achievements = getAchievementRequirements();
+const ReactiveNetworkDashboard: React.FC<ReactiveNetworkDashboardProps> = ({
+  isOpen = true,
+  onClose
+}) => {
+  const [stats, setStats] = useState<NetworkStats>({
+    totalNodes: 0,
+    activeNodes: 0,
+    transactionsPerSecond: 0,
+    averageLatency: 0,
+    networkHealth: 0,
+    stakedTokens: 0,
+    rewardsDistributed: 0
+  });
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Add notification
-  const addNotification = (message: string) => {
-    setNotifications(prev => [...prev, message]);
-    setTimeout(() => {
-      setNotifications(prev => prev.slice(1));
-    }, 5000);
-  };
-
-  // Check achievements on load
   useEffect(() => {
-    const checkAchievements = async () => {
-      if (!isOnReactive()) return;
-
-      const checks: Record<number, boolean> = {};
-      for (const achievement of achievements) {
-        checks[achievement.id] = await hasAchievement(achievement.id);
-      }
-      setAchievementChecks(checks);
+    // Simulate loading network data
+    const loadNetworkData = () => {
+      setIsLoading(true);
+      setTimeout(() => {
+        setStats({
+          totalNodes: 1247,
+          activeNodes: 1156,
+          transactionsPerSecond: 2847,
+          averageLatency: 12,
+          networkHealth: 98,
+          stakedTokens: 2456789,
+          rewardsDistributed: 123456
+        });
+        setIsLoading(false);
+      }, 2000);
     };
 
-    checkAchievements();
-  }, [hasAchievement, isOnReactive, achievements]);
+    loadNetworkData();
+    const interval = setInterval(loadNetworkData, 30000); // Update every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
 
-  // Demo function to test Reactive workflow
-  const testReactiveWorkflow = async () => {
-    if (!isOnAvalanche()) {
-      addNotification('Please switch to Avalanche C-Chain to test the workflow');
-      return;
-    }
-
-    const score = parseInt(demoScore);
-    const distance = Math.floor(score * 0.8);
-    const coins = Math.floor(score * 0.1);
-    const obstacles = Math.floor(score * 0.05);
-
-    addNotification('Recording game session on Avalanche...');
-    
-    const success = await recordGameSession(score, distance, coins, obstacles);
-    
-    if (success) {
-      addNotification('✅ Game session recorded! Reactive contracts will process automatically.');
-      addNotification('⚡ Switch to Reactive Network to see automatic achievement processing.');
-    } else {
-      addNotification('❌ Failed to record game session. Please try again.');
-    }
+  const getHealthColor = (health: number) => {
+    if (health >= 90) return 'text-green-400';
+    if (health >= 70) return 'text-yellow-400';
+    return 'text-red-400';
   };
 
-  if (!isConnected) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 flex items-center justify-center p-6"
-      >
-        <div className="bg-black/80 backdrop-blur-sm rounded-2xl p-8 max-w-md w-full text-center border border-purple-500/30">
-          <div className="text-6xl mb-6">⚡</div>
-          <h2 className="text-3xl font-bold text-white mb-4">Reactive Network Required</h2>
-          <p className="text-purple-200 mb-6">
-            Please connect your wallet to access Reactive Network features.
-          </p>
-        </div>
-      </motion.div>
-    );
-  }
+  const getHealthBadge = (health: number) => {
+    if (health >= 90) return 'bg-green-500/20 text-green-400 border-green-500/30';
+    if (health >= 70) return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+    return 'bg-red-500/20 text-red-400 border-red-500/30';
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 p-6">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="text-6xl">⚡</div>
-            <div>
-              <h1 className="text-4xl font-black text-white">Reactive Network</h1>
-              <p className="text-purple-200">Automatic Smart Contract Execution</p>
-            </div>
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-5xl font-black text-white mb-2">Reactive Network</h1>
+            <p className="text-white/70 text-lg">Real-time blockchain network monitoring</p>
           </div>
-          
-          {networkInfo && (
-            <div className="bg-black/60 backdrop-blur-sm rounded-xl p-4 border border-purple-500/30">
-              <div className={`text-sm font-bold text-${networkInfo.color}-400`}>
-                {networkInfo.name}
-              </div>
-              <div className="text-xs text-purple-300">
-                {networkInfo.type} Contract • Chain {currentChainId}
-              </div>
-            </div>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="text-white/70 hover:text-white text-2xl transition-colors"
+            >
+              <X className="w-8 h-8" />
+            </button>
           )}
         </div>
-      </motion.div>
 
-      {/* Network Status */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-black/60 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-purple-500/30"
-      >
-        <h3 className="text-2xl font-bold text-white mb-4 flex items-center">
-          <span className="mr-3">🔗</span>
-          Network Status & Explanation
-        </h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center p-4 bg-red-500/20 rounded-xl">
-            <div className="text-3xl mb-2">🏔️</div>
-            <div className="font-bold text-red-300">Avalanche C-Chain</div>
-            <div className="text-sm text-red-200">Origin Contracts</div>
-            <div className="text-xs text-red-100 mt-2">
-              Game sessions recorded here trigger Reactive contracts
-            </div>
+        {isLoading ? (
+          <div className="text-center py-16">
+            <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-400 border-t-transparent mx-auto mb-6"></div>
+            <p className="text-white/70 text-xl">Loading network data...</p>
           </div>
-          
-          <div className="text-center p-4 bg-purple-500/20 rounded-xl">
-            <div className="text-3xl mb-2">⚡</div>
-            <div className="font-bold text-purple-300">Reactive Network</div>
-            <div className="text-sm text-purple-200">Reactive Contracts</div>
-            <div className="text-xs text-purple-100 mt-2">
-              Automatic achievement processing happens here
+        ) : (
+          <div className="space-y-8">
+            {/* Network Health Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Card className="bg-gradient-to-br from-green-900/20 to-green-800/20 border-green-500/30">
+                <CardContent className="p-6 text-center">
+                  <Network className="w-12 h-12 text-green-400 mx-auto mb-4" />
+                  <div className="text-3xl font-bold text-white mb-2">{stats.totalNodes}</div>
+                  <div className="text-white/70">Total Nodes</div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-blue-900/20 to-blue-800/20 border-blue-500/30">
+                <CardContent className="p-6 text-center">
+                  <Activity className="w-12 h-12 text-blue-400 mx-auto mb-4" />
+                  <div className="text-3xl font-bold text-white mb-2">{stats.activeNodes}</div>
+                  <div className="text-white/70">Active Nodes</div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-purple-900/20 to-purple-800/20 border-purple-500/30">
+                <CardContent className="p-6 text-center">
+                  <Zap className="w-12 h-12 text-purple-400 mx-auto mb-4" />
+                  <div className="text-3xl font-bold text-white mb-2">{stats.transactionsPerSecond}</div>
+                  <div className="text-white/70">TPS</div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-orange-900/20 to-orange-800/20 border-orange-500/30">
+                <CardContent className="p-6 text-center">
+                  <TrendingUp className="w-12 h-12 text-orange-400 mx-auto mb-4" />
+                  <div className="text-3xl font-bold text-white mb-2">{stats.averageLatency}ms</div>
+                  <div className="text-white/70">Avg Latency</div>
+                </CardContent>
+              </Card>
             </div>
+
+            {/* Network Health Status */}
+            <Card className="bg-gradient-to-br from-indigo-900/20 to-indigo-800/20 border-indigo-500/30">
+              <CardHeader>
+                <CardTitle className="text-white text-2xl flex items-center space-x-3">
+                  <Shield className="w-8 h-8" />
+                  <span>Network Health</span>
+                  <Badge className={getHealthBadge(stats.networkHealth)}>
+                    {stats.networkHealth}%
+                  </Badge>
+                </CardTitle>
+                <CardDescription className="text-white/70">
+                  Overall network performance and stability
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <Progress value={stats.networkHealth} className="h-4" />
+                  <div className="flex items-center justify-between text-white">
+                    <span className="font-medium">Health Score</span>
+                    <span className={`font-bold ${getHealthColor(stats.networkHealth)}`}>
+                      {stats.networkHealth}%
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Token Economics */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card className="bg-gradient-to-br from-yellow-900/20 to-yellow-800/20 border-yellow-500/30">
+                <CardHeader>
+                  <CardTitle className="text-white text-xl">Staked Tokens</CardTitle>
+                  <CardDescription className="text-white/70">
+                    Total tokens staked in the network
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-4xl font-bold text-yellow-400 mb-2">
+                    {stats.stakedTokens.toLocaleString()}
+                  </div>
+                  <div className="text-white/70">REACT Tokens</div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-cyan-900/20 to-cyan-800/20 border-cyan-500/30">
+                <CardHeader>
+                  <CardTitle className="text-white text-xl">Rewards Distributed</CardTitle>
+                  <CardDescription className="text-white/70">
+                    Total rewards paid to validators
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-4xl font-bold text-cyan-400 mb-2">
+                    {stats.rewardsDistributed.toLocaleString()}
+                  </div>
+                  <div className="text-white/70">REACT Tokens</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Real-time Activity */}
+            <Card className="bg-gradient-to-br from-slate-800/20 to-slate-700/20 border-slate-500/30">
+              <CardHeader>
+                <CardTitle className="text-white text-xl">Real-time Activity</CardTitle>
+                <CardDescription className="text-white/70">
+                  Live network transactions and events
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {[
+                    { type: 'Transaction', details: 'Token transfer completed', time: '2s ago', status: 'success' },
+                    { type: 'Staking', details: 'New validator joined network', time: '5s ago', status: 'success' },
+                    { type: 'Reward', details: 'Block reward distributed', time: '8s ago', status: 'success' },
+                    { type: 'Transaction', details: 'Smart contract execution', time: '12s ago', status: 'success' },
+                    { type: 'Network', details: 'Node synchronization complete', time: '15s ago', status: 'success' }
+                  ].map((activity, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="flex items-center justify-between p-3 bg-white/5 rounded-lg"
+                    >
+                      <div className="flex items-center space-x-3">
+                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <div>
+                          <div className="text-white font-medium text-sm">{activity.type}</div>
+                          <div className="text-white/60 text-xs">{activity.details}</div>
+                        </div>
+                      </div>
+                      <div className="text-white/50 text-xs">{activity.time}</div>
+                    </motion.div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
-          
-          <div className="text-center p-4 bg-green-500/20 rounded-xl">
-            <div className="text-3xl mb-2">🔄</div>
-            <div className="font-bold text-green-300">Event Flow</div>
-            <div className="text-sm text-green-200">Avalanche → Reactive</div>
-            <div className="text-xs text-green-100 mt-2">
-              Events automatically trigger Reactive processing
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-6 p-4 bg-blue-500/10 rounded-xl border border-blue-500/20">
-          <h4 className="font-bold text-blue-300 mb-2">🎯 Why Reactive Contracts are ESSENTIAL:</h4>
-          <div className="text-sm text-blue-200 space-y-2">
-            <div>• <strong>Traditional:</strong> Players must manually claim achievements and pay gas fees</div>
-            <div>• <strong>Reactive:</strong> Achievements are automatically minted when conditions are met</div>
-            <div>• <strong>Result:</strong> 10x better UX + 80-90% gas cost reduction</div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {/* Player Progress */}
-        {playerProgress && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-black/60 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/30"
-          >
-            <h3 className="text-xl font-bold text-white mb-4 flex items-center">
-              <span className="mr-3">👤</span>
-              Player Progress
-            </h3>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-purple-200">Total Score:</span>
-                <span className="text-white font-bold">{parseFloat(playerProgress.totalScore).toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-purple-200">Achievements:</span>
-                <span className="text-yellow-400 font-bold">{playerProgress.achievementsUnlocked}</span>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Reactive Stats */}
-        {reactiveStats && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-black/60 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/30"
-          >
-            <h3 className="text-xl font-bold text-white mb-4 flex items-center">
-              <span className="mr-3">⚡</span>
-              Reactive Stats
-            </h3>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-purple-200">Events Processed:</span>
-                <span className="text-green-400 font-bold">{reactiveStats.totalEvents}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-purple-200">Gas Used:</span>
-                <span className="text-blue-400 font-bold">{parseFloat(reactiveStats.totalGas).toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-purple-200">Avg Gas/Event:</span>
-                <span className="text-orange-400 font-bold">{parseFloat(reactiveStats.averageGas).toFixed(2)}</span>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Game Stats */}
-        {gameStats && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-black/60 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/30"
-          >
-            <h3 className="text-xl font-bold text-white mb-4 flex items-center">
-              <span className="mr-3">🎮</span>
-              Game Stats
-            </h3>
-            <div className="space-y-3">
-              <div className="flex justify-between">
-                <span className="text-purple-200">Sessions:</span>
-                <span className="text-cyan-400 font-bold">{gameStats.sessionCount}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-purple-200">Total Score:</span>
-                <span className="text-pink-400 font-bold">{parseFloat(gameStats.totalScore).toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-purple-200">Average:</span>
-                <span className="text-yellow-400 font-bold">{parseFloat(gameStats.averageScore).toLocaleString()}</span>
-              </div>
-            </div>
-          </motion.div>
         )}
       </div>
-
-      {/* Achievements Grid */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-black/60 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-purple-500/30"
-      >
-        <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
-          <span className="mr-3">🏆</span>
-          Reactive Achievements
-        </h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          {achievements.map((achievement) => {
-            const isUnlocked = achievementChecks[achievement.id];
-            const progress = playerProgress ? 
-              Math.min((parseFloat(playerProgress.totalScore) / achievement.requiredScore) * 100, 100) : 0;
-
-            return (
-              <motion.div
-                key={achievement.id}
-                whileHover={{ scale: 1.05, y: -5 }}
-                className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-                  isUnlocked 
-                    ? 'bg-yellow-500/20 border-yellow-500/50 shadow-yellow-500/25 shadow-lg' 
-                    : 'bg-gray-500/20 border-gray-500/30'
-                }`}
-              >
-                <div className="text-center">
-                  <div className="text-3xl mb-2">
-                    {isUnlocked ? '🏆' : '🔒'}
-                  </div>
-                  <h4 className="font-bold text-white text-sm mb-2">
-                    {achievement.name}
-                  </h4>
-                  <div className="text-xs text-gray-300 mb-3">
-                    {achievement.requiredScore.toLocaleString()} points
-                  </div>
-                  
-                  {/* Progress bar */}
-                  <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
-                    <div 
-                      className={`h-2 rounded-full transition-all duration-500 ${
-                        isUnlocked ? 'bg-yellow-500' : 'bg-blue-500'
-                      }`}
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                  
-                  <div className="text-xs text-gray-400">
-                    {isUnlocked ? '✅ Unlocked' : `${progress.toFixed(1)}%`}
-                  </div>
-                  
-                  <div className="text-xs text-purple-300 mt-1">
-                    {achievement.reward} ETH reward
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      </motion.div>
-
-      {/* Reactive Workflow Demo */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-black/60 backdrop-blur-sm rounded-2xl p-6 border border-purple-500/30"
-      >
-        <h3 className="text-2xl font-bold text-white mb-6 flex items-center">
-          <span className="mr-3">🧪</span>
-          Test Reactive Workflow
-        </h3>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <h4 className="text-lg font-bold text-purple-300 mb-4">1. Record Game Session (Avalanche)</h4>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-purple-200 mb-2">
-                  Demo Score
-                </label>
-                <input
-                  type="number"
-                  value={demoScore}
-                  onChange={(e) => setDemoScore(e.target.value)}
-                  className="w-full px-4 py-3 bg-black/40 border border-purple-500/30 rounded-lg text-white placeholder-purple-300 focus:border-purple-400 focus:outline-none"
-                  placeholder="Enter score"
-                />
-              </div>
-              
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={testReactiveWorkflow}
-                disabled={isLoading || !demoScore}
-                className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-lg transition-all duration-200"
-              >
-                {isLoading ? 'Processing...' : 'Record Game Session'}
-              </motion.button>
-              
-              <div className="text-sm text-purple-200">
-                <p>• This records a session on Avalanche C-Chain</p>
-                <p>• Reactive contracts will automatically process achievements</p>
-                <p>• No manual claiming required!</p>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h4 className="text-lg font-bold text-purple-300 mb-4">2. Automatic Processing (Reactive)</h4>
-            <div className="space-y-4">
-              <div className="p-4 bg-purple-500/10 rounded-lg border border-purple-500/20">
-                <h5 className="font-bold text-purple-300 mb-2">Workflow Steps:</h5>
-                <div className="text-sm text-purple-200 space-y-1">
-                  <div>1. 🏔️ Session recorded on Avalanche</div>
-                  <div>2. 📡 Event emitted to Reactive Network</div>
-                  <div>3. ⚡ Reactive contract processes automatically</div>
-                  <div>4. 🏆 Achievements minted (if eligible)</div>
-                  <div>5. 💰 Rewards distributed automatically</div>
-                </div>
-              </div>
-              
-              <div className="p-4 bg-green-500/10 rounded-lg border border-green-500/20">
-                <h5 className="font-bold text-green-300 mb-2">Benefits:</h5>
-                <div className="text-sm text-green-200 space-y-1">
-                  <div>• Zero user interaction required</div>
-                  <div>• 80-90% gas cost reduction</div>
-                  <div>• Instant reward processing</div>
-                  <div>• Fully decentralized automation</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Notifications */}
-      <AnimatePresence>
-        {notifications.map((notification, index) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, x: 400 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 400 }}
-            className="fixed top-6 right-6 bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 rounded-xl shadow-2xl border border-purple-400/30 backdrop-blur-sm z-50"
-            style={{ marginTop: `${index * 80}px` }}
-          >
-            <div className="flex items-center space-x-3">
-              <div className="text-2xl">⚡</div>
-              <div>
-                <div className="font-bold">{notification}</div>
-                <div className="text-purple-200 text-sm">Reactive Network</div>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </AnimatePresence>
     </div>
   );
 };
