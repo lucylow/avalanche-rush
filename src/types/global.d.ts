@@ -3,7 +3,12 @@
 declare global {
   interface Window {
     triggerReward?: (type: string, data: Record<string, unknown>) => void;
-    ethereum?: any;
+    ethereum?: {
+      request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
+      on: (event: string, callback: (...args: unknown[]) => void) => void;
+      removeListener: (event: string, callback: (...args: unknown[]) => void) => void;
+      removeAllListeners: () => void;
+    };
   }
 }
 

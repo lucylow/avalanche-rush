@@ -3,6 +3,7 @@ import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '../ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { AVALANCHE_CHARACTERS } from '../../data/characters';
 import { 
   MessageCircle, 
   Trophy, 
@@ -263,7 +264,6 @@ const StoryGameIntegration: React.FC<StoryGameIntegrationProps> = ({
   }, [selectedCharacter, playerProfile]);
 
   const selectContextualCharacter = (eventType: string, playerLevel: number, achievements: string[]): Character | undefined => {
-    const { AVALANCHE_CHARACTERS } = require('../../data/characters');
     
     // Filter characters based on unlock requirements
     const availableCharacters = AVALANCHE_CHARACTERS.filter((char: Character) => {

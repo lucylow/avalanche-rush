@@ -72,11 +72,11 @@ export interface CrossmintCharacter {
   type: string;
   imageUrl: string;
   description: string;
-  attributes: Record<string, any>;
-  skills: any[];
-  specialAbilities: any[];
+  attributes: Record<string, number>;
+  skills: string[];
+  specialAbilities: string[];
   tournamentBonus: number;
-  unlockRequirements: any[];
+  unlockRequirements: UnlockRequirement[];
 }
 
 export interface CrossmintMintResult {
@@ -217,8 +217,8 @@ export interface Web3State {
   isConnected: boolean;
   account: string | null;
   chainId: number | null;
-  provider: any;
-  signer: any;
+  provider: unknown;
+  signer: unknown;
   balance: string;
   isLoading: boolean;
   error: string | null;
@@ -226,7 +226,7 @@ export interface Web3State {
 
 export interface ContractConfig {
   address: string;
-  abi: any[];
+  abi: unknown[];
   name: string;
   network: string;
 }
@@ -287,7 +287,7 @@ export interface ReactiveConfig {
 export interface ReactiveEvent {
   eventId: string;
   emitter: string;
-  data: any;
+  data: unknown;
   blockNumber: number;
   transactionHash: string;
   timestamp: number;
@@ -296,7 +296,7 @@ export interface ReactiveEvent {
 export interface ReactiveCallback {
   contractAddress: string;
   functionName: string;
-  parameters: any[];
+  parameters: unknown[];
   gasLimit: number;
 }
 
@@ -404,13 +404,13 @@ export interface GameError {
   message: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
   timestamp: Date;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 }
 
 export interface ErrorBoundaryState {
   hasError: boolean;
   error?: Error;
-  errorInfo?: any;
+  errorInfo?: unknown;
 }
 
 // ==================== COMPONENT PROP INTERFACES ====================

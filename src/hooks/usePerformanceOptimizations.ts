@@ -70,35 +70,41 @@ export const LazyNFTMarketplace = lazy(() =>
 
 export const ComponentLoader: React.FC<{ message?: string }> = ({ 
   message = "Loading..." 
-}) => (
-  <div className="flex items-center justify-center p-8">
-    <div className="flex flex-col items-center space-y-4">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      <p className="text-sm text-muted-foreground">{message}</p>
+}) => {
+  return (
+    <div className="flex items-center justify-center p-8">
+      <div className="flex flex-col items-center space-y-4">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="text-sm text-muted-foreground">{message}</p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
-export const GameLoader: React.FC = () => (
-  <div className="fixed inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
-    <div className="text-center text-white">
-      <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
-      <h2 className="text-2xl font-bold mb-2">Loading Game...</h2>
-      <p className="text-lg">Preparing your Avalanche Rush experience</p>
+export const GameLoader: React.FC = () => {
+  return (
+    <div className="fixed inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+      <div className="text-center text-white">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
+        <h2 className="text-2xl font-bold mb-2">Loading Game...</h2>
+        <p className="text-lg">Preparing your Avalanche Rush experience</p>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // ==================== SUSPENSE WRAPPERS ====================
 
 export const SuspenseWrapper: React.FC<{
   children: React.ReactNode;
   fallback?: React.ReactNode;
-}> = ({ children, fallback = <ComponentLoader /> }) => (
-  <Suspense fallback={fallback}>
-    {children}
-  </Suspense>
-);
+}> = ({ children, fallback = <ComponentLoader /> }) => {
+  return (
+    <Suspense fallback={fallback}>
+      {children}
+    </Suspense>
+  );
+};
 
 // ==================== OPTIMIZED COMPONENT WRAPPERS ====================
 

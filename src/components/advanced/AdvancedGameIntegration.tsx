@@ -297,9 +297,9 @@ const AdvancedGameIntegration: React.FC<AdvancedGameIntegrationProps> = ({
       setIsLoading(true);
       
       const chainSelectors = {
-        1: 5009297550715157269, // Ethereum
-        137: 4051577828743386545, // Polygon
-        43114: 14767482510784806043 // Avalanche
+        1: BigInt('5009297550715157269'), // Ethereum
+        137: BigInt('4051577828743386545'), // Polygon
+        43114: BigInt('14767482510784806043') // Avalanche
       };
       
       const destinationChainSelector = chainSelectors[destinationChain as keyof typeof chainSelectors];

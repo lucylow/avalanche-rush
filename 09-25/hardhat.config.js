@@ -23,7 +23,9 @@ module.exports = {
       url: "https://api.avax-test.network/ext/bc/C/rpc",
       chainId: 43113,
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
-      gasPrice: 25000000000, // 25 gwei    avalanche: {
+      gasPrice: 25000000000, // 25 gwei
+    },
+    avalanche: {
       url: process.env.AVALANCHE_MAINNET_RPC_URL || "https://api.avax.network/ext/bc/C/rpc",
       chainId: 43114,
       accounts: process.env.MAINNET_PRIVATE_KEY ? [process.env.MAINNET_PRIVATE_KEY] : [],
@@ -31,7 +33,6 @@ module.exports = {
       gas: 8000000,
       timeout: 120000,
       confirmations: 3
-    },
     },
     reactive: {
       url: "https://rpc.reactive.network",
