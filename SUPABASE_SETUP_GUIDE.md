@@ -308,3 +308,4 @@ Your Supabase backend is now set up and ready to power the Avalanche Rush applic
 - ✅ **Scalability** - Ready for production use
 
 The Avalanche Rush application will now have a robust backend supporting all the hackathon-winning features!
+

@@ -307,3 +307,4 @@ Avalanche Rush represents the pinnacle of Web3 gaming innovation, combining:
 This isn't just a hackathon project - it's a glimpse into the future of decentralized gaming, where technology serves the user experience, and innovation drives adoption.
 
 **Ready to win the hackathon? Let's demonstrate the future of Web3 gaming! 🚀**
+

@@ -536,3 +536,4 @@ export const useUserAchievements = (userId?: string) => {
 };
 
 export default useSupabase;
+

@@ -330,3 +330,4 @@ Your Avalanche Rush application now provides:
 4. **Deploy**: Deploy with confidence to Lovable
 
 **Your mobile-responsive Avalanche Rush game is production-ready!** 🚀📱
+
