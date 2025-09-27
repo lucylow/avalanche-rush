@@ -82,7 +82,7 @@ interface StoryGameIntegrationProps {
 interface GameEvent {
   id: string;
   type: 'game_start' | 'game_end' | 'level_complete' | 'achievement' | 'high_score' | 'defeat' | 'victory' | 'quest_complete';
-  data: any;
+  data: unknown;
   timestamp: Date;
   triggeredDialogue?: boolean;
 }
@@ -189,7 +189,7 @@ const StoryGameIntegration: React.FC<StoryGameIntegrationProps> = ({
     }
   }, [playerProfile?.achievements]);
 
-  const handleGameEvent = useCallback((eventType: GameEvent['type'], data: any) => {
+  const handleGameEvent = useCallback((eventType: GameEvent['type'], data: unknown) => {
     const event: GameEvent = {
       id: `${eventType}_${Date.now()}`,
       type: eventType,

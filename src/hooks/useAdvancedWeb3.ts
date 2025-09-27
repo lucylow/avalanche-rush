@@ -336,7 +336,7 @@ export const useAdvancedWeb3 = () => {
       
       return true;
     } catch (switchError: unknown) {
-      if (switchError && typeof switchError === 'object' && 'code' in switchError && switchError.code === 4902) {
+      if (switchError && typeof switchError === 'object' && 'code' in switchError && (switchError as { code: number }).code === 4902) {
         // Network not added, try to add it
         const network = targetChainId === 43113 ? NETWORKS.AVALANCHE_FUJI : NETWORKS.REACTIVE_MAINNET;
         
@@ -603,40 +603,55 @@ export const useAdvancedWeb3 = () => {
     if (!contractInstances) return;
 
     const setupEventListeners = () => {
-      // Game events
-      contractInstances.avalancheRushCore.on('GameCompleted', (player, sessionId, finalScore, reward) => {
-        console.log('Game completed:', { player, sessionId: Number(sessionId), finalScore: Number(finalScore), reward: ethers.formatEther(reward) });
-      });
+      try {
+        // Game events
+        contractInstances.avalancheRushCore.on('GameCompleted', (player, sessionId, finalScore, reward) => {
+          console.log('Game completed:', { player, sessionId: Number(sessionId), finalScore: Number(finalScore), reward: ethers.formatEther(reward) });
+        });
 
-      contractInstances.avalancheRushCore.on('HighScoreBeat', (player, newScore, previousScore) => {
-        console.log('High score beaten:', { player, newScore: Number(newScore), previousScore: Number(previousScore) });
-      });
+        contractInstances.avalancheRushCore.on('HighScoreBeat', (player, newScore, previousScore) => {
+          console.log('High score beaten:', { player, newScore: Number(newScore), previousScore: Number(previousScore) });
+        });
 
-      // Quest events
-      contractInstances.reactiveQuestEngine.on('QuestCompleted', (player, questId, reward, timestamp) => {
-        console.log('Quest completed:', { player, questId: Number(questId), reward: ethers.formatEther(reward), timestamp: Number(timestamp) });
-      });
+        // Quest events
+        contractInstances.reactiveQuestEngine.on('QuestCompleted', (player, questId, reward, timestamp) => {
+          console.log('Quest completed:', { player, questId: Number(questId), reward: ethers.formatEther(reward), timestamp: Number(timestamp) });
+        });
 
-      // NFT events
-      contractInstances.educationalNFT.on('RareNFTMinted', (player, tokenId, raffleId) => {
-        console.log('Rare NFT minted:', { player, tokenId: Number(tokenId), raffleId: Number(raffleId) });
-      });
+        // NFT events
+        contractInstances.educationalNFT.on('RareNFTMinted', (player, tokenId, raffleId) => {
+          console.log('Rare NFT minted:', { player, tokenId: Number(tokenId), raffleId: Number(raffleId) });
+        });
+      } catch (error) {
+        console.error('Error setting up event listeners:', error);
+      }
     };
 
     setupEventListeners();
 
     return () => {
       // Cleanup event listeners
-      if (contractInstances.avalancheRushCore) {
-        contractInstances.avalancheRushCore.removeAllListeners();
-      }
-      if (contractInstances.reactiveQuestEngine) {
-        contractInstances.reactiveQuestEngine.removeAllListeners();
-      }
-      if (contractInstances.educationalNFT) {
-        contractInstances.educationalNFT.removeAllListeners();
+      try {
+        if (contractInstances.avalancheRushCore) {
+          contractInstances.avalancheRushCore.removeAllListeners();
+        }
+        if (contractInstances.reactiveQuestEngine) {
+          contractInstances.reactiveQuestEngine.removeAllListeners();
+        }
+        if (contractInstances.educationalNFT) {
+          contractInstances.educationalNFT.removeAllListeners();
+        }
+      } catch (error) {
+        console.error('Error cleaning up event listeners:', error);
       }
     };
+  }, [contractInstances]);
+
+  // Initialize contracts when signer changes
+  useEffect(() => {
+    if (contractInstances) {
+      setContracts(contractInstances);
+    }
   }, [contractInstances]);
 
   // Initialize on mount and handle account/chain changes
@@ -651,7 +666,7 @@ export const useAdvancedWeb3 = () => {
         web3State.provider.removeAllListeners();
       }
     };
-  }, [web3State.account, web3State.chainId, web3State.provider, contracts, initializeWeb3]);
+  }, [web3State.account, web3State.chainId, web3State.provider, initializeWeb3]);
 
   // Handle MetaMask events
   useEffect(() => {

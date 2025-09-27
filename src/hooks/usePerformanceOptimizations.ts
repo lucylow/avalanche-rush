@@ -10,7 +10,7 @@ export {
 };
 
 // Simple performance hooks
-export const useStableCallback = <T extends (...args: any[]) => any>(
+export const useStableCallback = <T extends (...args: unknown[]) => unknown>(
   callback: T,
   dependencies: React.DependencyList
 ): T => {

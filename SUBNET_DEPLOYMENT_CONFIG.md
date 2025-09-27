@@ -102,3 +102,4 @@ avalanche subnet monitor AvalancheRushGamenet --metric crossChain
 This configuration positions Avalanche Rush as a clear hackathon winner! 🏆
 
 
+

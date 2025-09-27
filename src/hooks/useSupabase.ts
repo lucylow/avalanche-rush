@@ -8,9 +8,9 @@ interface UseSupabaseReturn {
   session: Session | null;
   loading: boolean;
   error: string | null;
-  signUp: (email: string, password: string) => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signOut: () => Promise<{ error: any }>;
+  signUp: (email: string, password: string) => Promise<{ error: unknown }>;
+  signIn: (email: string, password: string) => Promise<{ error: unknown }>;
+  signOut: () => Promise<{ error: unknown }>;
   clearError: () => void;
 }
 
@@ -63,8 +63,8 @@ export const useSupabase = (): UseSupabaseReturn => {
       });
 
       return { error };
-    } catch (err: any) {
-      const errorMsg = err.message || 'Failed to sign up';
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to sign up';
       setError(errorMsg);
       return { error: { message: errorMsg } };
     } finally {
@@ -84,8 +84,8 @@ export const useSupabase = (): UseSupabaseReturn => {
       });
 
       return { error };
-    } catch (err: any) {
-      const errorMsg = err.message || 'Failed to sign in';
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to sign in';
       setError(errorMsg);
       return { error: { message: errorMsg } };
     } finally {
@@ -99,8 +99,8 @@ export const useSupabase = (): UseSupabaseReturn => {
       setError(null);
       const { error } = await supabase.auth.signOut();
       return { error };
-    } catch (err: any) {
-      const errorMsg = err.message || 'Failed to sign out';
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to sign out';
       setError(errorMsg);
       return { error: { message: errorMsg } };
     }
@@ -119,3 +119,4 @@ export const useSupabase = (): UseSupabaseReturn => {
 };
 
 export default useSupabase;
+
