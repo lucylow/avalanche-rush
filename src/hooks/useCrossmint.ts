@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAdvancedWeb3 } from './useAdvancedWeb3';
 
 interface CrossmintConfig {
@@ -38,13 +38,13 @@ export const useCrossmint = () => {
   const { account, isConnected } = useAdvancedWeb3();
 
   // Crossmint configuration for Avalanche Rush
-  const crossmintConfig: CrossmintConfig = {
+  const crossmintConfig: CrossmintConfig = useMemo(() => ({
     clientId: process.env.REACT_APP_CROSSMINT_CLIENT_ID || 'avalanche-rush-client',
     environment: process.env.NODE_ENV === 'production' ? 'production' : 'staging',
     recipient: {
       wallet: account || undefined,
     }
-  };
+  }), [account]);
 
   // Initialize Crossmint SDK
   const initializeCrossmint = useCallback(async () => {
@@ -68,7 +68,7 @@ export const useCrossmint = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [account, crossmintConfig]);
+  }, [crossmintConfig]);
 
   // Load available characters from Crossmint
   const loadAvailableCharacters = async (): Promise<CrossmintCharacter[]> => {

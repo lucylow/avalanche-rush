@@ -654,3 +654,4 @@ export class FunticoIntegrationV2 {
 
 export default FunticoIntegrationV2;
 
+

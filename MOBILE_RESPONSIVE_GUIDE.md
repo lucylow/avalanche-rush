@@ -331,3 +331,4 @@ Your Avalanche Rush application now provides:
 
 **Your mobile-responsive Avalanche Rush game is production-ready!** 🚀📱
 
+

@@ -56,3 +56,4 @@ npm install --legacy-peer-deps
 
 The application builds successfully and is ready for Lovable hosting.
 
+

@@ -335,8 +335,8 @@ export const useAdvancedWeb3 = () => {
       });
       
       return true;
-    } catch (switchError: any) {
-      if (switchError.code === 4902) {
+    } catch (switchError: unknown) {
+      if (switchError && typeof switchError === 'object' && 'code' in switchError && switchError.code === 4902) {
         // Network not added, try to add it
         const network = targetChainId === 43113 ? NETWORKS.AVALANCHE_FUJI : NETWORKS.REACTIVE_MAINNET;
         
@@ -381,7 +381,7 @@ export const useAdvancedWeb3 = () => {
       const receipt = await tx.wait();
       
       // Extract session ID from events
-      const gameStartedEvent = receipt.logs.find((log: any) => {
+      const gameStartedEvent = receipt.logs.find((log: ethers.Log) => {
         try {
           const parsed = contracts.avalancheRushCore!.interface.parseLog(log);
           return parsed?.name === 'GameStarted';

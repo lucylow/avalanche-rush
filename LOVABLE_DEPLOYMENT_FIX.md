@@ -220,3 +220,4 @@ If you encounter any issues during deployment:
 
 **Your Avalanche Rush game is ready to go live on Lovable!** 🌟🎮
 
+

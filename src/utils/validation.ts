@@ -188,7 +188,7 @@ export const formatValidationError = (error: yup.ValidationError): string => {
 
 // Batch validation helper
 export const validateBatch = async <T>(
-  schema: yup.ObjectSchema<any>,
+  schema: yup.ObjectSchema<Record<string, unknown>>,
   data: T[]
 ): Promise<{ valid: T[]; invalid: { data: T; error: string }[] }> => {
   const valid: T[] = [];

@@ -942,7 +942,7 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
 
     // Continue game loop
     gameLoopRef.current = requestAnimationFrame(gameLoop);
-  }, [gameState.isPlaying, isPaused, playerPosition, keys, gameSpeed, particles, createParticles]);
+  }, [gameState.isPlaying, isPaused, playerPosition, keys, gameSpeed, particles, createParticles, onScoreUpdate, selectedCharacter]);
 
   const drawEnhancedUI = (ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement) => {
     // Main UI Background
@@ -1116,7 +1116,7 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
     if (gameState.isPlaying && !gameStateRef.current.isRunning) {
       startGame();
     }
-  }, [gameState.isPlaying]);
+  }, [gameState.isPlaying, startGame]);
 
   // Handle keyboard input
   useEffect(() => {
@@ -1137,7 +1137,7 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
     };
   }, []);
 
-  const startGame = () => {
+  const startGame = useCallback(() => {
     gameStateRef.current = {
       score: 0,
       lives: 3,
@@ -1182,7 +1182,7 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
     setParticles([]);
     setBackgroundOffset(0);
     gameLoopRef.current = requestAnimationFrame(gameLoop);
-  };
+  }, [gameLoop]);
 
   const pauseGame = () => {
     if (gameLoopRef.current) {
@@ -1190,9 +1190,9 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
     }
   };
 
-  const resumeGame = () => {
+  const resumeGame = useCallback(() => {
     gameLoopRef.current = requestAnimationFrame(gameLoop);
-  };
+  }, [gameLoop]);
 
   const endGame = () => {
     gameStateRef.current.isRunning = false;
@@ -1224,7 +1224,7 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
     } else if (gameState.isPlaying) {
       resumeGame();
     }
-  }, [isPaused, gameState.isPlaying]);
+  }, [isPaused, gameState.isPlaying, resumeGame]);
 
   return (
     <ErrorBoundary

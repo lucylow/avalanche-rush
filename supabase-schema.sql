@@ -538,3 +538,4 @@ COMMENT ON TABLE cross_chain_transactions IS 'Cross-chain asset migration record
 COMMENT ON TABLE reactive_events IS 'Reactive Smart Contract event logs';
 COMMENT ON TABLE performance_metrics IS 'System performance and analytics data';
 
+
