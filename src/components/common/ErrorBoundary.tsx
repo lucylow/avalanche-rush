@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { getCurrentUserId, getSessionId, getPreviousErrors, updateErrorHistory } from './errorBoundaryUtils';
 
 interface Props {
   children: ReactNode;
@@ -127,39 +128,10 @@ class ErrorBoundary extends Component<Props, State> {
     }
   };
 
-  private getCurrentUserId = (): string | null => {
-    // Implement user ID retrieval logic
-    // This could come from authentication context, localStorage, etc.
-    return localStorage.getItem('userId') || null;
-  };
-
-  private getSessionId = (): string => {
-    // Generate or retrieve session ID
-    let sessionId = sessionStorage.getItem('sessionId');
-    if (!sessionId) {
-      sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      sessionStorage.setItem('sessionId', sessionId);
-    }
-    return sessionId;
-  };
-
-  private getPreviousErrors = (): string[] => {
-    // Get list of previous errors in this session
-    const errors = sessionStorage.getItem('errorHistory');
-    return errors ? JSON.parse(errors) : [];
-  };
-
-  private updateErrorHistory = (errorId: string) => {
-    const errors = this.getPreviousErrors();
-    errors.push(errorId);
-    
-    // Keep only last 10 errors
-    if (errors.length > 10) {
-      errors.splice(0, errors.length - 10);
-    }
-    
-    sessionStorage.setItem('errorHistory', JSON.stringify(errors));
-  };
+  private getCurrentUserId = getCurrentUserId;
+  private getSessionId = getSessionId;
+  private getPreviousErrors = getPreviousErrors;
+  private updateErrorHistory = updateErrorHistory;
 
   resetErrorBoundary = () => {
     this.updateErrorHistory(this.state.errorId);
@@ -309,34 +281,6 @@ class ErrorBoundary extends Component<Props, State> {
   }
 }
 
-// Higher-order component for easier usage
-export const withErrorBoundary = <P extends object>(
-  Component: React.ComponentType<P>,
-  errorBoundaryProps?: Omit<Props, 'children'>
-) => {
-  const WrappedComponent = (props: P) => (
-    <ErrorBoundary {...errorBoundaryProps}>
-      <Component {...props} />
-    </ErrorBoundary>
-  );
-  
-  WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`;
-  
-  return WrappedComponent;
-};
-
-// Hook for functional components to trigger error boundary
-export const useErrorHandler = () => {
-  const handleError = (error: Error, errorInfo?: Partial<ErrorInfo>) => {
-    // Create a synthetic error event to trigger the error boundary
-    const syntheticError = new Error(error.message);
-    syntheticError.stack = error.stack;
-    
-    // This will be caught by the nearest error boundary
-    throw syntheticError;
-  };
-
-  return { handleError };
-};
+// Note: Utility functions moved to errorBoundaryUtils.ts to avoid React Fast Refresh warnings
 
 export default ErrorBoundary;

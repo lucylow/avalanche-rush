@@ -1247,7 +1247,7 @@ const GameEngine = React.memo(forwardRef<GameEngineRef, GameEngineProps>(({
     } else if (gameState.isPlaying) {
       resumeGame();
     }
-  }, [isPaused, gameState.isPlaying, resumeGame]);
+  }, [isPaused, gameState.isPlaying, resumeGame, pauseGame]);
 
   return (
     <ErrorBoundary
