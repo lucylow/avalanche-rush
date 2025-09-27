@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
 import { 
   User, 
   Star, 
@@ -14,8 +13,6 @@ import {
   Crown, 
   Flame,
   Sparkles,
-  Trophy,
-  Coins,
   Check
 } from 'lucide-react';
 import { useCrossmint } from '../../hooks/useCrossmint';
@@ -25,10 +22,14 @@ interface Character {
   name: string;
   description: string;
   imageUrl: string;
-  rarity: string;
+  rarity: 'Common' | 'Rare' | 'Epic' | 'Legendary' | 'Mythic';
+  type: 'Warrior' | 'Mage' | 'Ranger' | 'Tank' | 'Support' | 'Assassin';
   unlockRequirements: Array<{ type: string; value: string | number }>;
   specialAbilities: string[];
+  skills?: string[];
+  attributes?: Record<string, number>;
   questBonus: number;
+  tournamentBonus: number;
 }
 
 interface CharacterSelectionModalProps {
@@ -85,20 +86,20 @@ const CharacterSelectionModal: React.FC<CharacterSelectionModalProps> = ({
 
   const handleMintCharacter = async (character: Character) => {
     try {
-      // Convert Character to CrossmintCharacter format (using type assertion for properties)
+      // Convert Character to CrossmintCharacter format with proper type safety
       const crossmintChar = {
         id: character.id,
         name: character.name,
         rarity: character.rarity,
-        type: (character as any).type || 'Warrior',
-        imageUrl: (character as any).imageUrl || character.imageUrl,
-        description: (character as any).backstory || 'No description',
-        attributes: (character as any).attributes || {},
-        skills: (character as any).skills || [],
-        specialAbilities: (character as any).specialAbilities || [],
-        tournamentBonus: (character as any).tournamentBonus || 0,
+        type: character.type || 'Warrior',
+        imageUrl: character.imageUrl || '',
+        description: character.description || 'No description',
+        attributes: character.attributes || {},
+        skills: character.skills || [],
+        specialAbilities: character.specialAbilities || [],
+        tournamentBonus: character.tournamentBonus || 0,
         unlockRequirements: character.unlockRequirements || []
-      } as any;
+      };
       
       const result = await mintCharacter(crossmintChar);
       if (result.success) {
@@ -298,7 +299,7 @@ const CharacterSelectionModal: React.FC<CharacterSelectionModalProps> = ({
               <div>
                 <h5 className="font-medium text-sm mb-1">Skills</h5>
                 <div className="flex flex-wrap gap-1">
-                  {(selectedCharacter as any).skills?.map((skill: string, index: number) => (
+                  {selectedCharacter.skills?.map((skill: string, index: number) => (
                     <Badge key={index} variant="outline" className="text-xs">
                       {skill}
                     </Badge>

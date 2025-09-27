@@ -1,28 +1,84 @@
 import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import QuestIntegration from '../quest/QuestIntegration';
+import TouchControls from './TouchControls';
+import ErrorBoundary from '../common/ErrorBoundary';
+
+interface GameState {
+  isPlaying: boolean;
+  isPaused: boolean;
+  gameMode: string;
+  difficulty: string;
+  currentLevel: number;
+  score: number;
+  lives: number;
+  energy: number;
+}
+
+interface Player {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  velocityY: number;
+  velocityX: number;
+  isJumping: boolean;
+  isSliding: boolean;
+  isInvulnerable: boolean;
+  animation: 'idle' | 'running' | 'jumping' | 'sliding' | 'falling' | 'celebrating';
+}
+
+interface Obstacle {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  type: 'spike' | 'wall' | 'pit' | 'moving' | 'laser' | 'saw' | 'fire';
+  speed: number;
+  damage: number;
+  isActive: boolean;
+}
+
+interface Collectible {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  type: 'coin' | 'gem' | 'powerup' | 'multiplier' | 'life' | 'token';
+  value: number;
+  collected: boolean;
+  animation: string;
+}
+
+interface PowerUp {
+  id: string;
+  type: 'shield' | 'magnet' | 'jump_boost' | 'slow_time' | 'double_score' | 'invincibility';
+  duration: number;
+  remainingTime: number;
+  effect: {
+    multiplier?: number;
+    duration?: number;
+    protection?: boolean;
+    magnetRange?: number;
+  };
+}
+
+interface Character {
+  id: string;
+  name: string;
+  rarity: string;
+  type: string;
+  questBonus: number;
+  tournamentBonus: number;
+  attributes: Record<string, number>;
+  specialAbilities: string[];
+}
 
 interface GameEngineProps {
-  gameState: {
-    isPlaying: boolean;
-    isPaused: boolean;
-    gameMode: string;
-    difficulty: string;
-    currentLevel: number;
-    score: number;
-    lives: number;
-    energy: number;
-  };
-  selectedCharacter?: {
-    id: string;
-    name: string;
-    rarity: string;
-    type: string;
-    questBonus: number;
-    tournamentBonus: number;
-    attributes: Record<string, number>;
-    specialAbilities: string[];
-  };
+  gameState: GameState;
+  selectedCharacter?: Character;
   onScoreUpdate: (score: number) => void;
   onGameEnd: (score: number, achievements?: string[]) => void;
   onLevelComplete: (level: number) => void;
@@ -77,6 +133,7 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
   const [gameSpeed, setGameSpeed] = useState(2);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [backgroundOffset, setBackgroundOffset] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Enhanced game state with power-ups and special abilities
   const gameStateRef = useRef({
@@ -1001,6 +1058,59 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
     }
   };
 
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        window.innerWidth <= 768 ||
+        'ontouchstart' in window
+      );
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Touch control handlers
+  const handleTouchMove = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
+    setKeys(prev => ({ ...prev, [`Arrow${direction.charAt(0).toUpperCase() + direction.slice(1)}`]: true }));
+    
+    // Clear the key after a short delay to simulate key press
+    setTimeout(() => {
+      setKeys(prev => ({ ...prev, [`Arrow${direction.charAt(0).toUpperCase() + direction.slice(1)}`]: false }));
+    }, 100);
+  }, []);
+
+  const handleTouchJump = useCallback(() => {
+    setKeys(prev => ({ ...prev, ' ': true }));
+    setTimeout(() => {
+      setKeys(prev => ({ ...prev, ' ': false }));
+    }, 100);
+  }, []);
+
+  const handleTouchSlide = useCallback(() => {
+    setKeys(prev => ({ ...prev, 'ArrowDown': true }));
+    setTimeout(() => {
+      setKeys(prev => ({ ...prev, 'ArrowDown': false }));
+    }, 100);
+  }, []);
+
+  const handleSpecialAbility = useCallback((ability: 'dash' | 'timeFreeze' | 'megaCollect') => {
+    const keyMap = {
+      dash: 'q',
+      timeFreeze: 'e',
+      megaCollect: 'r'
+    };
+    
+    setKeys(prev => ({ ...prev, [keyMap[ability]]: true }));
+    setTimeout(() => {
+      setKeys(prev => ({ ...prev, [keyMap[ability]]: false }));
+    }, 100);
+  }, []);
+
   // Initialize game
   useEffect(() => {
     if (gameState.isPlaying && !gameStateRef.current.isRunning) {
@@ -1117,107 +1227,124 @@ const GameEngine = forwardRef<GameEngineRef, GameEngineProps>(({
   }, [isPaused, gameState.isPlaying]);
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
-      <div className="relative">
-        <canvas
-          ref={canvasRef}
-          width={1000}
-          height={600}
-          className="border-2 border-green-400 rounded-lg shadow-2xl"
-          style={{ maxWidth: '95vw', maxHeight: '85vh' }}
-        />
-        
-        {/* Enhanced Game Instructions Overlay */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="absolute top-4 right-4 bg-black/80 text-white p-4 rounded-lg backdrop-blur-sm border border-green-400/30 max-w-xs"
-        >
-          <div className="text-sm space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="text-green-400">🎮</span>
-              <span>WASD or Arrow Keys to move</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-yellow-400">🪙</span>
-              <span>Collect coins for points</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-blue-400">💎</span>
-              <span>Energy crystals restore health</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-purple-400">💎</span>
-              <span>Rare gems give massive points!</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-red-400">⚠️</span>
-              <span>Avoid spinning obstacles</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-orange-400">⚡</span>
-              <span>Collect power-ups for abilities</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-purple-400">🔥</span>
-              <span>Build combos for bonus points!</span>
-            </div>
-            <div className="border-t border-gray-600 pt-2 mt-2">
-              <div className="flex items-center gap-2">
-                <span className="text-green-400">Q</span>
-                <span>Dash forward</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-blue-400">E</span>
-                <span>Time freeze</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-orange-400">R</span>
-                <span>Mega collect</span>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Pause Overlay */}
-        {isPaused && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="absolute inset-0 bg-black/50 flex items-center justify-center backdrop-blur-sm rounded-lg"
+    <ErrorBoundary
+      onError={(error, errorInfo) => {
+        console.error('GameEngine Error:', error, errorInfo);
+        // In production, you might want to send this to an error reporting service
+      }}
+    >
+      <div className="fixed inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center">
+        <div className="relative">
+          <canvas
+            ref={canvasRef}
+            width={1000}
+            height={600}
+            className="border-2 border-green-400 rounded-lg shadow-2xl"
+            style={{ maxWidth: '95vw', maxHeight: '85vh' }}
+          />
+          
+          {/* Enhanced Game Instructions Overlay */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="absolute top-4 right-4 bg-black/80 text-white p-4 rounded-lg backdrop-blur-sm border border-green-400/30 max-w-xs"
           >
-            <div className="text-center text-white">
-              <motion.div
-                animate={{ scale: [1, 1.1, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="text-6xl mb-4"
-              >
-                ⏸️
-              </motion.div>
-              <h2 className="text-4xl font-bold mb-2">PAUSED</h2>
-              <p className="text-xl">Press Resume to continue</p>
+            <div className="text-sm space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-green-400">🎮</span>
+                <span>WASD or Arrow Keys to move</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-yellow-400">🪙</span>
+                <span>Collect coins for points</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-blue-400">💎</span>
+                <span>Energy crystals restore health</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-purple-400">💎</span>
+                <span>Rare gems give massive points!</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-red-400">⚠️</span>
+                <span>Avoid spinning obstacles</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-orange-400">⚡</span>
+                <span>Collect power-ups for abilities</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-purple-400">🔥</span>
+                <span>Build combos for bonus points!</span>
+              </div>
+              <div className="border-t border-gray-600 pt-2 mt-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-green-400">Q</span>
+                  <span>Dash forward</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-blue-400">E</span>
+                  <span>Time freeze</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-orange-400">R</span>
+                  <span>Mega collect</span>
+                </div>
+              </div>
             </div>
           </motion.div>
-        )}
 
-        {/* Quest Integration */}
-        <QuestIntegration
-          gameState={{
-            isPlaying: gameState.isPlaying,
-            score: gameState.score,
-            lives: gameState.lives,
-            energy: gameState.energy,
-            currentLevel: gameState.currentLevel
-          }}
-          onQuestUpdate={(questId, objectiveId, progress) => {
-            console.log(`Quest ${questId} objective ${objectiveId} progress: ${progress}`);
-          }}
-          onQuestComplete={(questId, rewards) => {
-            console.log(`Quest ${questId} completed with rewards:`, rewards);
-          }}
-        />
+          {/* Pause Overlay */}
+          {isPaused && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="absolute inset-0 bg-black/50 flex items-center justify-center backdrop-blur-sm rounded-lg"
+            >
+              <div className="text-center text-white">
+                <motion.div
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="text-6xl mb-4"
+                >
+                  ⏸️
+                </motion.div>
+                <h2 className="text-4xl font-bold mb-2">PAUSED</h2>
+                <p className="text-xl">Press Resume to continue</p>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Touch Controls for Mobile */}
+          <TouchControls
+            onMove={handleTouchMove}
+            onSpecialAbility={handleSpecialAbility}
+            onJump={handleTouchJump}
+            onSlide={handleTouchSlide}
+            isVisible={isMobile && gameState.isPlaying}
+            abilities={gameStateRef.current.specialAbilities}
+          />
+
+          {/* Quest Integration */}
+          <QuestIntegration
+            gameState={{
+              isPlaying: gameState.isPlaying,
+              score: gameState.score,
+              lives: gameState.lives,
+              energy: gameState.energy,
+              currentLevel: gameState.currentLevel
+            }}
+            onQuestUpdate={(questId, objectiveId, progress) => {
+              console.log(`Quest ${questId} objective ${objectiveId} progress: ${progress}`);
+            }}
+            onQuestComplete={(questId, rewards) => {
+              console.log(`Quest ${questId} completed with rewards:`, rewards);
+            }}
+          />
+        </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 });
 

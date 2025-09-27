@@ -634,16 +634,34 @@ export const useAdvancedWeb3 = () => {
 
     return () => {
       // Cleanup event listeners
-      contractInstances.avalancheRushCore.removeAllListeners();
-      contractInstances.reactiveQuestEngine.removeAllListeners();
-      contractInstances.educationalNFT.removeAllListeners();
+      if (contractInstances.avalancheRushCore) {
+        contractInstances.avalancheRushCore.removeAllListeners();
+      }
+      if (contractInstances.reactiveQuestEngine) {
+        contractInstances.reactiveQuestEngine.removeAllListeners();
+      }
+      if (contractInstances.educationalNFT) {
+        contractInstances.educationalNFT.removeAllListeners();
+      }
     };
   }, [contractInstances]);
 
-  // Initialize on mount
+  // Initialize on mount and handle account/chain changes
   useEffect(() => {
-    initializeWeb3();
+    if (web3State.account && web3State.chainId && web3State.provider) {
+      initializeWeb3();
+    }
+    
+    return () => {
+      // Cleanup event listeners
+      if (web3State.provider) {
+        web3State.provider.removeAllListeners();
+      }
+    };
+  }, [web3State.account, web3State.chainId, web3State.provider, contracts, initializeWeb3]);
 
+  // Handle MetaMask events
+  useEffect(() => {
     if (typeof window.ethereum !== 'undefined') {
       const handleAccountsChanged = (accounts: string[]) => {
         if (accounts.length === 0) {

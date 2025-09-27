@@ -27,7 +27,6 @@ interface CrossmintCharacter {
 interface CrossmintMintResult {
   success: boolean;
   tokenId?: string;
-  transactionHash?: string;
   error?: string;
 }
 
@@ -149,7 +148,10 @@ export const useCrossmint = () => {
       setError(null);
 
       if (!isConnected && !recipientEmail) {
-        throw new Error('Wallet not connected and no email provided');
+        return {
+          success: false,
+          error: 'Wallet not connected and no email provided'
+        };
       }
 
       // Prepare minting configuration
@@ -186,15 +188,13 @@ export const useCrossmint = () => {
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       const mockTokenId = `token_${Date.now()}_${character.id}`;
-      const mockTransactionHash = `0x${Math.random().toString(16).substr(2, 64)}`;
 
       // Update minted characters
       setMintedCharacters(prev => new Map(prev).set(character.id, mockTokenId));
 
       return {
         success: true,
-        tokenId: mockTokenId,
-        transactionHash: mockTransactionHash
+        tokenId: mockTokenId
       };
 
     } catch (err) {
