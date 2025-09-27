@@ -12,7 +12,7 @@ interface ParticleEffectProps {
 export const ParticleEffect: React.FC<ParticleEffectProps> = ({ 
   x, y, color, count = 15, duration = 1000 
 }) => {
-  const [particles, setParticles] = useState<Array<{id: number; x: number; y: number; vx: number; vy: number; life: number}>>([]);
+  const [particles, setParticles] = useState<Array<{id: number; x: number; y: number; vx: number; vy: number; life: number; size: number}>>([]);
 
   useEffect(() => {
     const newParticles = Array.from({ length: count }, (_, i) => ({

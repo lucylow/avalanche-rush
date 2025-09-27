@@ -252,7 +252,7 @@ const StoryGameIntegration: React.FC<StoryGameIntegrationProps> = ({
       setActiveDialogue({
         isVisible: true,
         triggeredBy: dialogueType,
-        character
+        character: character as ReactiveCharacter
       });
     }, 1000);
 
@@ -464,7 +464,7 @@ const StoryGameIntegration: React.FC<StoryGameIntegrationProps> = ({
       <DialogueSystem
         isVisible={activeDialogue.isVisible}
         onClose={handleDialogueClose}
-        triggeredBy={activeDialogue.triggeredBy}
+        triggeredBy={activeDialogue.triggeredBy as 'achievement' | 'defeat' | 'greeting' | 'levelUp' | 'questComplete' | 'questStart' | 'random' | 'victory'}
         playerLevel={playerProfile?.level || 1}
         selectedCharacter={activeDialogue.character}
         relationships={relationships}

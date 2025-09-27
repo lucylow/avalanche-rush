@@ -123,7 +123,7 @@ const AudioEnhancedGameEngine = forwardRef<AudioEnhancedGameEngineRef, AudioEnha
     audioManager.onObstacleHit();
     
     // Play different hit sounds based on obstacle type
-    const obstacleTypes = ['iceBreak', 'avalancheCrash', 'obstacleHit'];
+    const obstacleTypes: ('iceBreak' | 'avalancheCrash' | 'obstacleHit')[] = ['iceBreak', 'avalancheCrash', 'obstacleHit'];
     audioManager.playRandomSound(obstacleTypes);
   }, [audioManager]);
 
@@ -462,7 +462,8 @@ const AudioEnhancedGameEngine = forwardRef<AudioEnhancedGameEngineRef, AudioEnha
 
     // Draw particles
     particles.forEach(particle => {
-      const alpha = particle.life / particle.maxLife;
+      const maxLife = (particle as any).maxLife || 60; // Add maxLife fallback
+      const alpha = particle.life / maxLife;
       ctx.fillStyle = particle.color + Math.floor(alpha * 255).toString(16).padStart(2, '0');
       ctx.fillRect(particle.x, particle.y, 4, 4);
     });

@@ -23,6 +23,9 @@ interface GameState {
   achievements: string[];
   skillPoints: { [key: string]: number };
   totalGamesPlayed: number;
+  level: number;
+  speed: number;
+  mode: 'classic' | 'tutorial' | 'challenge' | 'quest' | 'speedrun' | 'survival';
 }
 
 interface PlayerProfile {
@@ -61,7 +64,10 @@ const AvalancheRushGame: React.FC = () => {
     sessionId: null,
     achievements: [],
     skillPoints: {},
-    totalGamesPlayed: 0
+    totalGamesPlayed: 0,
+    level: 1,
+    speed: 1,
+    mode: 'classic'
   });
 
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile | null>(null);

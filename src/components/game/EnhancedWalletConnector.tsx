@@ -90,7 +90,7 @@ const EnhancedWalletConnector: React.FC = () => {
   }, [isConnected, account, getRushBalance]);
 
   const handleConnectWallet = useCallback(async () => {
-    if (!window.ethereum) {
+    if (!(window as any)?.ethereum) {
       setWalletState(prev => ({ 
         ...prev, 
         error: 'MetaMask not detected. Please install MetaMask to continue.' 

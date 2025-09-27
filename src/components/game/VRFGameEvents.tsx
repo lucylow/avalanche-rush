@@ -2,6 +2,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useChainlinkVRF, RandomEventType } from '../../hooks/useChainlinkVRF';
 
+interface RandomnessRequest {
+  eventType: RandomEventType;
+  randomResult?: unknown;
+  gameSessionId: number;
+  fulfilled: boolean;
+}
+
 interface VRFGameEventsProps {
   gameSessionId: number;
   onRandomEvent: (eventType: string, data: Record<string, unknown>) => void;
@@ -59,29 +66,29 @@ const VRFGameEvents: React.FC<VRFGameEventsProps> = ({ gameSessionId, onRandomEv
     handleVRFResults();
   }, [pendingRequests]);
 
-  const handleRandomResult = useCallback((request: Record<string, unknown>) => {
+  const handleRandomResult = useCallback((request: RandomnessRequest) => {
     const { eventType, randomResult, gameSessionId } = request;
     
     let eventData: Record<string, unknown> = {};
     
     switch (eventType) {
       case RandomEventType.DAILY_CHALLENGE:
-        eventData = generateDailyChallenge(randomResult);
+        eventData = generateDailyChallenge(Number(randomResult));
         break;
       case RandomEventType.NFT_REWARD_RARITY:
-        eventData = generateNFTReward(randomResult);
+        eventData = generateNFTReward(Number(randomResult));
         break;
       case RandomEventType.POWER_UP_SPAWN:
-        eventData = generatePowerUp(randomResult);
+        eventData = generatePowerUp(Number(randomResult));
         break;
       case RandomEventType.OBSTACLE_PATTERN:
-        eventData = generateObstaclePattern(randomResult);
+        eventData = generateObstaclePattern(Number(randomResult));
         break;
       case RandomEventType.SPECIAL_EVENT:
-        eventData = generateSpecialEvent(randomResult);
+        eventData = generateSpecialEvent(Number(randomResult));
         break;
       case RandomEventType.BONUS_MULTIPLIER:
-        eventData = generateBonusMultiplier(randomResult);
+        eventData = generateBonusMultiplier(Number(randomResult));
         break;
     }
     
@@ -408,13 +415,17 @@ const VRFGameEvents: React.FC<VRFGameEventsProps> = ({ gameSessionId, onRandomEv
                   transition={{ duration: 0.5 }}
                   className="text-4xl mb-3"
                 >
-                  {lastRandomEvent.data.icon || '🎲'}
+      const randomEvent: any = lastRandomEvent.data;
+      const icon = randomEvent?.icon || '🎲';
+      const name = randomEvent?.name || randomEvent?.title || 'Random Event';
+      const description = randomEvent?.description || 'A random event occurred!';
+      const reward = randomEvent?.reward;
                 </motion.div>
-                <h3 className="text-xl font-bold mb-2">{lastRandomEvent.data.name || lastRandomEvent.data.title}</h3>
-                <p className="text-sm text-green-200 mb-3">{lastRandomEvent.data.description}</p>
-                {lastRandomEvent.data.reward && (
+                <h3 className="text-xl font-bold mb-2">{name}</h3>
+                <p className="text-sm text-green-200 mb-3">{description}</p>
+                {reward && (
                   <div className="bg-green-500/20 px-3 py-1 rounded-full text-xs font-semibold">
-                    Reward: {lastRandomEvent.data.reward}
+                    Reward: {reward}
                   </div>
                 )}
               </div>

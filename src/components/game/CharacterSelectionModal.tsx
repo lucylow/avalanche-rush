@@ -148,14 +148,14 @@ const CharacterSelectionModal: React.FC<CharacterSelectionModalProps> = ({
 
           <TabsContent value="available" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {availableCharacters.map((character) => (
-                <div
-                  key={character.id}
-                  className={`relative border rounded-lg p-4 cursor-pointer transition-all duration-200 hover:shadow-lg ${
-                    selectedCharacter?.id === character.id ? 'ring-2 ring-primary bg-primary/5' : 'hover:border-primary/50'
-                  }`}
-                  onClick={() => handleCharacterSelect(character)}
-                >
+          {availableCharacters.map((character) => (
+            <div
+              key={character.id}
+              className={`relative border rounded-lg p-4 cursor-pointer transition-all duration-200 hover:shadow-lg ${
+                selectedCharacter?.id === character.id ? 'ring-2 ring-primary bg-primary/5' : 'hover:border-primary/50'
+              }`}
+              onClick={() => handleCharacterSelect(character)}
+            >
                   {selectedCharacter?.id === character.id && (
                     <div className="absolute top-2 right-2">
                       <Check className="h-5 w-5 text-primary" />
