@@ -1,252 +1,49 @@
-// Supabase client configuration for Avalanche Rush
-// This provides a mock implementation for development
+// Re-export the configured Supabase client
+export { supabase } from "@/integrations/supabase/client";
 
-interface AuthResponse {
-  user: { id: string; email: string } | null;
-  error: { message: string } | null;
-}
+// Re-export types for convenience
+export type { Database, Tables } from "@/integrations/supabase/types";
 
-interface AuthSession {
-  user: { id: string; email: string };
-  access_token: string;
-}
-
-interface QueryBuilder {
-  eq: (column: string, value: string | number) => QueryBuilder;
-  neq: (column: string, value: string | number) => QueryBuilder;
-  gt: (column: string, value: string | number) => QueryBuilder;
-  gte: (column: string, value: string | number) => QueryBuilder;
-  lt: (column: string, value: string | number) => QueryBuilder;
-  lte: (column: string, value: string | number) => QueryBuilder;
-  like: (column: string, pattern: string) => QueryBuilder;
-  ilike: (column: string, pattern: string) => QueryBuilder;
-  is: (column: string, value: string | number | null) => QueryBuilder;
-  in: (column: string, values: (string | number)[]) => QueryBuilder;
-  contains: (column: string, value: string | number | Record<string, unknown>) => QueryBuilder;
-  containedBy: (column: string, value: string | number | Record<string, unknown>) => QueryBuilder;
-  rangeGt: (column: string, value: string | number) => QueryBuilder;
-  rangeGte: (column: string, value: string | number) => QueryBuilder;
-  rangeLt: (column: string, value: string | number) => QueryBuilder;
-  rangeLte: (column: string, value: string | number) => QueryBuilder;
-  rangeAdjacent: (column: string, value: string | number) => QueryBuilder;
-  overlaps: (column: string, value: string | number) => QueryBuilder;
-  textSearch: (column: string, query: string) => QueryBuilder;
-  match: (query: Record<string, unknown>) => QueryBuilder;
-  not: (column: string, operator: string, value: string | number) => QueryBuilder;
-  or: (filters: string) => QueryBuilder;
-  filter: (column: string, operator: string, value: string | number) => QueryBuilder;
-  order: (column: string, options?: { ascending?: boolean }) => QueryBuilder;
-  limit: (count: number) => QueryBuilder;
-  range: (from: number, to: number) => QueryBuilder;
-  single: () => Promise<Record<string, unknown>>;
-  maybeSingle: () => Promise<Record<string, unknown> | null>;
-  csv: () => Promise<string>;
-  geojson: () => Promise<Record<string, unknown>>;
-  explain: (options?: Record<string, unknown>) => Promise<Record<string, unknown>>;
-  rollback: () => QueryBuilder;
-  returns: (columns?: string) => QueryBuilder;
-  then: (onfulfilled?: (value: Record<string, unknown>[]) => unknown, onrejected?: (reason: unknown) => unknown) => Promise<unknown>;
-  abort: (reason?: unknown) => QueryBuilder;
-}
-
-export interface SupabaseClient {
-  auth: {
-    signUp: (email: string, password: string) => Promise<AuthResponse>;
-    signIn: (email: string, password: string) => Promise<AuthResponse>;
-    signOut: () => Promise<{ error: { message: string } | null }>;
-    getUser: () => Promise<{ user: { id: string; email: string } | null; error: { message: string } | null }>;
-    onAuthStateChange: (callback: (event: string, session: AuthSession | null) => void) => { data: { subscription: { unsubscribe: () => void } } };
-  };
-  from: (table: string) => QueryBuilder;
-  channel: (name: string) => {
-    on: (event: string, callback: (payload: Record<string, unknown>) => void) => { subscribe: () => void };
-    subscribe: () => void;
-    unsubscribe: () => void;
-  };
-}
-
-// Mock Supabase client for development
-class MockSupabaseClient implements SupabaseClient {
-  auth = {
-    signUp: async (email: string, password: string) => {
-      console.log('Mock signUp:', email);
-      return {
-        data: {
-          user: {
-            id: 'mock-user-id',
-            email: email,
-            created_at: new Date().toISOString()
-          },
-          session: {
-            access_token: 'mock-access-token',
-            refresh_token: 'mock-refresh-token'
-          }
-        },
-        error: null
-      };
-    },
-    signIn: async (email: string, password: string) => {
-      console.log('Mock signIn:', email);
-      return {
-        data: {
-          user: {
-            id: 'mock-user-id',
-            email: email
-          },
-          session: {
-            access_token: 'mock-access-token',
-            refresh_token: 'mock-refresh-token'
-          }
-        },
-        error: null
-      };
-    },
-    signOut: async () => {
-      console.log('Mock signOut');
-      return { error: null };
-    },
-    getUser: async () => {
-      return {
-        data: {
-          user: {
-            id: 'mock-user-id',
-            email: 'user@example.com'
-          }
-        },
-        error: null
-      };
-    },
-    onAuthStateChange: (callback: (event: string, session: any) => void) => {
-      console.log('Mock onAuthStateChange');
-      return { data: { subscription: { unsubscribe: () => {} } } };
-    }
-  };
-
-  from = (table: string) => {
-    console.log('Mock from table:', table);
-    return {
-      select: (columns?: string) => ({
-        eq: (column: string, value: any) => ({
-          single: () => Promise.resolve({ data: null, error: null }),
-          then: (callback: any) => Promise.resolve(callback({ data: [], error: null }))
-        }),
-        then: (callback: any) => Promise.resolve(callback({ data: [], error: null }))
-      }),
-      insert: (data: any) => ({
-        select: () => Promise.resolve({ data: [data], error: null }),
-        then: (callback: any) => Promise.resolve(callback({ data: [data], error: null }))
-      }),
-      update: (data: any) => ({
-        eq: (column: string, value: any) => ({
-          select: () => Promise.resolve({ data: [data], error: null }),
-          then: (callback: any) => Promise.resolve(callback({ data: [data], error: null }))
-        })
-      }),
-      delete: () => ({
-        eq: (column: string, value: any) => ({
-          then: (callback: any) => Promise.resolve(callback({ data: [], error: null }))
-        })
-      }),
-      upsert: (data: any) => ({
-        select: () => Promise.resolve({ data: [data], error: null }),
-        then: (callback: any) => Promise.resolve(callback({ data: [data], error: null }))
-      })
-    };
-  };
-
-  channel = (name: string) => {
-    console.log('Mock channel:', name);
-    return {
-      on: (event: string, callback: (payload: any) => void) => {
-        console.log('Mock channel on:', event);
-        return this;
-      },
-      subscribe: () => {
-        console.log('Mock channel subscribe');
-        return this;
-      },
-      unsubscribe: () => {
-        console.log('Mock channel unsubscribe');
-        return this;
-      }
-    };
-  };
-}
-
-// Environment variables for Supabase configuration
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
-
-// Create Supabase client
-let supabase: SupabaseClient;
-
-try {
-  // Try to import the real Supabase client
-  // @ts-ignore
-  const { createClient } = await import('@supabase/supabase-js');
-  supabase = createClient(supabaseUrl, supabaseAnonKey);
-  console.log('✅ Real Supabase client initialized');
-} catch (error) {
-  // Fall back to mock client for development
-  console.log('⚠️ Using mock Supabase client for development');
-  supabase = new MockSupabaseClient();
-}
-
-export { supabase };
-
-// Database types for Avalanche Rush
+// Basic types for the gaming app
 export interface User {
   id: string;
   email: string;
-  wallet_address?: string;
-  created_at: string;
-  updated_at: string;
-  profile?: UserProfile;
+  created_at?: string;
 }
 
 export interface UserProfile {
   id: string;
   user_id: string;
-  username?: string;
+  display_name?: string;
   avatar_url?: string;
-  bio?: string;
-  total_xp: number;
-  level: number;
-  games_played: number;
-  best_score: number;
-  achievements: string[];
-  preferences: {
-    theme: 'light' | 'dark';
-    notifications: boolean;
-    sound_enabled: boolean;
-  };
-  created_at: string;
-  updated_at: string;
+  level?: number;
+  experience?: number;
+  rush_tokens?: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface GameSession {
   id: string;
   user_id: string;
-  game_type: string;
-  score: number;
-  duration: number;
+  game_mode: string;
+  final_score: number;
   level_reached: number;
-  power_ups_used: number;
-  chain_id: number;
-  transaction_hash?: string;
-  created_at: string;
+  duration_seconds: number;
+  blockchain_tx_hash?: string;
+  chain_id?: number;
+  created_at?: string;
 }
 
 export interface LeaderboardEntry {
   id: string;
   user_id: string;
-  username: string;
-  score: number;
   game_type: string;
+  score: number;
+  level: number;
   chain_id: number;
-  rank: number;
-  created_at: string;
-  updated_at: string;
+  display_name?: string;
+  created_at?: string;
 }
 
 export interface Achievement {
@@ -254,13 +51,22 @@ export interface Achievement {
   name: string;
   description: string;
   icon: string;
-  xp_reward: number;
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
-  requirements: {
-    type: string;
-    value: number;
-  };
-  created_at: string;
+  category: string;
+  points: number;
+  requirements: Record<string, any>;
+  created_at?: string;
+}
+
+export interface Quest {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  difficulty: string;
+  objectives: Record<string, any>[];
+  rewards: Record<string, any>;
+  is_active: boolean;
+  created_at?: string;
 }
 
 export interface UserAchievement {
@@ -268,23 +74,6 @@ export interface UserAchievement {
   user_id: string;
   achievement_id: string;
   unlocked_at: string;
-  progress: number;
-}
-
-export interface Quest {
-  id: string;
-  title: string;
-  description: string;
-  type: 'daily' | 'weekly' | 'special';
-  xp_reward: number;
-  token_reward: number;
-  requirements: {
-    type: string;
-    value: number;
-  };
-  is_active: boolean;
-  expires_at?: string;
-  created_at: string;
 }
 
 export interface UserQuest {
@@ -294,241 +83,4 @@ export interface UserQuest {
   progress: number;
   completed: boolean;
   completed_at?: string;
-  created_at: string;
 }
-
-// Database service functions
-export class SupabaseService {
-  // User management
-  static async createUser(userData: Partial<User>): Promise<User> {
-    const { data, error } = await supabase
-      .from('users')
-      .insert(userData)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  }
-
-  static async getUser(userId: string): Promise<User | null> {
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    
-    if (error) return null;
-    return data;
-  }
-
-  static async updateUser(userId: string, updates: Partial<User>): Promise<User> {
-    const { data, error } = await supabase
-      .from('users')
-      .update(updates)
-      .eq('id', userId)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  }
-
-  // User profile management
-  static async createUserProfile(profileData: Partial<UserProfile>): Promise<UserProfile> {
-    const { data, error } = await supabase
-      .from('user_profiles')
-      .insert(profileData)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  }
-
-  static async getUserProfile(userId: string): Promise<UserProfile | null> {
-    const { data, error } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-    
-    if (error) return null;
-    return data;
-  }
-
-  static async updateUserProfile(userId: string, updates: Partial<UserProfile>): Promise<UserProfile> {
-    const { data, error } = await supabase
-      .from('user_profiles')
-      .update(updates)
-      .eq('user_id', userId)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  }
-
-  // Game session management
-  static async createGameSession(sessionData: Partial<GameSession>): Promise<GameSession> {
-    const { data, error } = await supabase
-      .from('game_sessions')
-      .insert(sessionData)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  }
-
-  static async getUserGameSessions(userId: string, limit = 10): Promise<GameSession[]> {
-    const { data, error } = await supabase
-      .from('game_sessions')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(limit);
-    
-    if (error) throw error;
-    return data || [];
-  }
-
-  // Leaderboard management
-  static async getLeaderboard(gameType: string, chainId: number, limit = 100): Promise<LeaderboardEntry[]> {
-    const { data, error } = await supabase
-      .from('leaderboard_entries')
-      .select('*')
-      .eq('game_type', gameType)
-      .eq('chain_id', chainId)
-      .order('score', { ascending: false })
-      .limit(limit);
-    
-    if (error) throw error;
-    return data || [];
-  }
-
-  static async updateLeaderboard(entryData: Partial<LeaderboardEntry>): Promise<LeaderboardEntry> {
-    const { data, error } = await supabase
-      .from('leaderboard_entries')
-      .upsert(entryData)
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  }
-
-  // Achievement management
-  static async getAchievements(): Promise<Achievement[]> {
-    const { data, error } = await supabase
-      .from('achievements')
-      .select('*')
-      .eq('is_active', true);
-    
-    if (error) throw error;
-    return data || [];
-  }
-
-  static async getUserAchievements(userId: string): Promise<UserAchievement[]> {
-    const { data, error } = await supabase
-      .from('user_achievements')
-      .select('*')
-      .eq('user_id', userId);
-    
-    if (error) throw error;
-    return data || [];
-  }
-
-  static async unlockAchievement(userId: string, achievementId: string): Promise<UserAchievement> {
-    const { data, error } = await supabase
-      .from('user_achievements')
-      .insert({
-        user_id: userId,
-        achievement_id: achievementId,
-        unlocked_at: new Date().toISOString(),
-        progress: 100
-      })
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  }
-
-  // Quest management
-  static async getQuests(): Promise<Quest[]> {
-    const { data, error } = await supabase
-      .from('quests')
-      .select('*')
-      .eq('is_active', true);
-    
-    if (error) throw error;
-    return data || [];
-  }
-
-  static async getUserQuests(userId: string): Promise<UserQuest[]> {
-    const { data, error } = await supabase
-      .from('user_quests')
-      .select('*')
-      .eq('user_id', userId);
-    
-    if (error) throw error;
-    return data || [];
-  }
-
-  static async updateQuestProgress(userId: string, questId: string, progress: number): Promise<UserQuest> {
-    const { data, error } = await supabase
-      .from('user_quests')
-      .upsert({
-        user_id: userId,
-        quest_id: questId,
-        progress,
-        completed: progress >= 100,
-        completed_at: progress >= 100 ? new Date().toISOString() : null
-      })
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
-  }
-
-  // Real-time subscriptions
-  static subscribeToLeaderboard(gameType: string, chainId: number, callback: (payload: any) => void) {
-    return supabase
-      .channel(`leaderboard-${gameType}-${chainId}`)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'leaderboard_entries',
-        filter: `game_type=eq.${gameType}`
-      }, callback)
-      .subscribe();
-  }
-
-  static subscribeToUserAchievements(userId: string, callback: (payload: any) => void) {
-    return supabase
-      .channel(`user-achievements-${userId}`)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'user_achievements',
-        filter: `user_id=eq.${userId}`
-      }, callback)
-      .subscribe();
-  }
-
-  static subscribeToGameSessions(userId: string, callback: (payload: any) => void) {
-    return supabase
-      .channel(`game-sessions-${userId}`)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'game_sessions',
-        filter: `user_id=eq.${userId}`
-      }, callback)
-      .subscribe();
-  }
-}
-
-export default supabase;
