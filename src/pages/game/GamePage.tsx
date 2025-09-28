@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import AvalancheRushGame from '../../components/game/AvalancheRushGame';
-import GameEngine from '../../components/game/GameEngine';
 import { useSmartContracts } from '../../hooks/useSmartContracts';
 
 const GamePage: React.FC = () => {
   const { isConnected, connectWallet, isLoading } = useSmartContracts();
   const [showWalletPrompt, setShowWalletPrompt] = useState(false);
-  const [showGameEngine, setShowGameEngine] = useState(false);
 
   useEffect(() => {
     if (!isConnected && !isLoading) {
       setShowWalletPrompt(true);
     } else {
       setShowWalletPrompt(false);
-      setShowGameEngine(true);
     }
   }, [isConnected, isLoading]);
 
@@ -21,7 +18,6 @@ const GamePage: React.FC = () => {
     try {
       await connectWallet();
       setShowWalletPrompt(false);
-      setShowGameEngine(true);
     } catch (error) {
       console.error('Failed to connect wallet:', error);
     }
@@ -83,11 +79,7 @@ const GamePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {showGameEngine ? (
-        <GameEngine />
-      ) : (
-        <AvalancheRushGame />
-      )}
+      <AvalancheRushGame />
     </div>
   );
 };
