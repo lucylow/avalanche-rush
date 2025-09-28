@@ -176,14 +176,14 @@ const StoryGameIntegration: React.FC<StoryGameIntegrationProps> = ({
 
   useEffect(() => {
     // Achievement unlocks
-    if (playerProfile?.achievements) {
+    if (playerProfile?.achievements && playerProfile.achievements.length > 0) {
       const newAchievements = playerProfile.achievements.filter(
-        achievement => !recentEvents.some(e => 
-          e.type === 'achievement' && e.data.achievement === achievement
+        (achievement: string) => !recentEvents.some(e => 
+          e.type === 'achievement' && (e.data as { achievement: string }).achievement === achievement
         )
       );
       
-      newAchievements.forEach(achievement => {
+      newAchievements.forEach((achievement: string) => {
         handleGameEvent('achievement', { achievement });
       });
     }
@@ -216,15 +216,15 @@ const StoryGameIntegration: React.FC<StoryGameIntegrationProps> = ({
         
       case 'level_complete':
         dialogueType = 'levelUp';
-        if (event.data.level % 5 === 0) {
+        if ((event.data as { level: number }).level % 5 === 0) {
           // Major milestone - trigger special dialogue
-          setContextualNarration(`Congratulations on reaching level ${event.data.level}! Your character is impressed by your progress.`);
+          setContextualNarration(`Congratulations on reaching level ${(event.data as { level: number }).level}! Your character is impressed by your progress.`);
         }
         break;
         
       case 'achievement':
         dialogueType = 'achievement';
-        setContextualNarration(`Your character celebrates your achievement: ${event.data.achievement}`);
+        setContextualNarration(`Your character celebrates your achievement: ${(event.data as { achievement: string }).achievement}`);
         break;
         
       case 'high_score':

@@ -13,8 +13,8 @@ interface CrossmintConfig {
 interface CrossmintCharacter {
   id: string;
   name: string;
-  rarity: string;
-  type: string;
+  rarity: 'Common' | 'Rare' | 'Epic' | 'Legendary' | 'Mythic';
+  type: 'Warrior' | 'Mage' | 'Ranger' | 'Tank' | 'Support' | 'Assassin';
   imageUrl: string;
   description: string;
   attributes: Record<string, number>;
@@ -94,7 +94,8 @@ export const useCrossmint = () => {
         skills: ['Ice Slash', 'Avalanche Strike', 'Frost Shield'],
         specialAbilities: ['Ice Resistance', 'Cold Weather Mastery'],
         questBonus: 15,
-        tournamentBonus: 10
+        tournamentBonus: 10,
+        unlockRequirements: [{ type: 'level', value: 1 }]
       },
       {
         id: 'rush-mage',
@@ -114,7 +115,8 @@ export const useCrossmint = () => {
         skills: ['Lightning Bolt', 'Rush Storm', 'Energy Shield'],
         specialAbilities: ['Energy Manipulation', 'Fast Casting'],
         questBonus: 25,
-        tournamentBonus: 20
+        tournamentBonus: 20,
+        unlockRequirements: [{ type: 'level', value: 5 }]
       },
       {
         id: 'reactive-ranger',
@@ -134,7 +136,8 @@ export const useCrossmint = () => {
         skills: ['Precision Shot', 'Reactive Arrow', 'Nature\'s Blessing'],
         specialAbilities: ['Network Synergy', 'Environmental Awareness'],
         questBonus: 20,
-        tournamentBonus: 15
+        tournamentBonus: 15,
+        unlockRequirements: [{ type: 'level', value: 3 }]
       }
     ];
   };
