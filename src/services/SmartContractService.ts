@@ -1,4 +1,4 @@
-import { ethers, Contract, BigNumber, formatEther, parseEther } from 'ethers';
+import { ethers, Contract, formatEther, parseEther } from 'ethers';
 
 // Contract ABIs with full functionality
 export const AVALANCHE_RUSH_CORE_ABI = [
@@ -552,11 +552,11 @@ export class SmartContractService {
   }
 
   // Utility functions
-  public formatEther(value: BigNumber): string {
+  public formatEther(value: bigint): string {
     return formatEther(value);
   }
 
-  public parseEther(value: string): BigNumber {
+  public parseEther(value: string): bigint {
     return parseEther(value);
   }
 
@@ -576,7 +576,7 @@ export class SmartContractService {
     
     const network = await this.provider.getNetwork();
     return {
-      chainId: network.chainId,
+      chainId: Number(network.chainId),
       name: network.name
     };
   }

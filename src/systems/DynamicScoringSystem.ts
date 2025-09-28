@@ -218,11 +218,11 @@ export class DynamicScoringSystem {
   private updateStyleScore(type: ScoreEvent['type'], value: number, additionalData?: Record<string, unknown>): void {
     if (type === 'style' && additionalData?.styleType) {
       const styleScore: StyleScore = {
-        type: additionalData.styleType,
+        type: additionalData.styleType as "dodge" | "flip" | "jump" | "slide" | "trick",
         basePoints: value,
-        difficulty: additionalData.difficulty || 1,
-        multiplier: this.getStyleMultiplier(additionalData.styleType),
-        bonus: this.calculateStyleBonus(additionalData.styleType, additionalData.difficulty)
+        difficulty: (additionalData.difficulty as number) || 1,
+        multiplier: this.getStyleMultiplier(additionalData.styleType as "dodge" | "flip" | "jump" | "slide" | "trick"),
+        bonus: this.calculateStyleBonus(additionalData.styleType as "dodge" | "flip" | "jump" | "slide" | "trick", additionalData.difficulty as number)
       };
 
       this.styleScores.push(styleScore);

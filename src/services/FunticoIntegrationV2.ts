@@ -94,7 +94,7 @@ interface RealTimeMetrics {
 
 export class FunticoIntegrationV2 {
   private sdk: FunticoSDKV2;
-  private provider: ethers.providers.Provider;
+  private provider: ethers.Provider;
   private analytics: Map<string, any> = new Map();
   private tournaments: Map<string, any> = new Map();
   private matchmaking: Map<string, any> = new Map();
@@ -104,7 +104,7 @@ export class FunticoIntegrationV2 {
     gameId: string;
     analyticsEnabled?: boolean;
     crossChainSupport?: boolean;
-    provider: ethers.providers.Provider;
+    provider: ethers.Provider;
   }) {
     this.sdk = {
       gameId: config.gameId,

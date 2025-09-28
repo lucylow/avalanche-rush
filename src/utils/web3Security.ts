@@ -28,16 +28,16 @@ export class Web3Security {
 
   // Validate transaction before sending
   static validateTransaction(tx: {
-    to?: string;
-    value?: string | number;
+    to?: string | ethers.AddressLike;
+    value?: string | number | bigint;
     data?: string;
-    gasLimit?: string | number;
-    gasPrice?: string | number;
+    gasLimit?: string | number | bigint;
+    gasPrice?: string | number | bigint;
   }): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
 
     // Validate recipient address
-    if (tx.to && !this.isValidAddress(tx.to)) {
+    if (tx.to && !this.isValidAddress(tx.to.toString())) {
       errors.push('Invalid recipient address');
     }
 

@@ -241,47 +241,47 @@ export class EnhancedLevelSystem {
     return {
       speed: {
         branches: [
-          { level: 1, name: 'Quick Feet', description: '+5% movement speed', cost: 1, bonus: { type: 'multiplier', value: 0.05 } },
-          { level: 5, name: 'Lightning Reflexes', description: '+10% movement speed', cost: 2, bonus: { type: 'multiplier', value: 0.10 } },
-          { level: 10, name: 'Speed Demon', description: '+15% movement speed', cost: 3, bonus: { type: 'multiplier', value: 0.15 } },
-          { level: 20, name: 'Velocity Master', description: '+25% movement speed', cost: 5, bonus: { type: 'multiplier', value: 0.25 } },
-          { level: 30, name: 'Sonic Boom', description: '+35% movement speed', cost: 7, bonus: { type: 'multiplier', value: 0.35 } }
+          { level: 1, name: 'Quick Feet', description: '+5% movement speed', cost: 1, bonus: { type: 'multiplier', value: 0.05, description: '+5% movement speed' } },
+          { level: 5, name: 'Lightning Reflexes', description: '+10% movement speed', cost: 2, bonus: { type: 'multiplier', value: 0.10, description: '+10% movement speed' } },
+          { level: 10, name: 'Speed Demon', description: '+15% movement speed', cost: 3, bonus: { type: 'multiplier', value: 0.15, description: '+15% movement speed' } },
+          { level: 20, name: 'Velocity Master', description: '+25% movement speed', cost: 5, bonus: { type: 'multiplier', value: 0.25, description: '+25% movement speed' } },
+          { level: 30, name: 'Sonic Boom', description: '+35% movement speed', cost: 7, bonus: { type: 'multiplier', value: 0.35, description: '+35% movement speed' } }
         ]
       },
       accuracy: {
         branches: [
-          { level: 1, name: 'Steady Hands', description: '+5% accuracy', cost: 1, bonus: { type: 'multiplier', value: 0.05 } },
-          { level: 5, name: 'Precision Aim', description: '+10% accuracy', cost: 2, bonus: { type: 'multiplier', value: 0.10 } },
-          { level: 10, name: 'Bullseye', description: '+15% accuracy', cost: 3, bonus: { type: 'multiplier', value: 0.15 } },
-          { level: 20, name: 'Perfect Shot', description: '+25% accuracy', cost: 5, bonus: { type: 'multiplier', value: 0.25 } },
-          { level: 30, name: 'Sniper Mode', description: '+35% accuracy', cost: 7, bonus: { type: 'multiplier', value: 0.35 } }
+          { level: 1, name: 'Steady Hands', description: '+5% accuracy', cost: 1, bonus: { type: 'multiplier', value: 0.05, description: '+5% accuracy' } },
+          { level: 5, name: 'Precision Aim', description: '+10% accuracy', cost: 2, bonus: { type: 'multiplier', value: 0.10, description: '+10% accuracy' } },
+          { level: 10, name: 'Bullseye', description: '+15% accuracy', cost: 3, bonus: { type: 'multiplier', value: 0.15, description: '+15% accuracy' } },
+          { level: 20, name: 'Perfect Shot', description: '+25% accuracy', cost: 5, bonus: { type: 'multiplier', value: 0.25, description: '+25% accuracy' } },
+          { level: 30, name: 'Sniper Mode', description: '+35% accuracy', cost: 7, bonus: { type: 'multiplier', value: 0.35, description: '+35% accuracy' } }
         ]
       },
       endurance: {
         branches: [
-          { level: 1, name: 'Stamina Boost', description: '+5% endurance', cost: 1, bonus: { type: 'multiplier', value: 0.05 } },
-          { level: 5, name: 'Iron Will', description: '+10% endurance', cost: 2, bonus: { type: 'multiplier', value: 0.10 } },
-          { level: 10, name: 'Unstoppable', description: '+15% endurance', cost: 3, bonus: { type: 'multiplier', value: 0.15 } },
-          { level: 20, name: 'Titan Mode', description: '+25% endurance', cost: 5, bonus: { type: 'multiplier', value: 0.25 } },
-          { level: 30, name: 'Immortal', description: '+35% endurance', cost: 7, bonus: { type: 'multiplier', value: 0.35 } }
+          { level: 1, name: 'Stamina Boost', description: '+5% endurance', cost: 1, bonus: { type: 'multiplier', value: 0.05, description: '+5% endurance' } },
+          { level: 5, name: 'Iron Will', description: '+10% endurance', cost: 2, bonus: { type: 'multiplier', value: 0.10, description: '+10% endurance' } },
+          { level: 10, name: 'Unstoppable', description: '+15% endurance', cost: 3, bonus: { type: 'multiplier', value: 0.15, description: '+15% endurance' } },
+          { level: 20, name: 'Titan Mode', description: '+25% endurance', cost: 5, bonus: { type: 'multiplier', value: 0.25, description: '+25% endurance' } },
+          { level: 30, name: 'Immortal', description: '+35% endurance', cost: 7, bonus: { type: 'multiplier', value: 0.35, description: '+35% endurance' } }
         ]
       },
       luck: {
         branches: [
-          { level: 1, name: 'Lucky Break', description: '+5% luck', cost: 1, bonus: { type: 'multiplier', value: 0.05 } },
-          { level: 5, name: 'Fortune Favors', description: '+10% luck', cost: 2, bonus: { type: 'multiplier', value: 0.10 } },
-          { level: 10, name: 'Lucky Charm', description: '+15% luck', cost: 3, bonus: { type: 'multiplier', value: 0.15 } },
-          { level: 20, name: 'Jackpot', description: '+25% luck', cost: 5, bonus: { type: 'multiplier', value: 0.25 } },
-          { level: 30, name: 'Miracle', description: '+35% luck', cost: 7, bonus: { type: 'multiplier', value: 0.35 } }
+          { level: 1, name: 'Lucky Break', description: '+5% luck', cost: 1, bonus: { type: 'multiplier', value: 0.05, description: '+5% luck' } },
+          { level: 5, name: 'Fortune Favors', description: '+10% luck', cost: 2, bonus: { type: 'multiplier', value: 0.10, description: '+10% luck' } },
+          { level: 10, name: 'Lucky Charm', description: '+15% luck', cost: 3, bonus: { type: 'multiplier', value: 0.15, description: '+15% luck' } },
+          { level: 20, name: 'Jackpot', description: '+25% luck', cost: 5, bonus: { type: 'multiplier', value: 0.25, description: '+25% luck' } },
+          { level: 30, name: 'Miracle', description: '+35% luck', cost: 7, bonus: { type: 'multiplier', value: 0.35, description: '+35% luck' } }
         ]
       },
       strategy: {
         branches: [
-          { level: 1, name: 'Tactical Mind', description: '+5% strategy', cost: 1, bonus: { type: 'multiplier', value: 0.05 } },
-          { level: 5, name: 'Strategic Planning', description: '+10% strategy', cost: 2, bonus: { type: 'multiplier', value: 0.10 } },
-          { level: 10, name: 'Master Planner', description: '+15% strategy', cost: 3, bonus: { type: 'multiplier', value: 0.15 } },
-          { level: 20, name: 'Grand Strategist', description: '+25% strategy', cost: 5, bonus: { type: 'multiplier', value: 0.25 } },
-          { level: 30, name: 'Genius', description: '+35% strategy', cost: 7, bonus: { type: 'multiplier', value: 0.35 } }
+          { level: 1, name: 'Tactical Mind', description: '+5% strategy', cost: 1, bonus: { type: 'multiplier', value: 0.05, description: '+5% strategy' } },
+          { level: 5, name: 'Strategic Planning', description: '+10% strategy', cost: 2, bonus: { type: 'multiplier', value: 0.10, description: '+10% strategy' } },
+          { level: 10, name: 'Master Planner', description: '+15% strategy', cost: 3, bonus: { type: 'multiplier', value: 0.15, description: '+15% strategy' } },
+          { level: 20, name: 'Grand Strategist', description: '+25% strategy', cost: 5, bonus: { type: 'multiplier', value: 0.25, description: '+25% strategy' } },
+          { level: 30, name: 'Genius', description: '+35% strategy', cost: 7, bonus: { type: 'multiplier', value: 0.35, description: '+35% strategy' } }
         ]
       }
     };
@@ -371,7 +371,7 @@ export class EnhancedLevelSystem {
     switch (rank) {
       case 'Grandmaster':
         rewards.push({ type: 'RUSH', amount: 50000, rarity: 'Legendary', claimed: false });
-        rewards.push({ type: 'NFT', amount: 1, rarity: 'Mythic', claimed: false });
+        rewards.push({ type: 'NFT', amount: 1, rarity: 'Legendary', claimed: false });
         break;
       case 'Master':
         rewards.push({ type: 'RUSH', amount: 25000, rarity: 'Epic', claimed: false });
