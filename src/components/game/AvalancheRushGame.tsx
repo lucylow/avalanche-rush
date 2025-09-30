@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense, useRef } from 'react';
 import EnhancedWalletConnector from './EnhancedWalletConnector';
 import RewardPsychologyEngine from './RewardPsychologyEngine';
 import ReactiveNetworkDashboard from '../reactive/ReactiveNetworkDashboard';
@@ -7,6 +7,7 @@ import QuestDashboard from '../quest/QuestDashboard';
 import LeaderboardSystem from './LeaderboardSystem';
 import NFTMarketplace from './NFTMarketplace';
 import TutorialManager from '../tutorial/TutorialManager';
+import EnhancedGameEngine, { GameEngineRef } from './EnhancedGameEngine';
 import { useSmartContracts } from '../../hooks/useSmartContracts';
 import { BookOpen, Play } from 'lucide-react';
 
@@ -85,6 +86,7 @@ const AvalancheRushGame: React.FC<AvalancheRushGameProps> = ({ demoMode = false 
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showGameModeSelector, setShowGameModeSelector] = useState(false);
+  const gameEngineRef = useRef<GameEngineRef>(null);
   const [showQuestSystem, setShowQuestSystem] = useState(false);
   const [showQuestDashboard, setShowQuestDashboard] = useState(false);
   const [showLeaderboardSystem, setShowLeaderboardSystem] = useState(false);
@@ -185,6 +187,11 @@ const AvalancheRushGame: React.FC<AvalancheRushGameProps> = ({ demoMode = false 
 
       setShowGameModeSelector(false);
       setNotifications(prev => [...prev, `🎮 Started ${mode} game!`]);
+      
+      // Start the game engine
+      setTimeout(() => {
+        gameEngineRef.current?.startGame();
+      }, 100);
     } catch (error) {
       console.error('Error starting game:', error);
       setNotifications(prev => [...prev, 'Failed to start game session']);
@@ -314,39 +321,52 @@ const AvalancheRushGame: React.FC<AvalancheRushGameProps> = ({ demoMode = false 
           {/* Game Canvas */}
           {gameState.isPlaying && (
             <div className="mb-8">
-              <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 border border-white/10">
-                <div className="text-center mb-4">
-                  <h3 className="text-2xl font-bold text-white mb-2">Avalanche Rush Game</h3>
-                  <div className="flex items-center justify-center space-x-6 text-white">
-                    <div>Score: <span className="font-bold text-green-400">{gameState.score}</span></div>
-                    <div>Level: <span className="font-bold text-blue-400">{gameState.currentLevel}</span></div>
-                    <div>Lives: <span className="font-bold text-red-400">{gameState.lives}</span></div>
-                  </div>
-                </div>
-                
-                <div className="bg-black rounded-lg p-4 text-center">
-                  <div className="text-white text-lg mb-4">
-                    🏃‍♂️ Game Running... Press SPACE to jump!
-                  </div>
-                  <div className="text-white/70 text-sm">
-                    Score increases automatically. Complete quests to earn bonus points!
-                  </div>
-                </div>
-                
-                <div className="flex justify-center space-x-4 mt-4">
-                  <button
-                    onClick={() => setGameState(prev => ({ ...prev, isPaused: !prev.isPaused }))}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg"
-                  >
-                    {gameState.isPaused ? 'Resume' : 'Pause'}
-                  </button>
-                  <button
-                    onClick={() => endGame(gameState.score)}
-                    className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg"
-                  >
-                    End Game
-                  </button>
-                </div>
+              <EnhancedGameEngine
+                ref={gameEngineRef}
+                gameState={{
+                  isPlaying: gameState.isPlaying,
+                  isPaused: gameState.isPaused,
+                  score: gameState.score,
+                  level: gameState.currentLevel,
+                  lives: gameState.lives,
+                  speed: 1 + (gameState.currentLevel * 0.1),
+                  difficulty: gameState.difficulty,
+                  mode: gameState.gameMode,
+                  achievements: gameState.achievements,
+                  skillPoints: gameState.skillPoints
+                }}
+                onScoreUpdate={(score) => setGameState(prev => ({ ...prev, score }))}
+                onGameEnd={(score) => endGame(score)}
+                onLevelComplete={(level) => {
+                  setGameState(prev => ({ ...prev, currentLevel: level }));
+                  setNotifications(prev => [...prev, `🎉 Level ${level} complete!`]);
+                }}
+                isPaused={gameState.isPaused}
+              />
+              
+              <div className="flex justify-center space-x-4 mt-4">
+                <button
+                  onClick={() => {
+                    setGameState(prev => ({ ...prev, isPaused: !prev.isPaused }));
+                    if (gameState.isPaused) {
+                      gameEngineRef.current?.resumeGame();
+                    } else {
+                      gameEngineRef.current?.pauseGame();
+                    }
+                  }}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-lg transition-all"
+                >
+                  {gameState.isPaused ? 'Resume' : 'Pause'}
+                </button>
+                <button
+                  onClick={() => {
+                    gameEngineRef.current?.endGame();
+                    endGame(gameState.score);
+                  }}
+                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg transition-all"
+                >
+                  End Game
+                </button>
               </div>
             </div>
           )}
