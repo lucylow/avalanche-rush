@@ -19,10 +19,11 @@ const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const LearnWeb3Page = lazy(() => import("./pages/LearnWeb3Page"));
 const ReactiveQuestPage = lazy(() => import("./pages/ReactiveQuestPage"));
 
-// Enhanced features - lazy loaded
-const CareerPathSystem = lazy(() => import("./components/career/CareerPathSystem"));
-const AnalyticsDashboard = lazy(() => import("./components/analytics/AnalyticsDashboard"));
-const CommunityDashboard = lazy(() => import("./components/community/CommunityDashboard"));
+      // Enhanced features - lazy loaded
+      const CareerPathSystem = lazy(() => import("./components/career/CareerPathSystem"));
+      const AnalyticsDashboard = lazy(() => import("./components/analytics/AnalyticsDashboard"));
+      const ReactiveAnalyticsDashboard = lazy(() => import("./components/analytics/ReactiveAnalyticsDashboard"));
+      const CommunityDashboard = lazy(() => import("./components/community/CommunityDashboard"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -65,8 +66,9 @@ const App = () => (
                 {/* Enhanced Features Routes */}
                 <Route path="/career" element={<MobileResponsiveWrapper><CareerPathSystem /></MobileResponsiveWrapper>} />
                 <Route path="/career-paths" element={<MobileResponsiveWrapper><CareerPathSystem /></MobileResponsiveWrapper>} />
-                <Route path="/analytics" element={<MobileResponsiveWrapper><AnalyticsDashboard /></MobileResponsiveWrapper>} />
-                <Route path="/dashboard" element={<MobileResponsiveWrapper><AnalyticsDashboard /></MobileResponsiveWrapper>} />
+        <Route path="/analytics" element={<MobileResponsiveWrapper><AnalyticsDashboard /></MobileResponsiveWrapper>} />
+        <Route path="/reactive-analytics" element={<MobileResponsiveWrapper><ReactiveAnalyticsDashboard /></MobileResponsiveWrapper>} />
+        <Route path="/dashboard" element={<MobileResponsiveWrapper><AnalyticsDashboard /></MobileResponsiveWrapper>} />
                 <Route path="/community" element={<MobileResponsiveWrapper><CommunityDashboard /></MobileResponsiveWrapper>} />
                 <Route path="/governance" element={<MobileResponsiveWrapper><CommunityDashboard /></MobileResponsiveWrapper>} />
                 
