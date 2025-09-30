@@ -514,7 +514,7 @@ export const CommunityDashboard: React.FC = () => {
                       <div>
                         <CardTitle className="text-white">{challenge.title}</CardTitle>
                         <p className="text-gray-400 text-sm">
-                          Created by {challenge.creator} • {formatTimeAgo(challenge.createdAt)}
+                          Created by {challenge.creator}
                         </p>
                       </div>
                       <Badge className={`${getStatusColor(challenge.status)} text-white`}>

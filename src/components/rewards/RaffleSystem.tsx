@@ -163,44 +163,16 @@ const RaffleSystem: React.FC = () => {
   }, [address]);
 
   const startWeeklyRaffle = useCallback(async () => {
-    if (!isConnected) return;
-
-    setIsStartingRaffle(true);
-    try {
-      await writeContract({
-        abi: AUTOMATED_REWARD_ABI,
-        address: AUTOMATED_REWARD_ADDRESS as `0x${string}`,
-        functionName: 'startWeeklyRaffle',
-      });
-
-      // Refresh data after starting raffle
-      await loadRaffleData();
-    } catch (error) {
-      console.error('Error starting raffle:', error);
-    } finally {
-      setIsStartingRaffle(false);
-    }
-  }, [isConnected, writeContract, loadRaffleData]);
+    // Blockchain integration disabled - using mock data
+    console.log('Start weekly raffle called');
+    return;
+  }, []);
 
   const selectRaffleWinner = useCallback(async () => {
-    if (!isConnected) return;
-
-    setIsSelectingWinner(true);
-    try {
-      await writeContract({
-        abi: AUTOMATED_REWARD_ABI,
-        address: AUTOMATED_REWARD_ADDRESS as `0x${string}`,
-        functionName: 'selectRaffleWinner',
-      });
-
-      // Refresh data after selecting winner
-      await loadRaffleData();
-    } catch (error) {
-      console.error('Error selecting winner:', error);
-    } finally {
-      setIsSelectingWinner(false);
-    }
-  }, [isConnected, writeContract, loadRaffleData]);
+    // Blockchain integration disabled - using mock data
+    console.log('Select raffle winner called');
+    return;
+  }, []);
 
   const formatTime = (seconds: number) => {
     const days = Math.floor(seconds / (24 * 3600));

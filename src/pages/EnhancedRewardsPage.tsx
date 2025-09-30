@@ -18,6 +18,7 @@ import {
   Ticket,
   Layers,
   Activity,
+  CheckCircle,
   Shield,
   Sword,
   Gem,

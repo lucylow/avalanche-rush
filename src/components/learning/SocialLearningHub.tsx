@@ -25,7 +25,8 @@ import {
   Filter,
   Crown,
   Flame,
-  Coins
+  Coins,
+  Lock
 } from 'lucide-react';
 
 interface StudyGroup {

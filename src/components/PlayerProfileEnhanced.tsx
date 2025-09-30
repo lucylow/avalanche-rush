@@ -49,7 +49,7 @@ const PlayerProfile: React.FC<PlayerProfileProps> = ({
   
   const stats = playerStats ? {
     totalScore: playerData?.totalScore || 0,
-    bestScore: Math.max(...(mockData.gameSessions?.map(s => s.finalScore) || [0])),
+    bestScore: playerData?.highScore || 0,
     gamesPlayed: playerData?.totalGamesPlayed || 0,
     winRate: 68, // Mock calculation
     currentStreak: playerData?.currentStreak || 0,

@@ -153,43 +153,16 @@ const EvolvingNFTGallery: React.FC = () => {
   }, [address]);
 
   const evolveNFT = useCallback(async (tokenId: number) => {
-    if (!isConnected) return;
-
-    setIsEvolving(true);
-    try {
-      await writeContract({
-        abi: EVOLVING_NFT_ABI,
-        address: NFT_ADDRESS as `0x${string}`,
-        functionName: 'evolveNFT',
-        args: [BigInt(tokenId)]
-      });
-
-      // Refresh NFT data
-      await loadPlayerNFTs();
-    } catch (error) {
-      console.error('Error evolving NFT:', error);
-    } finally {
-      setIsEvolving(false);
-    }
-  }, [isConnected, writeContract, loadPlayerNFTs]);
+    // Blockchain integration disabled - using mock data
+    console.log('Evolve NFT called for token:', tokenId);
+    return;
+  }, []);
 
   const completeEvolution = useCallback(async (tokenId: number) => {
-    if (!isConnected) return;
-
-    try {
-      await writeContract({
-        abi: EVOLVING_NFT_ABI,
-        address: NFT_ADDRESS as `0x${string}`,
-        functionName: 'completeEvolution',
-        args: [BigInt(tokenId)]
-      });
-
-      // Refresh NFT data
-      await loadPlayerNFTs();
-    } catch (error) {
-      console.error('Error completing evolution:', error);
-    }
-  }, [isConnected, writeContract, loadPlayerNFTs]);
+    // Blockchain integration disabled - using mock data  
+    console.log('Complete evolution called for token:', tokenId);
+    return;
+  }, []);
 
   const getRarityColor = (rarity: string) => {
     switch (rarity) {

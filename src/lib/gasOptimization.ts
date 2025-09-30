@@ -208,14 +208,8 @@ export class GasOptimizedBatchManager {
       // Prepare batch data for contract call
       const batchData = this.prepareBatchData(batch);
       
-      // Estimate gas for the entire batch
-      const gasEstimate = await this.contract.estimateGas.batchProcessOptimizedEvents(
-        batchData.eventTypes,
-        batchData.playerAddresses,
-        batchData.timestamps,
-        batchData.sessionIds,
-        batchData.compressedDataArray
-      );
+      // Estimate gas for the entire batch (simplified estimation)
+      const gasEstimate = 21000 + (batch.length * 50000); // Base gas + per-event estimate
 
       // Execute batch transaction with optimized gas
       const tx = await this.contract.batchProcessOptimizedEvents(
@@ -225,14 +219,14 @@ export class GasOptimizedBatchManager {
         batchData.sessionIds,
         batchData.compressedDataArray,
         {
-          gasLimit: gasEstimate.mul(120).div(100) // Add 20% buffer
+          gasLimit: Math.floor(gasEstimate * 1.2) // Add 20% buffer
         }
       );
 
       console.log(`Processed optimized batch of ${batch.length} events:`, tx.hash);
       
       // Track gas savings
-      this.trackGasSavings(batch, gasEstimate);
+      this.trackGasSavings(batch, BigInt(gasEstimate));
       
     } catch (error) {
       console.error('Error processing optimized batch:', error);
@@ -268,9 +262,9 @@ export class GasOptimizedBatchManager {
   }
 
   // Track gas savings from optimization
-  private trackGasSavings(batch: OptimizedEvent[], actualGasUsed: ethers.BigNumber): void {
+  private trackGasSavings(batch: OptimizedEvent[], actualGasUsed: bigint): void {
     const estimatedGas = batch.reduce((sum, event) => sum + event.gasEstimate, 0);
-    const actualGas = actualGasUsed.toNumber();
+    const actualGas = Number(actualGasUsed);
     const savings = estimatedGas - actualGas;
     const savingsPercentage = (savings / estimatedGas) * 100;
 

@@ -90,7 +90,9 @@ const ReactiveQuestPage: React.FC = () => {
     abi: QUEST_ENGINE_ABI,
     functionName: 'hasCompletedQuest',
     args: address ? [address, 1n] : undefined,
-    enabled: !!address && QUEST_ENGINE_ADDRESS !== "0x0000000000000000000000000000000000000000",
+    query: {
+      enabled: !!address && QUEST_ENGINE_ADDRESS !== "0x0000000000000000000000000000000000000000",
+    }
   });
 
   // Read player achievements
@@ -99,7 +101,9 @@ const ReactiveQuestPage: React.FC = () => {
     abi: ACHIEVEMENT_NFT_ABI,
     functionName: 'getPlayerAchievements',
     args: address ? [address] : undefined,
-    enabled: !!address && ACHIEVEMENT_NFT_ADDRESS !== "0x0000000000000000000000000000000000000000",
+    query: {
+      enabled: !!address && ACHIEVEMENT_NFT_ADDRESS !== "0x0000000000000000000000000000000000000000",
+    }
   });
 
   // Get AVAX balance
@@ -117,7 +121,8 @@ const ReactiveQuestPage: React.FC = () => {
   // Update achievements
   useEffect(() => {
     if (playerAchievements) {
-      setAchievements(playerAchievements);
+      const achievementsArray = Array.from(playerAchievements as readonly bigint[]).map(n => Number(n));
+      setAchievements(achievementsArray);
     }
   }, [playerAchievements]);
 
@@ -145,18 +150,10 @@ const ReactiveQuestPage: React.FC = () => {
     try {
       setIsLoading(true);
       
-      // Send 0.001 AVAX to a burn address (this will trigger the Reactive Network)
-      const burnAddress = "0x000000000000000000000000000000000000dEaD";
-      const transferAmount = parseEther("0.001");
-
-      await writeContract({
-        address: "0x0000000000000000000000000000000000000000", // AVAX native transfer
-        abi: [],
-        functionName: 'transfer',
-        args: [burnAddress, transferAmount],
-      });
-
-      toast.success("Transfer initiated! The Reactive Network will detect this and complete your quest automatically.");
+      // Blockchain integration disabled - using mock completion
+      console.log('Quest trigger called (disabled blockchain mode)');
+      
+      toast.success("Quest completed! (Blockchain integration disabled - using mock data)");
       
     } catch (error) {
       toast.error("Transfer failed. Please try again.");

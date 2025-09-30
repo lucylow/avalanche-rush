@@ -199,7 +199,7 @@ const ProceduralContentGenerator: React.FC<ProceduralContentGeneratorProps> = ({
       rewards.push({
         type: 'xp',
         amount: getRewardAmount('xp', difficulty, rarity),
-        rarity,
+        rarity: rarity as 'common' | 'rare' | 'epic' | 'legendary',
         description: `${getRewardAmount('xp', difficulty, rarity)} Experience Points`,
         isClaimed: false
       });
@@ -209,7 +209,7 @@ const ProceduralContentGenerator: React.FC<ProceduralContentGeneratorProps> = ({
       rewards.push({
         type: 'token',
         amount: getRewardAmount('token', difficulty, rarity),
-        rarity,
+        rarity: rarity as 'common' | 'rare' | 'epic' | 'legendary',
         description: `${getRewardAmount('token', difficulty, rarity)} RUSH Tokens`,
         isClaimed: false
       });
@@ -219,7 +219,7 @@ const ProceduralContentGenerator: React.FC<ProceduralContentGeneratorProps> = ({
       rewards.push({
         type: 'evolution',
         amount: 1,
-        rarity,
+        rarity: rarity as 'common' | 'rare' | 'epic' | 'legendary',
         description: 'NFT Evolution Stage',
         isClaimed: false
       });
