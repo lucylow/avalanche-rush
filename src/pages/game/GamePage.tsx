@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AvalancheRushGame from '../../components/game/AvalancheRushGame';
-import GameEngine from '../../components/game/GameEngine';
+import SimpleGameEngine from '../../components/game/SimpleGameEngine';
 import { useSmartContracts } from '../../hooks/useSmartContracts';
 
 const GamePage: React.FC = () => {
@@ -85,7 +85,7 @@ const GamePage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {showGameEngine ? (
-        <GameEngine 
+        <SimpleGameEngine 
           gameState={{
             isPlaying: true,
             isPaused: false,

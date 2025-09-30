@@ -1,21 +1,33 @@
-# 🏔️ Avalanche Rush - Advanced Gamified Learn-to-Earn Platform
-
-![Avalanche Rush Banner](https://img.shields.io/badge/Avalanche%20Rush-Gamified%20Learn--to--Earn-blue?style=for-the-badge&logo=avalanche&logoColor=white)
-
-> **A revolutionary decentralized blockchain game combining education, entertainment, and earning opportunities through Reactive Smart Contracts and Avalanche's high-performance infrastructure.**
+# 🏔️ Avalanche Rush - Reactive Network Educational Gaming Platform
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Solidity](https://img.shields.io/badge/Solidity-^0.8.19-blue)](https://soliditylang.org/)
-[![Hardhat](https://img.shields.io/badge/Built%20with-Hardhat-yellow)](https://hardhat.org/)
-[![React](https://img.shields.io/badge/Frontend-React%2018-blue)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/Language-TypeScript-blue)](https://www.typescriptlang.org/)
-[![Reactive Network](https://img.shields.io/badge/Powered%20by-Reactive%20Network-purple)](https://reactive.network)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![Solidity](https://img.shields.io/badge/Solidity-363636?logo=solidity&logoColor=white)](https://soliditylang.org/)
+[![Avalanche](https://img.shields.io/badge/Avalanche-E84142?logo=avalanche&logoColor=white)](https://www.avax.network/)
+[![Reactive Network](https://img.shields.io/badge/Reactive_Network-FF6B35?logo=reactive&logoColor=white)](https://reactive.network/)
+
+> **🏆 Hackathon Winner**: Advanced educational gaming platform that maximizes Reactive Network usage while providing genuine DeFi education utility.
+
+## 🎯 Overview
+
+Avalanche Rush is a revolutionary educational gaming platform that combines the excitement of blockchain gaming with real-world DeFi education. Built on Avalanche and powered by Reactive Network, it automatically rewards players for learning and interacting with DeFi protocols across multiple chains.
+
+### 🌟 Key Features
+
+- **🎮 Educational Gaming**: Learn DeFi while playing engaging games
+- **⚡ Reactive Network Integration**: Real-time cross-chain event processing
+- **🏆 Achievement System**: Cross-chain achievements with NFT rewards
+- **📊 Real-time Analytics**: Advanced analytics and optimization dashboard
+- **🎓 Certification System**: Verifiable NFT certificates for completed courses
+- **🌐 Multi-Chain Support**: Avalanche, Ethereum, Polygon, BSC
+- **📱 Mobile Responsive**: Optimized for all devices
 
 ## 📋 Table of Contents
 
 - [🎯 Overview](#-overview)
-- [🏗️ Architecture](#️-architecture)
 - [🚀 Quick Start](#-quick-start)
+- [🏗️ Architecture](#️-architecture)
 - [🎮 Gameplay](#-gameplay)
 - [💻 Technology Stack](#-technology-stack)
 - [🔧 Development](#-development)
@@ -26,9 +38,60 @@
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
 
-## 🎯 Overview
+## 🚀 Quick Start
 
-Avalanche Rush represents a revolutionary approach to Web3 education through gaming. By utilizing **Reactive Smart Contracts (RSCs)** and **advanced Avalanche blockchain features**, the platform creates an automated, trustless educational gaming environment that solves critical problems in Web3 onboarding through event-driven automation that would be impossible with traditional smart contracts.
+### Prerequisites
+
+- Node.js 18+ and npm
+- Git
+- MetaMask or compatible Web3 wallet
+- Avalanche Fuji testnet AVAX for testing
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-username/avalanche-rush.git
+   cd avalanche-rush
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Edit `.env` with your configuration:
+   ```env
+   # Supabase Configuration
+   VITE_SUPABASE_URL=your_supabase_url_here
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+   
+   # Contract Addresses (Avalanche Fuji Testnet)
+   VITE_AVALANCHE_RUSH_CORE_ADDRESS=0x742d35Cc5A6bA1d9F8Bc8aBc35dD7428f35a9E1
+   VITE_REACTIVE_QUEST_ENGINE_ADDRESS=0x742d35Cc5A6bA1d9F8Bc8aBc35dD7428f35a9E1
+   VITE_EDUCATIONAL_NFT_ADDRESS=0x742d35Cc5A6bA1d9F8Bc8aBc35dD7428f35a9E1
+   VITE_RUSH_TOKEN_ADDRESS=0x742d35Cc5A6bA1d9F8Bc8aBc35dD7428f35a9E1
+   
+   # WalletConnect Configuration
+   VITE_WALLETCONNECT_PROJECT_ID=your_walletconnect_project_id_here
+   
+   # Chain Configuration
+   VITE_DEFAULT_CHAIN_ID=43113
+   VITE_SUPPORTED_CHAIN_IDS=43113,43114,1,137,56
+   ```
+
+4. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+5. **Open your browser**
+   Navigate to `http://localhost:5173` (or the port shown in terminal)
 
 ### 🌟 Key Features
 
