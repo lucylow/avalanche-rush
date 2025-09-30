@@ -10,9 +10,9 @@ async function main() {
 
   // Chainlink VRF Configuration for Avalanche Fuji Testnet
   const VRF_COORDINATOR = "0x2eD832Ba664535e5886b75D64C46EB9a228C2610"; // Avalanche Fuji VRF Coordinator
-  const LINK_TOKEN = "0x0b9d5D9136855f6FEc3c0993feE6E9CE8a297846"; // LINK token on Avalanche Fuji
   const KEY_HASH = "0x354d2f95da55398f44b7cff77da56283d9c6c829a4bdf1bbcaf2ad6a4d081f62"; // Avalanche Fuji key hash
-  const FEE = hre.ethers.utils.parseEther("0.25"); // 0.25 LINK fee for Avalanche Fuji
+  const SUBSCRIPTION_ID = 1; // Replace with your VRF subscription ID
+  const CALLBACK_GAS_LIMIT = 500000; // Gas limit for VRF callback
 
   // Contract addresses
   const RUSH_TOKEN_ADDRESS = "0x0000000000000000000000000000000000000000"; // Deploy RUSH token first
@@ -48,9 +48,9 @@ async function main() {
     const AutomatedRewardSystem = await ethers.getContractFactory("AutomatedRewardSystem");
     const rewardSystem = await AutomatedRewardSystem.deploy(
       VRF_COORDINATOR,
-      LINK_TOKEN,
       KEY_HASH,
-      FEE,
+      SUBSCRIPTION_ID,
+      CALLBACK_GAS_LIMIT,
       rushTokenAddress,
       achievementNFTAddress
     );
@@ -90,26 +90,12 @@ async function main() {
     console.log("✅ Reward system funded with RUSH tokens");
 
     // Step 6: Fund reward system with LINK tokens for VRF
-    console.log("\n🔗 Funding reward system with LINK tokens...");
-    try {
-      // Try to get LINK token contract
-      const linkToken = await ethers.getContractAt("LinkTokenInterface", LINK_TOKEN);
-      const linkAmount = hre.ethers.utils.parseEther("10"); // 10 LINK tokens
-      
-      // Check if deployer has LINK tokens
-      const linkBalance = await linkToken.balanceOf(deployer.address);
-      if (linkBalance.gte(linkAmount)) {
-        const fundLinkTx = await linkToken.transfer(rewardSystemAddress, linkAmount);
-        await fundLinkTx.wait();
-        console.log("✅ Reward system funded with LINK tokens");
-      } else {
-        console.log("⚠️  Deployer doesn't have enough LINK tokens. Please fund manually.");
-        console.log(`   Required: ${hre.ethers.utils.formatEther(linkAmount)} LINK`);
-        console.log(`   Current balance: ${hre.ethers.utils.formatEther(linkBalance)} LINK`);
-      }
-    } catch (error) {
-      console.log("⚠️  Could not fund LINK tokens automatically. Please fund manually.");
-    }
+    console.log("\n🔗 VRF Subscription Setup...");
+    console.log("⚠️  Manual setup required:");
+    console.log(`   1. Create a VRF subscription at: https://vrf.chain.link/avalanche-fuji`);
+    console.log(`   2. Fund the subscription with LINK tokens`);
+    console.log(`   3. Add the reward system contract as a consumer: ${rewardSystemAddress}`);
+    console.log(`   4. Update the subscription ID in the contract if needed`);
 
     // Step 7: Initialize reward system
     console.log("\n🚀 Initializing reward system...");
@@ -173,9 +159,9 @@ async function main() {
       deployer: deployer.address,
       chainlinkVrf: {
         coordinator: VRF_COORDINATOR,
-        linkToken: LINK_TOKEN,
         keyHash: KEY_HASH,
-        fee: FEE.toString()
+        subscriptionId: SUBSCRIPTION_ID,
+        callbackGasLimit: CALLBACK_GAS_LIMIT
       },
       contracts: {
         RushToken: {
@@ -266,7 +252,7 @@ async function main() {
 
     console.log("\n⚠️  Important Notes:");
     console.log("- This deployment is on Avalanche Fuji testnet");
-    console.log("- Fund the reward system with LINK tokens for VRF");
+    console.log("- Set up VRF subscription manually for raffle functionality");
     console.log("- Test all features before mainnet deployment");
     console.log("- Set up proper metadata URIs for NFTs");
 

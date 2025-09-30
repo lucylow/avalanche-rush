@@ -6,20 +6,22 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBase.sol";
-import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
+import "@chainlink/contracts/src/v0.8/vrf/VRFConsumerBaseV2.sol";
+import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 
 /**
  * @title AutomatedRewardSystem - Advanced reward distribution with transparency and automation
  * @dev Integrates with Chainlink VRF for provably random raffle winners
  * @notice Provides transparent, automated reward distribution with evolving NFTs
  */
-contract AutomatedRewardSystem is Ownable, ReentrancyGuard, Pausable, VRFConsumerBase {
+contract AutomatedRewardSystem is Ownable, ReentrancyGuard, Pausable, VRFConsumerBaseV2 {
     
     // ============ CHAINLINK VRF VARIABLES ============
     
+    VRFCoordinatorV2Interface internal vrfCoordinator;
     bytes32 internal keyHash;
-    uint256 internal fee;
+    uint64 internal subscriptionId;
+    uint32 internal callbackGasLimit;
     
     // ============ REWARD STRUCTS ============
     
@@ -146,14 +148,16 @@ contract AutomatedRewardSystem is Ownable, ReentrancyGuard, Pausable, VRFConsume
     
     constructor(
         address _vrfCoordinator,
-        address _linkToken,
         bytes32 _keyHash,
-        uint256 _fee,
+        uint64 _subscriptionId,
+        uint32 _callbackGasLimit,
         address _rushToken,
         address _achievementNFT
-    ) VRFConsumerBase(_vrfCoordinator, _linkToken) {
+    ) VRFConsumerBaseV2() {
+        vrfCoordinator = VRFCoordinatorV2Interface(_vrfCoordinator);
         keyHash = _keyHash;
-        fee = _fee;
+        subscriptionId = _subscriptionId;
+        callbackGasLimit = _callbackGasLimit;
         rushTokenAddress = _rushToken;
         achievementNFTAddress = _achievementNFT;
         
@@ -281,13 +285,20 @@ contract AutomatedRewardSystem is Ownable, ReentrancyGuard, Pausable, VRFConsume
         require(rewardPool.totalRaffleTickets > 0, "No raffle entries");
         
         // Request random number from Chainlink VRF
-        requestRandomness(keyHash, fee);
+        vrfCoordinator.requestRandomWords(
+            keyHash,
+            subscriptionId,
+            3, // requestConfirmations
+            callbackGasLimit,
+            1 // numWords
+        );
     }
     
     /**
      * @dev Callback function for Chainlink VRF
      */
-    function fulfillRandomness(bytes32 requestId, uint256 randomness) internal override {
+    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords) internal override {
+        uint256 randomness = randomWords[0];
         uint256 winnerIndex = randomness % rewardPool.totalRaffleTickets;
         address winner = _selectWinnerByIndex(winnerIndex);
         

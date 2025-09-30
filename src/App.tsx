@@ -20,6 +20,7 @@ const LearnWeb3Page = lazy(() => import("./pages/LearnWeb3Page"));
 const ReactiveQuestPage = lazy(() => import("./pages/ReactiveQuestPage"));
 const InteractiveLearningPage = lazy(() => import("./pages/InteractiveLearningPage"));
 const EnhancedRewardsPage = lazy(() => import("./pages/EnhancedRewardsPage"));
+const MockDataDemo = lazy(() => import("./pages/MockDataDemo"));
 
       // Enhanced features - lazy loaded
       const CareerPathSystem = lazy(() => import("./components/career/CareerPathSystem"));
@@ -66,6 +67,8 @@ const App = () => (
                 <Route path="/reactive-quest" element={<MobileResponsiveWrapper><ReactiveQuestPage /></MobileResponsiveWrapper>} />
                 <Route path="/interactive-learning" element={<MobileResponsiveWrapper><InteractiveLearningPage /></MobileResponsiveWrapper>} />
                 <Route path="/enhanced-rewards" element={<MobileResponsiveWrapper><EnhancedRewardsPage /></MobileResponsiveWrapper>} />
+                <Route path="/mock-data" element={<MobileResponsiveWrapper><MockDataDemo /></MobileResponsiveWrapper>} />
+                <Route path="/demo" element={<MobileResponsiveWrapper><MockDataDemo /></MobileResponsiveWrapper>} />
                 
                 {/* Enhanced Features Routes */}
                 <Route path="/career" element={<MobileResponsiveWrapper><CareerPathSystem /></MobileResponsiveWrapper>} />
