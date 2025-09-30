@@ -162,18 +162,23 @@ const AvalancheRushGame: React.FC<AvalancheRushGameProps> = ({ demoMode = false 
 
   // Start game function
   const startGame = useCallback(async (mode: GameState['gameMode'], difficulty: GameState['difficulty']) => {
-    if (!effectiveIsConnected) {
-      setNotifications(prev => [...prev, 'Please connect your wallet to start playing']);
-      return;
-    }
-
     setIsLoading(true);
+    
     try {
-      // Start real game session on blockchain
-      const sessionId = await startGameSession(0, 1, 1);
+      let sessionId = Date.now(); // Use timestamp as fallback session ID
       
-      setCurrentSessionId(sessionId);
+      // Try to start blockchain session if wallet is connected
+      if (effectiveIsConnected) {
+        try {
+          sessionId = await startGameSession(0, 1, 1);
+          setCurrentSessionId(sessionId);
+        } catch (error) {
+          console.warn('Blockchain session failed, continuing with offline mode:', error);
+          // Continue anyway with fallback sessionId
+        }
+      }
 
+      // Start the game regardless of blockchain connection
       setGameState(prev => ({
         ...prev,
         isPlaying: true,
@@ -194,7 +199,25 @@ const AvalancheRushGame: React.FC<AvalancheRushGameProps> = ({ demoMode = false 
       }, 100);
     } catch (error) {
       console.error('Error starting game:', error);
-      setNotifications(prev => [...prev, 'Failed to start game session']);
+      setNotifications(prev => [...prev, 'Game started in offline mode']);
+      
+      // Force start the game even if there's an error
+      setGameState(prev => ({
+        ...prev,
+        isPlaying: true,
+        gameMode: mode,
+        difficulty: difficulty,
+        sessionId: Date.now(),
+        score: 0,
+        lives: 3,
+        energy: 100
+      }));
+      
+      setShowGameModeSelector(false);
+      
+      setTimeout(() => {
+        gameEngineRef.current?.startGame();
+      }, 100);
     } finally {
       setIsLoading(false);
     }
@@ -202,13 +225,19 @@ const AvalancheRushGame: React.FC<AvalancheRushGameProps> = ({ demoMode = false 
 
   // End game function
   const endGame = useCallback(async (finalScore: number) => {
-    if (!currentSessionId) return;
-
     setIsLoading(true);
+    
     try {
-      // Complete game session on blockchain
-      await completeGameSession(currentSessionId, finalScore, [], [], []);
+      // Try to complete game session on blockchain if connected and session exists
+      if (effectiveIsConnected && currentSessionId) {
+        try {
+          await completeGameSession(currentSessionId, finalScore, [], [], []);
+        } catch (error) {
+          console.warn('Blockchain completion failed, continuing anyway:', error);
+        }
+      }
       
+      // Update game state regardless of blockchain
       setGameState(prev => ({
         ...prev,
         isPlaying: false,
@@ -222,11 +251,23 @@ const AvalancheRushGame: React.FC<AvalancheRushGameProps> = ({ demoMode = false 
       setNotifications(prev => [...prev, `🏆 Game completed! Score: ${finalScore}`]);
     } catch (error) {
       console.error('Error ending game:', error);
-      setNotifications(prev => [...prev, 'Failed to complete game session']);
+      
+      // Force end the game even if there's an error
+      setGameState(prev => ({
+        ...prev,
+        isPlaying: false,
+        isPaused: false,
+        sessionId: null,
+        highScore: Math.max(prev.highScore, finalScore),
+        totalGamesPlayed: prev.totalGamesPlayed + 1
+      }));
+      
+      setCurrentSessionId(null);
+      setNotifications(prev => [...prev, `Game ended! Score: ${finalScore}`]);
     } finally {
       setIsLoading(false);
     }
-  }, [currentSessionId, completeGameSession]);
+  }, [currentSessionId, completeGameSession, effectiveIsConnected]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col relative overflow-hidden">
@@ -375,7 +416,7 @@ const AvalancheRushGame: React.FC<AvalancheRushGameProps> = ({ demoMode = false 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6">
             <button
               onClick={() => setShowGameModeSelector(true)}
-              disabled={!effectiveIsConnected || isLoading}
+              disabled={isLoading}
               className="bg-gradient-to-br from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-bold py-8 px-6 rounded-2xl shadow-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div className="text-4xl mb-3">🎮</div>
