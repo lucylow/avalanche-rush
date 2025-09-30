@@ -4,7 +4,7 @@ import { Button } from '../ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Progress } from '../ui/progress';
-import { X, Shuffle, Sparkles, Dice, Zap, Star } from 'lucide-react';
+import { X, Shuffle, Sparkles, Square, Zap, Star } from 'lucide-react';
 
 interface ProceduralEvent {
   id: string;
@@ -428,7 +428,7 @@ const ProceduralContentGenerator: React.FC<ProceduralContentGeneratorProps> = ({
                       </>
                     ) : (
                       <>
-                        <Dice className="w-5 h-5 mr-2" />
+                        <Square className="w-5 h-5 mr-2" />
                         Generate Event
                       </>
                     )}
