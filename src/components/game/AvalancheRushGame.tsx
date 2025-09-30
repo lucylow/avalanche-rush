@@ -10,6 +10,15 @@ import TutorialManager from '../tutorial/TutorialManager';
 import { useSmartContracts } from '../../hooks/useSmartContracts';
 import { BookOpen, Play } from 'lucide-react';
 
+// Import new enhancement components
+import CrossChainQuestSystem from '../quest/CrossChainQuestSystem';
+import ProceduralContentGenerator from './ProceduralContentGenerator';
+import AutomatedRewardSystem from './AutomatedRewardSystem';
+import ProgressiveOnboarding from '../onboarding/ProgressiveOnboarding';
+import GasOptimizationSystem from './GasOptimizationSystem';
+import RealTimeMultiplayer from './RealTimeMultiplayer';
+import ModularContractSystem from './ModularContractSystem';
+
 interface GameState {
   isPlaying: boolean;
   isPaused: boolean;
@@ -77,6 +86,15 @@ const AvalancheRushGame = () => {
   const [currentSessionId, setCurrentSessionId] = useState<number | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
   const [hasCompletedTutorial, setHasCompletedTutorial] = useState(false);
+  
+  // New enhancement component states
+  const [showCrossChainQuests, setShowCrossChainQuests] = useState(false);
+  const [showProceduralContent, setShowProceduralContent] = useState(false);
+  const [showAutomatedRewards, setShowAutomatedRewards] = useState(false);
+  const [showProgressiveOnboarding, setShowProgressiveOnboarding] = useState(false);
+  const [showGasOptimization, setShowGasOptimization] = useState(false);
+  const [showRealTimeMultiplayer, setShowRealTimeMultiplayer] = useState(false);
+  const [showModularContracts, setShowModularContracts] = useState(false);
 
   // Load player profile when wallet connects
   useEffect(() => {
@@ -312,7 +330,7 @@ const AvalancheRushGame = () => {
           )}
 
           {/* Action Buttons */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6">
             <button
               onClick={() => setShowGameModeSelector(true)}
               disabled={!isConnected || isLoading}
@@ -365,6 +383,93 @@ const AvalancheRushGame = () => {
               <div className="text-lg font-bold">Reactive</div>
             </button>
               </div>
+
+          {/* Enhancement Features */}
+          <div className="mt-8">
+            <h3 className="text-2xl font-bold text-white mb-6 text-center">🚀 Hackathon Enhancement Features</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <button
+                onClick={() => setShowCrossChainQuests(true)}
+                className="bg-gradient-to-br from-blue-500 to-cyan-600 hover:from-blue-400 hover:to-cyan-500 text-white font-bold py-6 px-4 rounded-2xl shadow-2xl transition-all duration-300"
+              >
+                <div className="text-3xl mb-2">🌐</div>
+                <div className="text-sm font-bold">Cross-Chain Quests</div>
+                <div className="text-xs text-blue-100 mt-1">Multi-blockchain</div>
+              </button>
+
+              <button
+                onClick={() => setShowProceduralContent(true)}
+                className="bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white font-bold py-6 px-4 rounded-2xl shadow-2xl transition-all duration-300"
+              >
+                <div className="text-3xl mb-2">🎲</div>
+                <div className="text-sm font-bold">Procedural Content</div>
+                <div className="text-xs text-green-100 mt-1">AI + VRF</div>
+              </button>
+
+              <button
+                onClick={() => setShowAutomatedRewards(true)}
+                className="bg-gradient-to-br from-yellow-500 to-orange-600 hover:from-yellow-400 hover:to-orange-500 text-white font-bold py-6 px-4 rounded-2xl shadow-2xl transition-all duration-300"
+              >
+                <div className="text-3xl mb-2">💰</div>
+                <div className="text-sm font-bold">Automated Rewards</div>
+                <div className="text-xs text-yellow-100 mt-1">RSC System</div>
+              </button>
+
+              <button
+                onClick={() => setShowProgressiveOnboarding(true)}
+                className="bg-gradient-to-br from-purple-500 to-pink-600 hover:from-purple-400 hover:to-pink-500 text-white font-bold py-6 px-4 rounded-2xl shadow-2xl transition-all duration-300"
+              >
+                <div className="text-3xl mb-2">🔗</div>
+                <div className="text-sm font-bold">Progressive Onboarding</div>
+                <div className="text-xs text-purple-100 mt-1">Web2 → Web3</div>
+              </button>
+
+              <button
+                onClick={() => setShowGasOptimization(true)}
+                className="bg-gradient-to-br from-red-500 to-rose-600 hover:from-red-400 hover:to-rose-500 text-white font-bold py-6 px-4 rounded-2xl shadow-2xl transition-all duration-300"
+              >
+                <div className="text-3xl mb-2">⚡</div>
+                <div className="text-sm font-bold">Gas Optimization</div>
+                <div className="text-xs text-red-100 mt-1">Batching</div>
+              </button>
+
+              <button
+                onClick={() => setShowRealTimeMultiplayer(true)}
+                className="bg-gradient-to-br from-teal-500 to-cyan-600 hover:from-teal-400 hover:to-cyan-500 text-white font-bold py-6 px-4 rounded-2xl shadow-2xl transition-all duration-300"
+              >
+                <div className="text-3xl mb-2">👥</div>
+                <div className="text-sm font-bold">Multiplayer</div>
+                <div className="text-xs text-teal-100 mt-1">Real-time</div>
+              </button>
+
+              <button
+                onClick={() => setShowModularContracts(true)}
+                className="bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white font-bold py-6 px-4 rounded-2xl shadow-2xl transition-all duration-300"
+              >
+                <div className="text-3xl mb-2">🧩</div>
+                <div className="text-sm font-bold">Modular Contracts</div>
+                <div className="text-xs text-indigo-100 mt-1">Composable</div>
+              </button>
+
+              <button
+                onClick={() => {
+                  // Show all enhancement features
+                  setShowCrossChainQuests(true);
+                  setTimeout(() => setShowProceduralContent(true), 100);
+                  setTimeout(() => setShowAutomatedRewards(true), 200);
+                  setTimeout(() => setShowProgressiveOnboarding(true), 300);
+                  setTimeout(() => setShowGasOptimization(true), 400);
+                  setTimeout(() => setShowRealTimeMultiplayer(true), 500);
+                  setTimeout(() => setShowModularContracts(true), 600);
+                }}
+                className="bg-gradient-to-br from-gray-500 to-slate-600 hover:from-gray-400 hover:to-slate-500 text-white font-bold py-6 px-4 rounded-2xl shadow-2xl transition-all duration-300"
+              >
+                <div className="text-3xl mb-2">🚀</div>
+                <div className="text-sm font-bold">Show All Features</div>
+                <div className="text-xs text-gray-100 mt-1">Demo Mode</div>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -536,6 +641,91 @@ const AvalancheRushGame = () => {
             hasPlayedBefore={hasCompletedTutorial}
           />
         </Suspense>
+      )}
+
+      {/* New Enhancement Components */}
+      {showCrossChainQuests && (
+        <CrossChainQuestSystem
+          isOpen={showCrossChainQuests}
+          onClose={() => setShowCrossChainQuests(false)}
+          onQuestComplete={(questId, rewards) => {
+            console.log('Cross-chain quest completed:', questId, rewards);
+            setNotifications(prev => [...prev, `Cross-chain quest completed! Earned ${rewards.length} rewards!`]);
+          }}
+        />
+      )}
+
+      {showProceduralContent && (
+        <ProceduralContentGenerator
+          isOpen={showProceduralContent}
+          onClose={() => setShowProceduralContent(false)}
+          onEventGenerated={(event) => {
+            console.log('Procedural event generated:', event);
+            setNotifications(prev => [...prev, `New ${event.type} event generated!`]);
+          }}
+          playerLevel={playerProfile?.level || 1}
+          playerScore={gameState.score}
+          playerHistory={[]}
+        />
+      )}
+
+      {showAutomatedRewards && (
+        <AutomatedRewardSystem
+          isOpen={showAutomatedRewards}
+          onClose={() => setShowAutomatedRewards(false)}
+          onRewardProcessed={(rewardId, transactionHash) => {
+            console.log('Reward processed:', rewardId, transactionHash);
+            setNotifications(prev => [...prev, `Reward processed! TX: ${transactionHash.substring(0, 10)}...`]);
+          }}
+        />
+      )}
+
+      {showProgressiveOnboarding && (
+        <ProgressiveOnboarding
+          isOpen={showProgressiveOnboarding}
+          onClose={() => setShowProgressiveOnboarding(false)}
+          onComplete={(userData) => {
+            console.log('Onboarding completed:', userData);
+            setNotifications(prev => [...prev, 'Welcome to Avalanche Rush!']);
+          }}
+        />
+      )}
+
+      {showGasOptimization && (
+        <GasOptimizationSystem
+          isOpen={showGasOptimization}
+          onClose={() => setShowGasOptimization(false)}
+          onOptimizationApplied={(optimization) => {
+            console.log('Optimization applied:', optimization);
+            setNotifications(prev => [...prev, `${optimization.title} optimization activated!`]);
+          }}
+        />
+      )}
+
+      {showRealTimeMultiplayer && (
+        <RealTimeMultiplayer
+          isOpen={showRealTimeMultiplayer}
+          onClose={() => setShowRealTimeMultiplayer(false)}
+          onJoinRoom={(roomId) => {
+            console.log('Joining room:', roomId);
+            setNotifications(prev => [...prev, `Joined room ${roomId}!`]);
+          }}
+          onShareAchievement={(achievement) => {
+            console.log('Sharing achievement:', achievement);
+            setNotifications(prev => [...prev, 'Achievement shared to social feed!']);
+          }}
+        />
+      )}
+
+      {showModularContracts && (
+        <ModularContractSystem
+          isOpen={showModularContracts}
+          onClose={() => setShowModularContracts(false)}
+          onModuleDeployed={(module) => {
+            console.log('Module deployed:', module);
+            setNotifications(prev => [...prev, `${module.name} module deployed successfully!`]);
+          }}
+        />
       )}
     </div>
   );

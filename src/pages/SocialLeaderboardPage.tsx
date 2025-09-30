@@ -1,5 +1,5 @@
 import React from 'react';
-import SocialLeaderboard from '../components/social/SocialLeaderboard';
+import SocialLeaderboard from '@/components/social/SocialLeaderboard';
 
 const SocialLeaderboardPage: React.FC = () => {
   return (
