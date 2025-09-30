@@ -46,7 +46,11 @@ interface PlayerProfile {
   isActive: boolean;
 }
 
-const AvalancheRushGame = () => {
+interface AvalancheRushGameProps {
+  demoMode?: boolean;
+}
+
+const AvalancheRushGame: React.FC<AvalancheRushGameProps> = ({ demoMode = false }) => {
   const {
     isConnected,
     account,
@@ -57,6 +61,10 @@ const AvalancheRushGame = () => {
     getRushBalance,
     getPlayerNFTs
   } = useSmartContracts();
+
+  // Demo mode overrides
+  const effectiveIsConnected = demoMode || isConnected;
+  const effectiveAccount = demoMode ? '0x1234567890123456789012345678901234567890' : account;
 
   const [gameState, setGameState] = useState<GameState>({
     isPlaying: false,
@@ -75,6 +83,23 @@ const AvalancheRushGame = () => {
   });
 
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile | null>(null);
+
+  // Demo mode player profile
+  const demoPlayerProfile: PlayerProfile = {
+    level: 5,
+    experience: 2500,
+    totalGames: 15,
+    totalScore: 125000,
+    highScore: 25000,
+    achievements: 8,
+    skillPoints: {
+      'speed': 75,
+      'accuracy': 60,
+      'endurance': 45,
+      'strategy': 80
+    },
+    isActive: true
+  };
   const [isLoading, setIsLoading] = useState(false);
   const [showGameModeSelector, setShowGameModeSelector] = useState(false);
   const [showQuestSystem, setShowQuestSystem] = useState(false);
@@ -96,11 +121,15 @@ const AvalancheRushGame = () => {
   const [showRealTimeMultiplayer, setShowRealTimeMultiplayer] = useState(false);
   const [showModularContracts, setShowModularContracts] = useState(false);
 
-  // Load player profile when wallet connects
+  // Load player profile when wallet connects or in demo mode
   useEffect(() => {
     const loadProfile = async () => {
-    if (isConnected && account) {
-        const profile = await getPlayerProfile(account);
+      if (demoMode) {
+        // Use demo profile
+        setPlayerProfile(demoPlayerProfile);
+        setHasCompletedTutorial(true); // Demo mode skips tutorial
+      } else if (effectiveIsConnected && effectiveAccount) {
+        const profile = await getPlayerProfile(effectiveAccount);
         setPlayerProfile(profile);
         
         // Check if player has completed tutorial
@@ -109,7 +138,7 @@ const AvalancheRushGame = () => {
       }
     };
     loadProfile();
-  }, [isConnected, account, getPlayerProfile]);
+  }, [effectiveIsConnected, effectiveAccount, getPlayerProfile, demoMode]);
 
   // Game loop for score increase
   useEffect(() => {
@@ -152,14 +181,22 @@ const AvalancheRushGame = () => {
 
   // Start game function
   const startGame = useCallback(async (mode: GameState['gameMode'], difficulty: GameState['difficulty']) => {
-    if (!isConnected) {
+    if (!effectiveIsConnected) {
       setNotifications(prev => [...prev, 'Please connect your wallet to start playing']);
       return;
     }
 
     setIsLoading(true);
     try {
-      const sessionId = await startGameSession(0, 1, 1);
+      let sessionId: number | null = null;
+      
+      if (demoMode) {
+        // Demo mode - simulate session ID
+        sessionId = Math.floor(Math.random() * 10000) + 1000;
+      } else {
+        sessionId = await startGameSession(0, 1, 1);
+      }
+      
       setCurrentSessionId(sessionId);
 
       setGameState(prev => ({
@@ -174,14 +211,14 @@ const AvalancheRushGame = () => {
       }));
 
       setShowGameModeSelector(false);
-      setNotifications(prev => [...prev, `🎮 Started ${mode} game!`]);
+      setNotifications(prev => [...prev, `🎮 Started ${mode} game! ${demoMode ? '(Demo Mode)' : ''}`]);
     } catch (error) {
       console.error('Error starting game:', error);
       setNotifications(prev => [...prev, 'Failed to start game session']);
     } finally {
       setIsLoading(false);
     }
-  }, [isConnected, startGameSession]);
+  }, [effectiveIsConnected, startGameSession, demoMode]);
 
   // End game function
   const endGame = useCallback(async (finalScore: number) => {
@@ -189,7 +226,9 @@ const AvalancheRushGame = () => {
 
     setIsLoading(true);
     try {
-      await completeGameSession(currentSessionId, finalScore, [], [], []);
+      if (!demoMode) {
+        await completeGameSession(currentSessionId, finalScore, [], [], []);
+      }
       
       setGameState(prev => ({
         ...prev,
@@ -201,18 +240,30 @@ const AvalancheRushGame = () => {
       }));
       
       setCurrentSessionId(null);
-      setNotifications(prev => [...prev, `🏆 Game completed! Score: ${finalScore}`]);
+      setNotifications(prev => [...prev, `🏆 Game completed! Score: ${finalScore} ${demoMode ? '(Demo Mode)' : ''}`]);
     } catch (error) {
       console.error('Error ending game:', error);
       setNotifications(prev => [...prev, 'Failed to complete game session']);
     } finally {
       setIsLoading(false);
     }
-  }, [currentSessionId, completeGameSession]);
+  }, [currentSessionId, completeGameSession, demoMode]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col relative overflow-hidden">
       <RewardPsychologyEngine />
+
+      {/* Demo Mode Banner */}
+      {demoMode && (
+        <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-3 text-center relative z-20">
+          <div className="flex items-center justify-center gap-2">
+            <span className="text-xl">🚀</span>
+            <span className="font-bold">HACKATHON DEMO MODE</span>
+            <span className="text-xl">🎮</span>
+            <span className="text-sm opacity-90">Play without wallet connection</span>
+          </div>
+        </div>
+      )}
 
       {/* Header */}
       <div className="flex justify-between items-center p-6 relative z-10">
@@ -225,11 +276,11 @@ const AvalancheRushGame = () => {
               Avalanche Rush
             </h1>
             <div className="text-sm text-white/70 font-medium tracking-wide">
-            Learn • Play • Earn
+            Learn • Play • Earn {demoMode && '• Demo'}
             </div>
           </div>
         </div>
-        <EnhancedWalletConnector />
+        {!demoMode && <EnhancedWalletConnector />}
       </div>
 
       {/* Main Content */}
@@ -333,11 +384,14 @@ const AvalancheRushGame = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-6">
             <button
               onClick={() => setShowGameModeSelector(true)}
-              disabled={!isConnected || isLoading}
+              disabled={!effectiveIsConnected || isLoading}
               className="bg-gradient-to-br from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-bold py-8 px-6 rounded-2xl shadow-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div className="text-4xl mb-3">🎮</div>
               <div className="text-lg font-bold">Play Game</div>
+              {demoMode && (
+                <div className="text-xs text-green-200 mt-1">Demo Mode</div>
+              )}
             </button>
 
             <button

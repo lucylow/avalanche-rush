@@ -5,14 +5,15 @@ import { useSmartContracts } from '../../hooks/useSmartContracts';
 const GamePage: React.FC = () => {
   const { isConnected, connectWallet, isLoading } = useSmartContracts();
   const [showWalletPrompt, setShowWalletPrompt] = useState(false);
+  const [demoMode, setDemoMode] = useState(false);
 
   useEffect(() => {
-    if (!isConnected && !isLoading) {
+    if (!isConnected && !isLoading && !demoMode) {
       setShowWalletPrompt(true);
     } else {
       setShowWalletPrompt(false);
     }
-  }, [isConnected, isLoading]);
+  }, [isConnected, isLoading, demoMode]);
 
   const handleConnectWallet = async () => {
     try {
@@ -21,6 +22,11 @@ const GamePage: React.FC = () => {
     } catch (error) {
       console.error('Failed to connect wallet:', error);
     }
+  };
+
+  const handleDemoMode = () => {
+    setDemoMode(true);
+    setShowWalletPrompt(false);
   };
 
   if (showWalletPrompt) {
@@ -57,7 +63,19 @@ const GamePage: React.FC = () => {
                 </>
               )}
             </button>
-            
+
+            {/* Demo Mode Button */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl blur opacity-30"></div>
+              <button
+                onClick={handleDemoMode}
+                className="relative w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 text-white font-bold py-4 px-8 rounded-2xl shadow-2xl transition-all duration-300 flex items-center justify-center space-x-3"
+              >
+                <span className="text-xl">🎮</span>
+                <span>🚀 Hackathon Demo Mode</span>
+              </button>
+            </div>
+
             <div className="text-center">
               <p className="text-white/60 text-sm">
                 Don't have MetaMask?{' '}
@@ -69,6 +87,13 @@ const GamePage: React.FC = () => {
                 >
                   Install it here
                 </a>
+                {' '}or try{' '}
+                <button
+                  onClick={handleDemoMode}
+                  className="text-purple-400 hover:text-purple-300 underline"
+                >
+                  Demo Mode
+                </button>
               </p>
             </div>
           </div>
@@ -79,7 +104,7 @@ const GamePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <AvalancheRushGame />
+      <AvalancheRushGame demoMode={demoMode} />
     </div>
   );
 };
