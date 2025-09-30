@@ -15,7 +15,9 @@ import {
   Users,
   Clock,
   CheckCircle,
-  ExternalLink
+  ExternalLink,
+  Share2,
+  Wallet
 } from 'lucide-react';
 import { useWeb3 } from '@/hooks/useWeb3';
 import { useAuth } from '@/hooks/useAuth';
