@@ -62,9 +62,9 @@ const AvalancheRushGame: React.FC<AvalancheRushGameProps> = ({ demoMode = false 
     getPlayerNFTs
   } = useSmartContracts();
 
-  // Demo mode overrides
-  const effectiveIsConnected = demoMode || isConnected;
-  const effectiveAccount = demoMode ? '0x1234567890123456789012345678901234567890' : account;
+  // No demo mode - require real wallet connection
+  const effectiveIsConnected = isConnected;
+  const effectiveAccount = account;
 
   const [gameState, setGameState] = useState<GameState>({
     isPlaying: false,
@@ -83,23 +83,6 @@ const AvalancheRushGame: React.FC<AvalancheRushGameProps> = ({ demoMode = false 
   });
 
   const [playerProfile, setPlayerProfile] = useState<PlayerProfile | null>(null);
-
-  // Demo mode player profile
-  const demoPlayerProfile: PlayerProfile = {
-    level: 5,
-    experience: 2500,
-    totalGames: 15,
-    totalScore: 125000,
-    highScore: 25000,
-    achievements: 8,
-    skillPoints: {
-      'speed': 75,
-      'accuracy': 60,
-      'endurance': 45,
-      'strategy': 80
-    },
-    isActive: true
-  };
   const [isLoading, setIsLoading] = useState(false);
   const [showGameModeSelector, setShowGameModeSelector] = useState(false);
   const [showQuestSystem, setShowQuestSystem] = useState(false);
@@ -121,14 +104,10 @@ const AvalancheRushGame: React.FC<AvalancheRushGameProps> = ({ demoMode = false 
   const [showRealTimeMultiplayer, setShowRealTimeMultiplayer] = useState(false);
   const [showModularContracts, setShowModularContracts] = useState(false);
 
-  // Load player profile when wallet connects or in demo mode
+  // Load player profile when wallet connects
   useEffect(() => {
     const loadProfile = async () => {
-      if (demoMode) {
-        // Use demo profile
-        setPlayerProfile(demoPlayerProfile);
-        setHasCompletedTutorial(true); // Demo mode skips tutorial
-      } else if (effectiveIsConnected && effectiveAccount) {
+      if (effectiveIsConnected && effectiveAccount) {
         const profile = await getPlayerProfile(effectiveAccount);
         setPlayerProfile(profile);
         
@@ -138,7 +117,7 @@ const AvalancheRushGame: React.FC<AvalancheRushGameProps> = ({ demoMode = false 
       }
     };
     loadProfile();
-  }, [effectiveIsConnected, effectiveAccount, getPlayerProfile, demoMode]);
+  }, [effectiveIsConnected, effectiveAccount, getPlayerProfile]);
 
   // Game loop for score increase
   useEffect(() => {
@@ -188,14 +167,8 @@ const AvalancheRushGame: React.FC<AvalancheRushGameProps> = ({ demoMode = false 
 
     setIsLoading(true);
     try {
-      let sessionId: number | null = null;
-      
-      if (demoMode) {
-        // Demo mode - simulate session ID
-        sessionId = Math.floor(Math.random() * 10000) + 1000;
-      } else {
-        sessionId = await startGameSession(0, 1, 1);
-      }
+      // Start real game session on blockchain
+      const sessionId = await startGameSession(0, 1, 1);
       
       setCurrentSessionId(sessionId);
 
@@ -211,14 +184,14 @@ const AvalancheRushGame: React.FC<AvalancheRushGameProps> = ({ demoMode = false 
       }));
 
       setShowGameModeSelector(false);
-      setNotifications(prev => [...prev, `🎮 Started ${mode} game! ${demoMode ? '(Demo Mode)' : ''}`]);
+      setNotifications(prev => [...prev, `🎮 Started ${mode} game!`]);
     } catch (error) {
       console.error('Error starting game:', error);
       setNotifications(prev => [...prev, 'Failed to start game session']);
     } finally {
       setIsLoading(false);
     }
-  }, [effectiveIsConnected, startGameSession, demoMode]);
+  }, [effectiveIsConnected, startGameSession]);
 
   // End game function
   const endGame = useCallback(async (finalScore: number) => {
@@ -226,9 +199,8 @@ const AvalancheRushGame: React.FC<AvalancheRushGameProps> = ({ demoMode = false 
 
     setIsLoading(true);
     try {
-      if (!demoMode) {
-        await completeGameSession(currentSessionId, finalScore, [], [], []);
-      }
+      // Complete game session on blockchain
+      await completeGameSession(currentSessionId, finalScore, [], [], []);
       
       setGameState(prev => ({
         ...prev,
@@ -240,20 +212,19 @@ const AvalancheRushGame: React.FC<AvalancheRushGameProps> = ({ demoMode = false 
       }));
       
       setCurrentSessionId(null);
-      setNotifications(prev => [...prev, `🏆 Game completed! Score: ${finalScore} ${demoMode ? '(Demo Mode)' : ''}`]);
+      setNotifications(prev => [...prev, `🏆 Game completed! Score: ${finalScore}`]);
     } catch (error) {
       console.error('Error ending game:', error);
       setNotifications(prev => [...prev, 'Failed to complete game session']);
     } finally {
       setIsLoading(false);
     }
-  }, [currentSessionId, completeGameSession, demoMode]);
+  }, [currentSessionId, completeGameSession]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex flex-col relative overflow-hidden">
       <RewardPsychologyEngine />
 
-      {/* Demo Mode Banner */}
       {demoMode && (
         <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-3 text-center relative z-20">
           <div className="flex items-center justify-center gap-2">
@@ -276,11 +247,11 @@ const AvalancheRushGame: React.FC<AvalancheRushGameProps> = ({ demoMode = false 
               Avalanche Rush
             </h1>
             <div className="text-sm text-white/70 font-medium tracking-wide">
-            Learn • Play • Earn {demoMode && '• Demo'}
+            Learn • Play • Earn
             </div>
           </div>
         </div>
-        {!demoMode && <EnhancedWalletConnector />}
+        <EnhancedWalletConnector />
       </div>
 
       {/* Main Content */}
@@ -389,9 +360,6 @@ const AvalancheRushGame: React.FC<AvalancheRushGameProps> = ({ demoMode = false 
             >
               <div className="text-4xl mb-3">🎮</div>
               <div className="text-lg font-bold">Play Game</div>
-              {demoMode && (
-                <div className="text-xs text-green-200 mt-1">Demo Mode</div>
-              )}
             </button>
 
             <button
